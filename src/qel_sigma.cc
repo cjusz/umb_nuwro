@@ -37,15 +37,21 @@ double qel_sigma ( double Enu, ///< neutrino energy in the target frame
 					double m,  ///< outgoing lepton mass
 					double M   ///< nucleon (effective) mass
 				  )
-{ 
+{
+
+
     const double static M12=(PDG::mass_proton+PDG::mass_neutron)/2;
     //M=M12;    
     double F1,F2,Fa,Fp; 
 
+    //    std::cout<<"Getting fap for "<<q2<<std::endl;
     // Calculate Form Factors 
     list(F1,F2)=f12(q2,kind);
     list(Fa,Fp)=fap(q2,kind);
 
+
+    //    std::cout<<"Got FA "<<Fa<<" "<<Fp<<std::endl;
+    
 	if(not anty)
 	{
 		Fa=-Fa;

@@ -357,8 +357,9 @@ FF kg_FF(const double q2)
 // Calculate vector form factors
 pair <double,double> f12(double q2, int kind)
 {
- FF ff=FFfromq2(q2);
- ff.Q2=-q2;
+  //  std::cout<<"F12"<<std::endl;
+  FF ff=FFfromq2(q2);
+  ff.Q2=-q2;
 //  cout<<ff.GEp<< ' '<<ff.GMp<<' '<<ff.GEn<<' '<<ff.GMn<<endl;
  return ff.f12(kind);	
 }
@@ -367,6 +368,7 @@ pair <double,double> f12(double q2, int kind)
 // Calculate the axial form factors
 pair<double,double> fap(double q2,int kind)
 {
+  
 	double ksi=3.706;
 
 	static const double M12=(PDG::mass_proton+PDG::mass_neutron)/2;
@@ -374,12 +376,18 @@ pair<double,double> fap(double q2,int kind)
 
 	double Ga, Fpa, Gas,Fpas;
 	double Fa=0,Fp=0;
+	
+	//	std::cout<<"MA FAP FUNC "<<MA_cc<<std::endl;
+	//	std::cout<<"Factor "<<pow2 (1 - q2 / MA_cc / MA_cc)<<std::endl;
 	switch(kind)
 	{
 		case 0: // cc
+ 
 			Fa = -1.267 / pow2 (1 - q2 / MA_cc / MA_cc);
+
 			Fa *= axialcorr(axialFFset,q2);
 			Fp = 2*MM*Fa/(piMass2-q2);
+
 			break;
 		case 1: //nc proton
 			Fa=0.5* -1.267/pow2(1-q2/MA_nc/MA_nc);
@@ -419,6 +427,7 @@ pair<double,double> fap(double q2,int kind)
 	    }
 	}
     
+
     return pair<double,double>(Fa,Fp); 
 }
 
@@ -461,6 +470,7 @@ double axialcorr(int axialFF,double q2)
 /// Form Factor Configuration
 void ff_configure(params& p)
 {
+
   switch(p.qel_vector_ff_set)	
 	 {
 		case 1: FFfromq2=DipoleFF; break; 	

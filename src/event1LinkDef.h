@@ -4,12 +4,15 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ nestedclass;
+
 #pragma link C++ class flags+;
 #pragma link C++ class vec+;
 #pragma link C++ class vect+;
 #pragma link C++ class params+;
 #pragma link C++ class particle+;
 #pragma link C++ class line+;
+#pragma link C++ function qel_sigma;
 //#pragma link C++ class part+;
 #pragma link C++ class vector<particle>+;
 //#pragma link C++ class vector<part>+;

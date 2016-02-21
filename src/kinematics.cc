@@ -67,6 +67,8 @@ double czarek_kinematics2(double Eb,particle nu,particle N0, particle &lepton, p
 
 
 
+
+
 double kF_potencjal=200*MeV;
 double kF_P=kF_potencjal;
 double kF_N=kF_potencjal;
