@@ -21,7 +21,6 @@ void PrintUsage(char const * rcmd){
 
 int main(int argc, char const *argv[]){
 
-
   if(argc != 4){
     std::cerr << "[ERROR]: Found " << (argc-1) << " cli args. Expected 3."
       << std::endl;
@@ -64,7 +63,7 @@ int main(int argc, char const *argv[]){
   }
 
   TTree* outputTree = new TTree("nRooTracker_weights","");
-  outputTree->SetDirectory(outputFile);
+  // outputTree->SetDirectory(outputFile);
   outputTree->Branch("weight",&weight);
 
   NuwroReWeight WghtGen;
@@ -81,9 +80,10 @@ int main(int argc, char const *argv[]){
       << nwev.nu().pdg << std::endl;
 
     WghtGen.Reconfigure();
+    weight = WghtGen.CalcWeight(&nwev);
     std::cout << "\tWeight (Dial Val: "
       << WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).CurValue << "): "
-      << WghtGen.CalcWeight(&nwev) << std::endl;
+      << weight << std::endl;
     WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).TurnUp();
     WghtGen.Reconfigure();
     std::cout << "\tWeight (Dial Val: "
@@ -98,4 +98,7 @@ int main(int argc, char const *argv[]){
 
     outputTree->Fill();
   }
+  outputTree->Write();
+  outputFile->Write();
+  outputFile->Close();
 }
