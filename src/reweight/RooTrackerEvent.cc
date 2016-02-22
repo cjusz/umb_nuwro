@@ -60,13 +60,30 @@ particle RooTrackerEvent::MakeParticle(Int_t const &inpStatus, Int_t const &inpP
   }
 
   if(!part.is_valid()){
+    if( fabs(inpP4[3]*inpP4[3] -
+      (inpP4[0]*inpP4[0]+inpP4[1]*inpP4[1]+inpP4[2]*inpP4[2])) < 1E-8){
+      std::cout << "[WARN]: Found unexpected particle with 0 (to within "
+        << "precision) mass, { StdHepStatus: " << inpStatus
+        << ", StdHepPdg: " << inpPdg << ", StdHepP4: [ " << inpP4[0]
+        << ", " << inpP4[1] << ", " << inpP4[2] << ", " << inpP4[3] << "], M2 = "
+        << (inpP4[3]*inpP4[3] -
+          (inpP4[0]*inpP4[0]+inpP4[1]*inpP4[1]+inpP4[2]*inpP4[2]))
+        << " }" << std::endl;
+      part.set_pdg_and_mass(inpPdg,0);
+      std::cout << "\tForcing mass to be 0 -> {Mass : " << part.mass()
+        << ", E: " << part.E() << "}" << std::endl;
+      return part;
+    }
+
     std::cerr << "[ERROR]: Bad NuWro particle: { " << part.mass() << ", ["
       << part.x << ", " <<  part.y << ", " << part.z << ", " << part.t
       << "] }" << std::endl;
     std::cerr << "\tGenerated from: { StdHepStatus: " << inpStatus
       << ", StdHepPdg: " << inpPdg << ", StdHepP4: [ " << inpP4[0]
-      << ", " << inpP4[1] << ", " << inpP4[2] << ", " << inpP4[3] << "]"
-      << std::endl;
+      << ", " << inpP4[1] << ", " << inpP4[2] << ", " << inpP4[3] << "], M2 = "
+      << (inpP4[3]*inpP4[3] -
+        (inpP4[0]*inpP4[0]+inpP4[1]*inpP4[1]+inpP4[2]*inpP4[2]))
+      << " }" << std::endl;
     throw std::exception();
   }
   return part;
