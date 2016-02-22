@@ -19,6 +19,15 @@ void PrintUsage(char const * rcmd){
     "<output weights file name>" << std::endl;
 }
 
+std::string GetDialValStr(Double_t dialval){
+  std::stringstream ss;
+  if(dialval<0){
+    ss << "minus";
+  }
+  ss << fabs(dialval);
+  return ss.str();
+}
+
 int main(int argc, char const *argv[]){
 
   if(argc != 4){
@@ -54,7 +63,7 @@ int main(int argc, char const *argv[]){
   }
   inpEv.InpToMev = 1000;
 
-  Double_t weight = 0;
+
   TFile* outputFile = TFile::Open(argv[3],"RECREATE");
   if(!outputFile || ! outputFile->IsOpen()){
     std::cerr << "[ERROR]: Couldn't open " << argv[2] << " for writing."
@@ -63,12 +72,24 @@ int main(int argc, char const *argv[]){
   }
 
   TTree* outputTree = new TTree("nRooTracker_weights","");
-  // outputTree->SetDirectory(outputFile);
-  outputTree->Branch("weight",&weight);
 
   NuwroReWeight WghtGen;
   WghtGen.AdoptWghtCalc("MAQE",new NuwroReWeight_MaCCQE());
-  WghtGen.Systematics().Add(kNuwro_MaCCQE, -2, -5, 5, 2);
+  WghtGen.Systematics().Add(kNuwro_MaCCQE, 0, -5, 5, 2);
+
+  std::string nominal = GetDialValStr(WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).CurValue);
+  WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).TurnDown();
+  std::string d1_val = GetDialValStr(WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).CurValue);
+  WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).TurnUp(2);
+  std::string d2_val = GetDialValStr(WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).CurValue);
+
+  Double_t weight_d1 = 0;
+  outputTree->Branch((std::string("weight_MAQE_")+nominal+"_to_"+d1_val).c_str(),
+    &weight_d1);
+  Double_t weight_d2 = 0;
+  outputTree->Branch((std::string("weight_MAQE_")+nominal+"_to_"+d2_val).c_str(),
+    &weight_d2);
+
 
   for(Long64_t ent = 0; ent < rootracker->GetEntries(); ++ent){
     rootracker->GetEntry(ent);
@@ -79,22 +100,12 @@ int main(int argc, char const *argv[]){
       << ", Mass(N0): " << nwev.N0().mass() << ", NuPdg: "
       << nwev.nu().pdg << std::endl;
 
-    WghtGen.Reconfigure();
-    weight = WghtGen.CalcWeight(&nwev);
-    std::cout << "\tWeight (Dial Val: "
-      << WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).CurValue << "): "
-      << weight << std::endl;
-    WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).TurnUp();
-    WghtGen.Reconfigure();
-    std::cout << "\tWeight (Dial Val: "
-      << WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).CurValue << "): "
-      << WghtGen.CalcWeight(&nwev) << std::endl;
-    WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).TurnUp();
-    WghtGen.Reconfigure();
-    std::cout << "\tWeight (Dial Val: "
-      << WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).CurValue << "): "
-      << WghtGen.CalcWeight(&nwev) << std::endl;
     WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).TurnDown(2);
+    WghtGen.Reconfigure();
+    weight_d1 = WghtGen.CalcWeight(&nwev);
+    WghtGen.Systematics().GetSystInfo(kNuwro_MaCCQE).TurnUp(2);
+    WghtGen.Reconfigure();
+    weight_d2 = WghtGen.CalcWeight(&nwev);
 
     outputTree->Fill();
   }
