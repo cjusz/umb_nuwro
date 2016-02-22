@@ -10,6 +10,8 @@ typedef enum ENuWroSyst {
   kNullSystematic = 0,
   kNuwro_MaCCQE,
   kNuwro_MECNorm,
+  kNuwro_MaRES,
+  kNuwro_CA5,
   kNNuWroSystematics
 } NuwroSyst_t;
 

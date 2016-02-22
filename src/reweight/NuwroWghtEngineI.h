@@ -2,11 +2,10 @@
 #define _NUWRO_REWEIGHT_ABC_H_
 
 #include "event1.h"
-#include "RooTrackerEvent.h"
 
-
-#include "NuwroSyst.h"
-#include "NuwroSystSet.h"
+#include "reweight/RooTrackerEvent.h"
+#include "reweight/NuwroSyst.h"
+#include "reweight/NuwroSystSet.h"
 
 namespace nuwro {
 namespace rew {
@@ -29,7 +28,6 @@ class NuwroWghtEngineI {
 
   /// calculate a weight for the input event using the current nuisance param values
   virtual double CalcWeight (event * nuwro_event) = 0;
-  virtual double CalcWeight (RooTrackerEvent &nuwro_event){ return 0.0; };
 
   /// calculate penalty factors
   virtual double CalcChisq (void) = 0;

@@ -129,9 +129,9 @@ $(BINDIR)/nuwro2nuance: $(OBJDIR)/nuwro2nuance.o $(STATICLIBDIR)/libevent.a
 		 @mkdir -p $(@D)
 		 $(CXX) $< -o $@ -L$(STATICLIBDIR) -levent $(LDFLAGS)
 
-$(BINDIR)/nuwro2rootracker: $(OBJDIR)/nuwro2rootracker.o $(STATICLIBDIR)/libevent.a
+$(BINDIR)/nuwro2rootracker: $(OBJDIR)/nuwro2rootracker.o $(STATICLIBDIR)/libevent.a $(STATICLIBDIR)/libreweight.a
 		 @mkdir -p $(@D)
-		 $(CXX) $< -o $@ -L$(STATICLIBDIR) -levent $(LDFLAGS)
+		 $(CXX) $< -o $@ -L$(STATICLIBDIR) -lreweight -levent $(LDFLAGS)
 
 $(BINDIR)/test_reweight_CCQE_rootracker: $(OBJDIR)/test_reweight_CCQE_rootracker.o $(STATICLIBDIR)/libreweight.a $(STATICLIBDIR)/libevent.a src/reweight/RooTrackerEvent.h
 		 @mkdir -p $(@D)

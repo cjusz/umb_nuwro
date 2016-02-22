@@ -1,16 +1,16 @@
-#ifndef _NUWRO_REWEIGHT_MAQE_H_
-#define _NUWRO_REWEIGHT_MAQE_H_
+#ifndef _NUWRO_REWEIGHT_MaRES_H_
+#define _NUWRO_REWEIGHT_MaRES_H_
 
 #include "NuwroWghtEngineI.h"
 
 namespace nuwro {
 namespace rew  {
 
-class NuwroReWeight_MaCCQE : public NuwroWghtEngineI {
+class NuwroReWeight_RES_CA5 : public NuwroWghtEngineI {
 public:
 
-  NuwroReWeight_MaCCQE();
-  ~NuwroReWeight_MaCCQE();
+  NuwroReWeight_RES_CA5();
+  ~NuwroReWeight_RES_CA5();
 
   bool SystIsHandled(NuwroSyst_t syst);
   void SetSystematic(NuwroSyst_t syst, double val);
@@ -23,10 +23,15 @@ public:
 private:
   void Init(void);
 
-  double fTwkDial_MaCCQE;
-  double fDef_MaCCQE;
-  double fCurr_MaCCQE;
-  double fError_MaCCQE;
+  double fTwkDial_MaRES;
+  double fDef_MaRES;
+  double fCurr_MaRES;
+  double fError_MaRES;
+
+  double fTwkDial_CA5;
+  double fDef_CA5;
+  double fCurr_CA5;
+  double fError_CA5;
 
 };
 

@@ -4,11 +4,11 @@
 #include <TMath.h>
 #include <TString.h>
 
-#include "NuwroReWeight.h"
-#include "NuwroWghtEngineI.h"
+#include "reweight/NuwroReWeight.h"
+#include "reweight/NuwroWghtEngineI.h"
 
 using namespace nuwro::rew;
-
+using namespace RooTrackerUtils;
 
 NuwroReWeight::NuwroReWeight(){}
 
@@ -68,15 +68,6 @@ double NuwroReWeight::CalcWeight(event * event){
   double weight = 1.0;
   for(WghtMapIt it = fWghtCalc.begin(); it != fWghtCalc.end(); ++it) {
     weight *= it->second->CalcWeight(event);
-  }
-  return weight;
-}
-
-double NuwroReWeight::CalcWeight(RooTrackerEvent &nuwro_event){
-
-  double weight = 1.0;
-  for(WghtMapIt it = fWghtCalc.begin(); it != fWghtCalc.end(); ++it) {
-    weight *= it->second->CalcWeight(nuwro_event);
   }
   return weight;
 }

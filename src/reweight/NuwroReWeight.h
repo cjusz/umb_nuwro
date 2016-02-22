@@ -1,14 +1,17 @@
 #ifndef _NUWRO_REWEIGHT_H_
 #define _NUWRO_REWEIGHT_H_
 
-#include "TObject.h"
 #include <string>
 #include <map>
-#include "NuwroSyst.h"
-#include "NuwroSystSet.h"
-#include "NuwroSystUncertainty.h"
-#include "NuwroWghtEngineI.h"
+
+#include "TObject.h"
+
 #include "event1.h"
+
+#include "reweight/NuwroSyst.h"
+#include "reweight/NuwroSystSet.h"
+#include "reweight/NuwroSystUncertainty.h"
+#include "reweight/NuwroWghtEngineI.h"
 
 namespace nuwro {
 namespace rew   {
@@ -29,7 +32,7 @@ public:
   void Reconfigure(void);
   /// calculate weight for input event
   double CalcWeight(event * nuwro_event);
-  double CalcWeight(RooTrackerEvent &nuwro_event);
+
   /// calculate penalty chisq for current values of tweaking dials
   double CalcChisq(void);
   /// print

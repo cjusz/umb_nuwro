@@ -12,6 +12,7 @@
 #include "reweight/RooTrackerEvent.h"
 
 using namespace nuwro::rew;
+using namespace RooTrackerUtils;
 
 void PrintUsage(char const * rcmd){
   std::cout << "[USAGE]: " << rcmd
@@ -61,8 +62,6 @@ int main(int argc, char const *argv[]){
   } else {
     std::cout << "[INFO]: StdHepEvent jacked in, here we go." << std::endl;
   }
-  inpEv.InpToMev = 1000;
-
 
   TFile* outputFile = TFile::Open(argv[3],"RECREATE");
   if(!outputFile || ! outputFile->IsOpen()){
@@ -93,7 +92,7 @@ int main(int argc, char const *argv[]){
 
   for(Long64_t ent = 0; ent < rootracker->GetEntries(); ++ent){
     rootracker->GetEntry(ent);
-    event nwev = inpEv.GetNuWroEvent1();
+    event nwev = GetNuWroEvent1(inpEv, 1000.0);
     nwev.par = NomParams;
     std::cout << "Entry[" << ent << "] NuWro event. Dyn: " << nwev.dyn
       << ", ENu: " << nwev.E() << ", Q2: " << nwev.q2()

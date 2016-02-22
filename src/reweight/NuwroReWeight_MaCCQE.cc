@@ -11,6 +11,7 @@
 #include "TMath.h"
 
 using namespace nuwro::rew;
+using namespace RooTrackerUtils;
 
 NuwroReWeight_MaCCQE::NuwroReWeight_MaCCQE(){
   fTwkDial_MaCCQE = 0.;
@@ -51,9 +52,9 @@ void NuwroReWeight_MaCCQE::Reconfigure(void){
 
 double NuwroReWeight_MaCCQE::CalcWeight(event* nuwro_event){
 
-  if (fabs(fTwkDial_MaCCQE) < 1E-8) return 1.0;
+  if (fabs(fTwkDial_MaCCQE) < 1E-8){ return 1.0; }
 
-  if (!nuwro_event->flag.cc or !nuwro_event->flag.qel) return 1.0;
+  if (!nuwro_event->flag.cc or !nuwro_event->flag.qel){ return 1.0; }
 
   double weight = 1;
   params rwparams = (nuwro_event->par);
@@ -61,8 +62,8 @@ double NuwroReWeight_MaCCQE::CalcWeight(event* nuwro_event){
   ff_configure(rwparams);
 
   double E = nuwro_event->E();
-  double q2 =  nuwro_event->q2();
-  double m_lep = 105.0;// nuwro_event->out[0].mass();
+  double q2 = nuwro_event->q2();
+  double m_lep = nuwro_event->out[0].mass();
   double m_nuc = nuwro_event->N0().mass();
   bool pdg_neut = nuwro_event->nu().pdg < 0;
 
@@ -81,11 +82,6 @@ double NuwroReWeight_MaCCQE::CalcWeight(event* nuwro_event){
 
   return weight;
 
-}
-
-double NuwroReWeight_MaCCQE::CalcWeight(RooTrackerEvent &nuwro_event){
-  event nev = nuwro_event.GetNuWroEvent1();
-  return CalcWeight(&nev);
 }
 
 double NuwroReWeight_MaCCQE::CalcChisq(void){
