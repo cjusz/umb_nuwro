@@ -11,11 +11,16 @@
 #include "TMath.h"
 
 using namespace nuwro::rew;
-using namespace RooTrackerUtils;
 
 NuwroReWeight_MaCCQE::NuwroReWeight_MaCCQE(){
-  fTwkDial_MaCCQE = 0.;
-  fDef_MaCCQE = 1200.;
+  fTwkDial_MaCCQE = 0;
+  fDef_MaCCQE = 1200;
+  fCurr_MaCCQE = fDef_MaCCQE;
+}
+
+NuwroReWeight_MaCCQE::NuwroReWeight_MaCCQE(params const & param){
+  fTwkDial_MaCCQE = 0;
+  fDef_MaCCQE = param.qel_cc_axial_mass;
   fCurr_MaCCQE = fDef_MaCCQE;
 }
 
@@ -43,9 +48,13 @@ void NuwroReWeight_MaCCQE::Reconfigure(void){
   NuwroSystUncertainty * fracerr = NuwroSystUncertainty::Instance();
   fError_MaCCQE = fracerr->OneSigmaErr(kNuwro_MaCCQE,
     (fTwkDial_MaCCQE > 0)?1:-1);
-  std::cout << "[INFO]: NuwroReWeight_MaCCQE::Reconfigure: New MaQE value = "
-    << fDef_MaCCQE << " + (" << fError_MaCCQE << "  *  " << fTwkDial_MaCCQE
-    << ")" << std::endl;
+  if(fabs(fTwkDial_MaCCQE) > 1E-8){
+#ifdef DEBUG_QE_REWEIGHT
+    std::cout << "[INFO]: NuwroReWeight_MaCCQE::Reconfigure: New MaQE value = "
+      << fDef_MaCCQE << " + (" << fError_MaCCQE << "  *  " << fTwkDial_MaCCQE
+      << ")" << std::endl;
+#endif
+  }
   fCurr_MaCCQE = fDef_MaCCQE + fError_MaCCQE * fTwkDial_MaCCQE;
 }
 
@@ -68,17 +77,19 @@ double NuwroReWeight_MaCCQE::CalcWeight(event* nuwro_event){
   bool pdg_neut = nuwro_event->nu().pdg < 0;
 
   double oldweight = qel_sigma( E, q2, 0, pdg_neut, m_lep, m_nuc );
-
+#ifdef DEBUG_QE_REWEIGHT
   std::cout << "Old / NEW axial mass = " << rwparams.qel_cc_axial_mass << "/"
     << fCurr_MaCCQE << std::endl;
+#endif
   rwparams.qel_cc_axial_mass = fCurr_MaCCQE;
   ff_configure(rwparams);
 
   double newweight = qel_sigma( E, q2, 0, pdg_neut, m_lep, m_nuc );
 
   weight *= newweight/oldweight;
-
+#ifdef DEBUG_QE_REWEIGHT
   std::cout << "Returning event weight of " << weight << std::endl;
+#endif
 
   return weight;
 

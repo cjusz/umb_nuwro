@@ -50,7 +50,9 @@ void NuwroSystUncertainty::SetUncertainty(NuwroSyst_t syst,
 }
 
 void NuwroSystUncertainty::SetDefaults(void){
-  SetUncertainty(kNuwro_MaCCQE, 100.0, 100.0);
+  SetUncertainty(kNuwro_MaCCQE, 100.0, 100.0); //MeV
   SetUncertainty(kNuwro_MECNorm, 1.0, 1.0);
+  SetUncertainty(kNuwro_MaRES, 0.1, 0.1); // GeV
+  SetUncertainty(kNuwro_CA5, 0.1, 0.1);
 }
 

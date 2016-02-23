@@ -28,7 +28,9 @@ TARGETS = nuwro \
 					test_nuwro \
 					mb_nce_run \
 					ganalysis \
-					test_reweight_CCQE_rootracker
+					test_reweight_CCQE_rootracker \
+					test_reweight_MaRES_rootracker \
+					test_reweight_MaRES
 
 TARGETS := $(addprefix $(BINDIR)/, $(TARGETS) )
 
@@ -111,7 +113,7 @@ $(LIBDIR)/libreweight.so: $(RW_OBJS)
 
 $(BINDIR)/nuwro: $(OBJDIR)/main.o $(STATICLIBDIR)/libevent.a $(STATICLIBDIR)/libsf.a $(STATICLIBDIR)/libdis.a
 		@mkdir -p $(@D)
-		$(CXX) $< -o $@ -L$(STATICLIBDIR) -levent -lsf -ldis $(LDFLAGS)
+		$(CXX) $< -o $@ -L$(STATICLIBDIR) -levent -lsf -ldis -lreweight $(LDFLAGS)
 
 $(BINDIR)/myroot: $(OBJDIR)/myroot.o $(STATICLIBDIR)/libevent.a
 		@mkdir -p $(@D)
@@ -134,8 +136,16 @@ $(BINDIR)/nuwro2rootracker: $(OBJDIR)/nuwro2rootracker.o $(STATICLIBDIR)/libeven
 		 $(CXX) $< -o $@ -L$(STATICLIBDIR) -lreweight -levent $(LDFLAGS)
 
 $(BINDIR)/test_reweight_CCQE_rootracker: $(OBJDIR)/test_reweight_CCQE_rootracker.o $(STATICLIBDIR)/libreweight.a $(STATICLIBDIR)/libevent.a src/reweight/RooTrackerEvent.h
+		@mkdir -p $(@D)
+		$(CXX) $< -o $@ -L$(STATICLIBDIR) -lreweight -levent $(LDFLAGS)
+
+$(BINDIR)/test_reweight_MaRES_rootracker: $(OBJDIR)/test_reweight_MaRES_rootracker.o $(STATICLIBDIR)/libreweight.a $(STATICLIBDIR)/libdis.a $(STATICLIBDIR)/libevent.a  src/reweight/RooTrackerEvent.h
 		 @mkdir -p $(@D)
-		 $(CXX) $< -o $@ -L$(STATICLIBDIR) -lreweight -levent $(LDFLAGS)
+		 $(CXX) $< -o $@ -L$(STATICLIBDIR) -lreweight -ldis -lreweight  -levent $(LDFLAGS)
+
+$(BINDIR)/test_reweight_MaRES: $(OBJDIR)/test_reweight_MaRES.o $(STATICLIBDIR)/libreweight.a $(STATICLIBDIR)/libdis.a $(STATICLIBDIR)/libevent.a  src/reweight/RooTrackerEvent.h
+		 @mkdir -p $(@D)
+		 $(CXX) $< -o $@ -L$(STATICLIBDIR) -lreweight -ldis -lreweight  -levent $(LDFLAGS)
 
 $(BINDIR)/kaskada: $(OBJDIR)/kaskada.o $(STATICLIBDIR)/libevent.a
 		@mkdir -p $(@D)
@@ -166,7 +176,7 @@ $(BINDIR)/test_nuwro: $(OBJDIR)/test.o $(STATICLIBDIR)/libevent.a
 
 $(BINDIR)/ganalysis: $(OBJDIR)/ganalysis.o $(STATICLIBDIR)/libevent.a $(STATICLIBDIR)/libsf.a $(STATICLIBDIR)/libdis.a
 		@mkdir -p $(@D)
-		$(CXX) $< -o $@ -L$(STATICLIBDIR) -levent -lsf -ldis $(LDFLAGS)
+		$(CXX) $< -o $@ -L$(STATICLIBDIR) -levent -lsf -ldis -lreweight  $(LDFLAGS)
 
 $(BINDIR)/dumpParams: $(OBJDIR)/dumpParams.o $(STATICLIBDIR)/libevent.a
 		@mkdir -p $(@D)

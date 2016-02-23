@@ -8,7 +8,6 @@
 #include "reweight/NuwroWghtEngineI.h"
 
 using namespace nuwro::rew;
-using namespace RooTrackerUtils;
 
 NuwroReWeight::NuwroReWeight(){}
 

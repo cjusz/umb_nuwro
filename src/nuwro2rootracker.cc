@@ -23,7 +23,7 @@
 //Nuwro
 #include "pdg.h"
 #include "generatormt.h"
-#include "reweight/RooTrackerEvent.h"
+#include "RooTrackerEvent.h"
 
 using namespace RooTrackerUtils;
 
@@ -49,8 +49,9 @@ bool FileExists(std::string strFilename) {
 
 void DisplayInfo(){
   std::cout << std::endl;
-  std::cout << "Usage: nuwro2rootracker [-n #evts] [-p POT] nuwrofile.root rootrackerfile_template.root" << std::endl;
+  std::cout << "Usage: nuwro2rootracker [-x extended] [-n #evts] [-p POT] nuwrofile.root rootrackerfile_template.root" << std::endl;
   std::cout << "Converts nuwro output file to a series of rootracker tree format files." << std::endl;
+  std::cout << "Extended mode splits up struck nucleon and nuclear target entries and also writes out pre-FSI info." << std::endl;
   std::cout << "The @ character in the template will be substituted with file number." << std::endl;
   std::cout << "#evts is the number of events per one output file" << std::endl;
   std::cout << "(must be less than the number of evts in the input file)." << std::endl;
@@ -65,9 +66,10 @@ int main (int argc, char *argv[]){
   bool onefile = true;
   float pot = 1;
   bool usepot = false;
+  bool extended_mode = false;
 
   int c;
-  while( (c = getopt(argc, argv, "n:p:h?") ) != -1){
+  while( (c = getopt(argc, argv, "xn:p:h?") ) != -1){
     switch(c){
       case 'n': {
         if(optarg && sscanf(optarg, "%lli", &nEntriesToCopy) >0 ){
@@ -91,6 +93,12 @@ int main (int argc, char *argv[]){
             << std::endl;
           return 2;
         }
+        break;
+      }
+      case 'x': {
+        std::cout << "[INFO]: Running in extended output mode. "
+          "Will output event::out vector to StdHep arrays" << std::endl;
+        extended_mode = true;
         break;
       }
       case 'h':
@@ -190,11 +198,18 @@ int main (int argc, char *argv[]){
         particle &in_part = nwEv->in[nin];
 
         //struck nucleon
-        if(in_part.pdg == 2112 || in_part.pdg==2212){ //neutron or proton -> nucleus
+        if(in_part.pdg == 2112 || in_part.pdg == 2212){ //neutron or proton -> nucleus
           if (nwEv->par.nucleus_p == 1 && nwEv->par.nucleus_n == 0){ //hydrogen
             rtEv.fStdHepPdg[rtEv.fStdHepN] = in_part.pdg; //proton code
           }else{
-            rtEv.fStdHepPdg[rtEv.fStdHepN] = NucleusPdg; //nucleus code
+            if(extended_mode){
+              rtEv.fStdHepPdg[rtEv.fStdHepN] = NucleusPdg;
+
+              rtEv.fStdHepN++; // fill out the rest of this entry as usual
+              rtEv.fStdHepPdg[rtEv.fStdHepN] = in_part.pdg;
+            } else { // Merge the struck nucleon and nuclear target entries
+              rtEv.fStdHepPdg[rtEv.fStdHepN] = NucleusPdg; //nucleus code
+            }
           }
         //else assume neutrino (gief ewro)
         }else{
@@ -227,7 +242,7 @@ int main (int argc, char *argv[]){
         } else {
           rtEv.fStdHepPdg[rtEv.fStdHepN] = NucleusPdg; //nucleus code
         }
-        rtEv.fStdHepStatus[rtEv.fStdHepN]=0;//incoming
+        rtEv.fStdHepStatus[rtEv.fStdHepN] = 0;//incoming
         for(int k = 0; k < 4; k++){
           rtEv.fStdHepX4[rtEv.fStdHepN][k] = 0;
         }
@@ -245,26 +260,29 @@ int main (int argc, char *argv[]){
         rtEv.fStdHepN++;
       }
 
-      //Out particles (particles leaving the vertex, preFSI)
-      for (int nout = 0; nout < nwEv->out.size(); nout++){
-        particle &out_part = nwEv->out[nout];
-        rtEv.fStdHepPdg[rtEv.fStdHepN] = out_part.pdg;
-        rtEv.fStdHepStatus[rtEv.fStdHepN] = 14; //Hadron in the nucleus
-        for(int k = 0; k < 4; k++){
-          rtEv.fStdHepX4[rtEv.fStdHepN][k] = 0;
+      if(extended_mode){
+        //Out particles (particles leaving the vertex, preFSI)
+        for (int nout = 0; nout < nwEv->out.size(); nout++){
+          particle &out_part = nwEv->out[nout];
+          // Don't bother saving preFSI lepton separately
+          rtEv.fStdHepPdg[rtEv.fStdHepN] = out_part.pdg;
+          rtEv.fStdHepStatus[rtEv.fStdHepN] = 14; //Hadron in the nucleus
+          for(int k = 0; k < 4; k++){
+            rtEv.fStdHepX4[rtEv.fStdHepN][k] = 0;
+          }
+          for(int k = 0; k < 3; k++){
+            rtEv.fStdHepPolz[rtEv.fStdHepN][k] = 0;
+          }
+          rtEv.fStdHepP4[rtEv.fStdHepN][3] = out_part.E()/1000.0;
+          rtEv.fStdHepP4[rtEv.fStdHepN][0] = out_part.x/1000.0;
+          rtEv.fStdHepP4[rtEv.fStdHepN][1] = out_part.y/1000.0;
+          rtEv.fStdHepP4[rtEv.fStdHepN][2] = out_part.z/1000.0;
+          rtEv.fStdHepFd[rtEv.fStdHepN] = 0;
+          rtEv.fStdHepLd[rtEv.fStdHepN] = 0;
+          rtEv.fStdHepFm[rtEv.fStdHepN] = 0;
+          rtEv.fStdHepLm[rtEv.fStdHepN] = 0;
+          rtEv.fStdHepN++;
         }
-        for(int k = 0; k < 3; k++){
-          rtEv.fStdHepPolz[rtEv.fStdHepN][k] = 0;
-        }
-        rtEv.fStdHepP4[rtEv.fStdHepN][3] = out_part.E()/1000.0;
-        rtEv.fStdHepP4[rtEv.fStdHepN][0] = out_part.x/1000.0;
-        rtEv.fStdHepP4[rtEv.fStdHepN][1] = out_part.y/1000.0;
-        rtEv.fStdHepP4[rtEv.fStdHepN][2] = out_part.z/1000.0;
-        rtEv.fStdHepFd[rtEv.fStdHepN] = 0;
-        rtEv.fStdHepLd[rtEv.fStdHepN] = 0;
-        rtEv.fStdHepFm[rtEv.fStdHepN] = 0;
-        rtEv.fStdHepLm[rtEv.fStdHepN] = 0;
-        rtEv.fStdHepN++;
       }
 
       //Nucleus leaving particles
@@ -316,6 +334,7 @@ int main (int argc, char *argv[]){
       rtEv.fNuParentProNVtx= 1 ;
 
       fOutputTree->Fill();
+
       std::cout << "\r" << int((ent+1)*100/nEntries) << "\% done."
         << std::flush;
     }
@@ -330,9 +349,9 @@ int main (int argc, char *argv[]){
     fout->Write();
     fout->Close();
 
-    std::cout << "[INFO]: Wrote Output file: " << fname.c_str() << " with "
-      << NCopiedEvts << " events, currently at " << ent
-      << "th event in the input file." << std::endl;
+    std::cout << std::endl << "[INFO]: Wrote Output file: "
+      << fname.c_str() << " with " << NCopiedEvts << " events, currently at "
+      << ent << "th event in the input file." << std::endl;
     if (usepot){
       printf("POT for this file: %e\n",filepot);
     }

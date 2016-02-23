@@ -5,10 +5,14 @@
 
 #include "RooTrackerEvent.h"
 
+//Enabled a number of asserts useful for validation.
+#define RTE_STRICT
+//#define RTE_DEBUG
+
 namespace RooTrackerUtils {
 
 int GetDynFromNeutCode(int NeutCode){
-  switch(NeutCode){
+  switch(abs(NeutCode)){
     case 1: { return 1;} // QE
     case 2: { return 8;} // MEC
     case 11:
@@ -27,12 +31,12 @@ int GetDynFromFlags(flags const &fl){
 flags GetFlagsFromNeutCode(int NeutCode, int nupdg){
   int dyn = GetDynFromNeutCode(NeutCode);
   flags fl;
-  fl.qel = (dyn/2==0);
-  fl.res = (dyn/2==1);
-  fl.dis = (dyn/2==2);
-  fl.coh = (dyn/2==3);
-  fl.mec = (dyn/2==4);
-  fl.nc = (!(dyn&1));
+  fl.qel = ((dyn/2)==0);
+  fl.res = ((dyn/2)==1);
+  fl.dis = ((dyn/2)==2);
+  fl.coh = ((dyn/2)==3);
+  fl.mec = ((dyn/2)==4);
+  fl.nc = (dyn&1);
   fl.cc = (!fl.nc);
   fl.anty = (nupdg > 0);
   return fl;
@@ -93,6 +97,7 @@ particle GetNuWroParticle(
 
     //Mass is 0 within float precision
     if( fabs(M2) < 1E-8){
+#ifdef RTE_DEBUG
       std::cout << "[WARN]: Found unexpected particle with 0 (to within "
         << "precision) mass, { StdHepStatus: " << inpStatus
         << ", StdHepPdg: " << inpPdg << ", StdHepP4: [ " << inpP4[0]
@@ -101,10 +106,12 @@ particle GetNuWroParticle(
       part.set_pdg_and_mass(inpPdg,0);
       std::cout << "\tForcing mass to be 0 -> {Mass : " << part.mass()
         << ", E: " << part.E() << "}" << std::endl;
+#endif
       return part;
     }
 
     //Mass is significantly negative.
+#ifdef RTE_DEBUG
     std::cerr << "[ERROR]: Bad NuWro particle: { " << part.mass() << ", ["
       << part.x << ", " <<  part.y << ", " << part.z << ", " << part.t
       << "] }" << std::endl;
@@ -114,6 +121,7 @@ particle GetNuWroParticle(
       << (inpP4[3]*inpP4[3] -
         (inpP4[0]*inpP4[0]+inpP4[1]*inpP4[1]+inpP4[2]*inpP4[2]))
       << " }" << std::endl;
+#endif
     throw std::exception();
   }
   return part;
@@ -128,6 +136,24 @@ event GetNuWroEvent1(RooTrackerEvent const & rt, Double_t EScale){
       rt.fStdHepP4[i], EScale);
     switch(rt.fStdHepStatus[i]){
       case 0: {
+        //Replaces struck nucleon PDGs, Should fix in nuwro2rootracker really.
+        if( (rt.fStdHepPdg[i] > 2212) ){ // if nuclear pdg
+
+          //TODO set event target nucleon information.
+
+          if(!part.t){ //This is nuclear target info in extended mode
+            //skip
+            continue;
+          }
+
+          //This is combined struck nucleon and nuclear target info
+          //Extract struck nucleon info
+          if(part.m() < (1.0*EScale)) {
+            // guess PDG from mass
+            if(part.m() > 0.939*EScale){ part.pdg = 2112; }
+            else { part.pdg = 2212; }
+          }
+        }
         ev.in.push_back(part);
         //If we have found the incoming neutrino
         if(ev.in.back().lepton() && !(rt.fStdHepPdg[i]&1)){
@@ -138,11 +164,11 @@ event GetNuWroEvent1(RooTrackerEvent const & rt, Double_t EScale){
         break;
       }
       case 1: {
-        ev.out.push_back(part);
+        ev.post.push_back(part);
         break;
       }
       case 14: {
-        ev.post.push_back(part);
+        ev.out.push_back(part);
         break;
       }
       default: {
@@ -152,6 +178,12 @@ event GetNuWroEvent1(RooTrackerEvent const & rt, Double_t EScale){
       }
     }
     ev.all.push_back(part);
+  }
+  if(!ev.out.size()){
+    std::cout << "[WARN]: RooTracker event didn't have any StdHepStatus==14 "
+      "particles (corresponding to event::out), some event helper functions "
+      "will not work (or cause segfaults).\n[INFO]: nuwro2rootracker might need"
+      " to be run in extended mode to output these particles." << std::endl;
   }
   return ev;
 }
@@ -196,6 +228,11 @@ bool RooTrackerEvent::SetBranchAddresses(TTree* tree){
   addCode = tree->SetBranchAddress("EvtCode", &fEvtCode);
   if(addCode){
     std::cerr << "Branch EvtCode failed with " << addCode << std::endl;
+  }
+  Added = Added && (!addCode);
+  addCode = tree->SetBranchAddress("EvtWght", &fEvtWght);
+  if(addCode){
+    std::cerr << "Branch EvtWght failed with " << addCode << std::endl;
   }
   Added = Added && (!addCode);
   addCode = tree->SetBranchAddress("StdHepN", &fStdHepN);

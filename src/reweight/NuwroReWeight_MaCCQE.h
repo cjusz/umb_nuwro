@@ -1,15 +1,20 @@
 #ifndef _NUWRO_REWEIGHT_MAQE_H_
 #define _NUWRO_REWEIGHT_MAQE_H_
 
+#include "params.h"
+
 #include "NuwroWghtEngineI.h"
 
 namespace nuwro {
 namespace rew  {
 
+//#define DEBUG_QE_REWEIGHT
+
 class NuwroReWeight_MaCCQE : public NuwroWghtEngineI {
 public:
 
   NuwroReWeight_MaCCQE();
+  NuwroReWeight_MaCCQE(params const & param);
   ~NuwroReWeight_MaCCQE();
 
   bool SystIsHandled(NuwroSyst_t syst);
@@ -18,7 +23,6 @@ public:
   void Reconfigure(void);
   double CalcWeight(event* nuwro_event);
   double CalcChisq(void);
-
 
 private:
   void Init(void);

@@ -1,17 +1,27 @@
 #ifndef _NUWRO_REWEIGHT_MaRES_H_
 #define _NUWRO_REWEIGHT_MaRES_H_
 
+#include "params.h"
+
 #include "NuwroWghtEngineI.h"
 
 namespace nuwro {
 namespace rew  {
 
-class NuwroReWeight_RES_CA5 : public NuwroWghtEngineI {
+//#define DEBUG_RES_REWEIGHT
+
+double GetWghtPropToResXSec(event &nuwro_event, params const & rwparams);
+
+class NuwroReWeight_MaRES_CA5 : public NuwroWghtEngineI {
 public:
 
-  NuwroReWeight_RES_CA5();
-  ~NuwroReWeight_RES_CA5();
+  NuwroReWeight_MaRES_CA5();
+  NuwroReWeight_MaRES_CA5(params const & param);
+  ~NuwroReWeight_MaRES_CA5();
 
+
+  void SetupSPP(void);
+  void SetupSPP(params & param);
   bool SystIsHandled(NuwroSyst_t syst);
   void SetSystematic(NuwroSyst_t syst, double val);
   void Reset(void);
@@ -19,6 +29,7 @@ public:
   double CalcWeight(event* nuwro_event);
   double CalcChisq(void);
 
+static bool DoSetupSPP;
 
 private:
   void Init(void);

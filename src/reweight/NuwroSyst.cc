@@ -15,6 +15,12 @@ std::string NuwroSyst::AsString(NuwroSyst_t syst){
     case kNuwro_MECNorm: {
       return "kNuwro_MECNorm";
     }
+    case kNuwro_MaRES: {
+      return "kNuwro_MaRES";
+    }
+    case kNuwro_CA5: {
+      return "kNuwro_CA5";
+    }
     default: {
       return "-";
     }
@@ -22,7 +28,7 @@ std::string NuwroSyst::AsString(NuwroSyst_t syst){
 }
 
 NuwroSyst_t NuwroSyst::FromString(std::string syst){
-  for(NuwroSyst_t rtnSyst = kNullSystematic;
+  for(NuwroSyst_t rtnSyst = Next(kNullSystematic);
     rtnSyst != kNullSystematic;
     Adv(rtnSyst) ){
     if(AsString(rtnSyst) == syst) {

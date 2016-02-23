@@ -3,7 +3,6 @@
 
 #include "event1.h"
 
-#include "reweight/RooTrackerEvent.h"
 #include "reweight/NuwroSyst.h"
 #include "reweight/NuwroSystSet.h"
 
