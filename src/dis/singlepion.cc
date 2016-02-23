@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <cassert>
 //#include "hist.h"
 #include "pdg_name.h"
 #include "LeptonMass.h"
@@ -34,9 +35,9 @@
 /////  SPP[ ][1]... NC reaction
 /////  SPP[ ][ ][0]... proton target
 /////  SPP[ ][ ][1]... neutron target
-/////  SPP[ ][ ][ ][0]... the channel with pi+ in the final state 
-/////  SPP[ ][ ][ ][1]... the channel with pi0 in the final state 
-/////  SPP[ ][ ][ ][2]... the channel with pi- in the final state 
+/////  SPP[ ][ ][ ][0]... the channel with pi+ in the final state
+/////  SPP[ ][ ][ ][1]... the channel with pi0 in the final state
+/////  SPP[ ][ ][ ][2]... the channel with pi- in the final state
 /////  SPP[ ][ ][ ][ ][n].. invariant hadronic mass from 1210 to 1990 every 20 MeV
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////   SPP is then used to define actual spp function in the file alfa.cc
@@ -47,9 +48,13 @@ double SPP[2][2][2][3][40];
 
 double sppweight;
 
+bool HasRun = false; // can we safetly have a global flag detailing whether
+//it is set up?
+
 void
 singlepion (params & p)		//produce SPP table
 {
+	assert(!HasRun);
   double M2 = M12 * M12;
   int ile = p.spp_precision;
 
@@ -166,6 +171,7 @@ singlepion (params & p)		//produce SPP table
 	    }
 	}
     }
+   HasRun = true;
 }
 
 //koniec
