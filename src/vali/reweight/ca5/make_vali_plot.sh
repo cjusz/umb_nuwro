@@ -50,7 +50,7 @@ fi
 
 DIALNAME="kNuwro_CA5"
 DIALPRETTYNAME="C_{A}^{5}"
-NEVS="500000"
+NEVS="50000"
 
 echo "[INFO]: Using ${PARAM_BASE}, specialised with ${FLUX_HIST}, and ${TARGET_PARAMS}, generating ${NEVS} events to test dial: ${DIALNAME}"
 
@@ -111,7 +111,7 @@ fi
 
 echo "[INFO]: Building: Plot_${DIALNAME}_Vars.cc"
 
-cp ../PlotDialVars.cc.in Plot_${DIALNAME}_Vars.cc
+cp ${NUWRO_ROOT}/src/vali/reweight/PlotDialVars.cc.in Plot_${DIALNAME}_Vars.cc
 
 #pmu
 echo "VarToPlot FS_mu_p; FS_mu_p.XAxisTitle = \"#it{p}^{#mu} (GeV/#it{c})\"; FS_mu_p.VariableName = \"pmu\"; FS_mu_p.DialName = \"${DIALNAME}\"; FS_mu_p.DialPrettyName = \"${DIALPRETTYNAME}\"; FS_mu_p.DialUnits = \"\"; FS_mu_p.PlotString = \"HMFSLepton_4Mom.Vect().Mag()\"; FS_mu_p.SelectionString = \"(HMFSLepton_PDG==13)&&(NeutConventionReactionCode==11)\"; FS_mu_p.DialValm2 = \"0.99\"; FS_mu_p.DialVal0 = \"1.19\"; FS_mu_p.DialVal2 = \"1.39\"; FS_mu_p.NBins = 50; FS_mu_p.XBinMin = 0; FS_mu_p.XBinMax = 2.5; FS_mu_p.LegX1 = 0.36; FS_mu_p.LegY1 = 0.5; FS_mu_p.LegX2 = 0.89; FS_mu_p.LegY2 = 0.89; FS_mu_p.LogY = false; PlotVar(FS_mu_p);" >> Plot_${DIALNAME}_Vars.cc

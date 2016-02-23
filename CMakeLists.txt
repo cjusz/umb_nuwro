@@ -69,6 +69,13 @@ function(gen_root_dicts TAR Header)
   endif()
 endfunction()
 
+if(DEFINED ENV{PYTHIA6}) #Latest ROOT 5 doesn't seem to add libPythia6.so to its
+                         #lib dir.
+  set(PYTHIA6LIBLOC "-L$ENV{PYTHIA6}")
+else()
+  set(PYTHIA6LIBLOC "")
+endif()
+
 ################################## COMPILER ####################################
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 ${ROOT_CXX_FLAGS} -Wall -Wno-unused-variable -Wno-sign-compare -Wno-unused-function -Wno-unused-but-set-variable -Wno-reorder")
