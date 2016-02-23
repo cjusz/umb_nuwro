@@ -96,27 +96,7 @@ add_executable(nuwro2rootracker nuwro2rootracker.cc)
 target_link_libraries(nuwro2rootracker event)
 set_target_properties(nuwro2rootracker PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 
-add_executable(test_reweight_CCQE_rootracker test_reweight_CCQE_rootracker.cc)
-target_link_libraries(test_reweight_CCQE_rootracker reweight)
-target_link_libraries(test_reweight_CCQE_rootracker event)
-target_link_libraries(test_reweight_CCQE_rootracker dis)
-set_target_properties(test_reweight_CCQE_rootracker PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-
-add_executable(test_reweight_MaRES_rootracker test_reweight_MaRES_rootracker.cc)
-target_link_libraries(test_reweight_MaRES_rootracker reweight)
-target_link_libraries(test_reweight_MaRES_rootracker event)
-target_link_libraries(test_reweight_MaRES_rootracker dis)
-set_target_properties(test_reweight_MaRES_rootracker PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-
-add_executable(test_reweight_MaRES test_reweight_MaRES.cc)
-target_link_libraries(test_reweight_MaRES reweight)
-target_link_libraries(test_reweight_MaRES event)
-target_link_libraries(test_reweight_MaRES dis)
-set_target_properties(test_reweight_MaRES PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-
-install(TARGETS nuwro
+install(TARGETS
+  nuwro
   nuwro2rootracker
-  test_reweight_CCQE_rootracker
-  test_reweight_MaRES_rootracker
-  test_reweight_MaRES
   DESTINATION bin)
