@@ -385,6 +385,12 @@ void SimpleAnalysisFormat::Finalise(){
   NuWroCC = nwfl.cc;
   NuWroAnty = nwfl.anty;
 
+#ifdef DEBUG_SAF
+  std::cout << "[INFO]: NeutCode: " << NeutConventionReactionCode
+    << ", NuWroDyn: " << NuWroDyn << ", NuWroCC: " << NuWroCC
+    << ", NuWroAnty: " << NuWroAnty << std::endl;
+#endif
+
   FourMomentum_Transfer = (ISLepton_4Mom - HMFSLepton_4Mom);
 
   PreFSI_HadrMass = sqrt(PreFSI_ESum*PreFSI_ESum - PreFSI_PSum.Mag2());

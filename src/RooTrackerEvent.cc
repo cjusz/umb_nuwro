@@ -13,14 +13,37 @@ namespace RooTrackerUtils {
 
 int GetDynFromNeutCode(int NeutCode){
   switch(abs(NeutCode)){
-    case 1: { return 1;} // QE
+    //CC nu
+    case 1: { return 0;} // QE
     case 2: { return 8;} // MEC
     case 11:
     case 12:
     case 13: { return 2; } //RES
-    case 16: { return 4; } //COH
-    case 27: { return 3; } //DIS
-    default: { return -1; }
+    case 16: { return 6; } //COH
+    case 17: { return 2; } //Single Gamma from Delta
+    case 21: { return 2; } //Multi pi (1.3 < W < 2.0 GeV)
+    case 22: { return 2; } //Eta from Delta
+    case 23: { return 2; } //Kaon from Delta
+    case 26: { return 4; } //DIS
+
+    //NC nu
+    case 31:
+    case 32:
+    case 33:
+    case 34: { return 3; } //RES
+    case 36: { return 7; } //COH
+    case 38: { return 3; } //Single Gamma from Delta
+    case 39: { return 3; } //Single Gamma from Delta
+    case 41: { return 3; } //Multi pi (1.3 < W < 2.0 GeV)
+    case 42: { return 3; } //Eta from Delta N-target
+    case 43: { return 3; } //Eta from Delta P-target
+    case 44: { return 3; } //Kaon from Delta N-target
+    case 45: { return 3; } //Kaon from Delta P-target
+    case 46: { return 5; } //DIS
+    case 51: { return 1;} // QE P-target
+    case 52: { return 1;} // QE N-target
+
+    default: { return -99; }
   }
 }
 

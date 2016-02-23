@@ -61,9 +61,22 @@ void NuwroReWeight_MaCCQE::Reconfigure(void){
 
 double NuwroReWeight_MaCCQE::CalcWeight(event* nuwro_event){
 
-  if (fabs(fTwkDial_MaCCQE) < 1E-8){ return 1.0; }
+  if (fabs(fTwkDial_MaCCQE) < 1E-8){
+#ifdef DEBUG_QE_REWEIGHT
+    std::cout << "[WARN]: fTwkDial_MaCCQE set very low, short circuiting."
+      << std::endl;
+#endif
+    return 1.0;
+  }
 
-  if (!nuwro_event->flag.cc or !nuwro_event->flag.qel){ return 1.0; }
+  if ((!nuwro_event->flag.cc) || (!nuwro_event->flag.qel)){
+#ifdef DEBUG_QE_REWEIGHT
+    std::cout << "[WARN]: This is not a CCQE event. nwEv.flag.cc: "
+      << nuwro_event->flag.cc << ", nwEv.flag.qel: " << nuwro_event->flag.qel
+      << std::endl;
+#endif
+    return 1.0;
+  }
 
   double weight = 1;
   params rwparams = (nuwro_event->par);

@@ -13,6 +13,8 @@
 static const Int_t kNThreshMax = 10;
 static const Int_t kMaxFSMomenta = 20;
 
+#define DEBUG_SAF
+
 ///\brief Structure used to hold intermediate StdHep information before
 ///finalising
 struct PartStruct {

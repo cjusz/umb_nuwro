@@ -107,6 +107,10 @@ template<typename X>
 void Draw(X* rt, std::string p, std::string s, std::string o){
   rt->Draw(p.c_str(),s.c_str(),o.c_str());
 }
+template<typename X>
+void SetTitle(X* ax, std::string s){
+  ax->SetTitle(s.c_str());
+}
 
 void PlotVar(VarToPlot &v){
 
@@ -178,8 +182,8 @@ void PlotVar(VarToPlot &v){
   leg->SetFillStyle(-1);
   leg->SetBorderSize(-1);
 
-  h_dial2->GetXaxis()->SetTitle(v.XAxisTitle.c_str());
-  h_dial2->GetYaxis()->SetTitle("#frac{d#sigma}{d#it{x}} (cm^{2} nucleon^{-1} GeV^{-1})");
+  SetTitle(h_dial2->GetXaxis(),v.XAxisTitle);
+  SetTitle(h_dial2->GetYaxis(),"#frac{d#sigma}{d" + v.VariableName + "} (cm^{2} nucleon^{-1} GeV^{-1})");
 
   h_dial2->Draw("EHIST");
   h_dialm2->Draw("EHIST SAME");
