@@ -11,24 +11,24 @@ set_target_properties(test_SimpleReweighter PROPERTIES LINK_FLAGS "${CMAKE_LINK_
 set_target_properties(test_SimpleReweighter PROPERTIES COMPILE_FLAGS -fopenmp)
 
 
-if(ISROOT6) #Only have ROOT6 implementation at the moment
-  add_executable(test_SimpleFitter test_SimpleFitter.cc)
+add_executable(test_SimpleFitter test_SimpleFitter.cc)
 
-  target_link_libraries(test_SimpleFitter reweight;${EVENT_LIBS})
-  set_target_properties(test_SimpleFitter PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} -fopenmp -lMinuit2")
-  set_target_properties(test_SimpleFitter PROPERTIES COMPILE_FLAGS "-fopenmp -DROOT6 ")
+target_link_libraries(test_SimpleFitter reweight;${EVENT_LIBS};vali)
 
-  install (TARGETS test_SimpleFitter DESTINATION bin)
-else()
-  add_executable(test_SimpleFitter test_SimpleFitter.cc)
+set(FOMP "-fopenmp")
+set_target_properties(test_SimpleFitter PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP} -lMinuit2")
+set_target_properties(test_SimpleFitter PROPERTIES COMPILE_FLAGS "${FOMP} ")
 
-  target_link_libraries(test_SimpleFitter reweight;${EVENT_LIBS})
-  set(FOMP "-fopenmp")
-  set_target_properties(test_SimpleFitter PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP} -lMinuit2")
-  set_target_properties(test_SimpleFitter PROPERTIES COMPILE_FLAGS "${FOMP} ")
+install (TARGETS test_SimpleFitter DESTINATION bin)
 
-  install (TARGETS test_SimpleFitter DESTINATION bin)
-endif()
+add_executable(test_SimpleFitterInterface test_SimpleFitterInterface.cc)
+
+target_link_libraries(test_SimpleFitterInterface reweight;${EVENT_LIBS};vali)
+
+set_target_properties(test_SimpleFitterInterface PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP} ")
+set_target_properties(test_SimpleFitterInterface PROPERTIES COMPILE_FLAGS "${FOMP} ")
+
+install (TARGETS test_SimpleFitterInterface DESTINATION bin)
 
 install(TARGETS
   test_reweighter

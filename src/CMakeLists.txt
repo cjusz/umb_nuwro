@@ -6,6 +6,7 @@ set(SRC_SUBDIRS
   dis
   sf
   reweight
+  vali
   #rpa -- Not included by default
   )
 
@@ -30,7 +31,7 @@ message(STATUS "Include Paths: ${incdirs}")
 
 set(EVENT_SOURCES)
 
-foreach (dir ${SRC_SUBDIRS};vali)
+foreach (dir ${SRC_SUBDIRS})
   message(STATUS "Adding subdirectory src/${dir}")
   add_subdirectory(${dir})
 endforeach()

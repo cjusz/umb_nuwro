@@ -37,7 +37,7 @@ public:
 	inline particle (vect fourmomentum);         ///< create moving particle
 	inline bool operator==(particle& p2);        ///< check if self->pdg==pdg2
 	inline bool operator!=(particle& p2);        ///< check if self->pdg!=pdg2
-	inline double E ();                          ///< particle energy
+	inline double E () const;                          ///< particle energy
 	inline double energy ();                     ///< particle energy
 	inline double Ek();                          ///< particle kinetic energy
 	inline double mass ();                       ///< particle mass
@@ -156,7 +156,7 @@ double particle::energy ()
     return t;
   }
 
-double particle::E()
+double particle::E() const
   {
     return t;
   }

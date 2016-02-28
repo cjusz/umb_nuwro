@@ -100,24 +100,12 @@ void NuwroReWeight_MaRES_CA5::Reconfigure(void){
   NuwroSystUncertainty * fracerr = NuwroSystUncertainty::Instance();
   fError_MaRES = fracerr->OneSigmaErr(kNuwro_MaRES,
     (fTwkDial_MaRES > 0)?1:-1);
-  if(fTwkDial_MaRES){
-#ifdef DEBUG_RES_REWEIGHT
-    std::cout << "[INFO]: NuwroReWeight_MaRES_CA5::Reconfigure: New MaRES value = "
-      << fDef_MaRES << " + (" << fError_MaRES << "  *  " << fTwkDial_MaRES
-      << ")" << std::endl;
-#endif
-  }
+
   fCurr_MaRES = fDef_MaRES + fError_MaRES * fTwkDial_MaRES;
 
   fError_CA5 = fracerr->OneSigmaErr(kNuwro_CA5,
     (fTwkDial_CA5 > 0)?1:-1);
-  if(fTwkDial_CA5){
-#ifdef DEBUG_RES_REWEIGHT
-    std::cout << "[INFO]: NuwroReWeight_MaRES_CA5::Reconfigure: New CA5 value = "
-      << fDef_CA5 << " + (" << fError_CA5 << "  *  " << fTwkDial_CA5
-      << ")" << std::endl;
-#endif
-  }
+
   fCurr_CA5 = fDef_CA5 + fError_CA5 * fTwkDial_CA5;
 }
 
@@ -194,14 +182,14 @@ double GetWghtPropToResXSec(event const &nuwro_event, params const & rwparams,
   j = (NeutrinoPdg > 0) ? 0 : 1;
   k = (IsCC) ? 0 : 1;
   l = (StruckNucleonPdg == 2212) ? 0 : 1;
-  //#pragma omp critical
+
   int finalcharge = charge(StruckNucleonPdg) + (1 - k) * (1 - 2 * j); //pdg.cc
 
   double nonspp = 0;
   double dis0 = 0;
   double dis1 = 0;
   double dis2 = 0;
-  //#pragma omp critical
+
   double fromdis = cr_sec_dis(Enu, HadrMass, q0, NeutrinoPdg,
     StruckNucleonPdg, IsCC);
 
@@ -221,52 +209,52 @@ double GetWghtPropToResXSec(event const &nuwro_event, params const & rwparams,
     double spp0 = SPP[j][k][l][0][0];
     double spp1 = SPP[j][k][l][1][0];
     double spp2 = SPP[j][k][l][2][0];
-    //#pragma omp critical
+
     dis0 = fromdis * spp0 * alfadis(j, k, l, 0, HadrMass);
-    //#pragma omp critical
+
     dis1 = fromdis * spp1 * alfadis(j, k, l, 1, HadrMass);
-    //#pragma omp critical
+
     dis2 = fromdis * spp2 * alfadis(j, k, l, 2, HadrMass);
 
     double delta0 = 0, delta1 = 0, delta2 = 0;
-    //#pragma omp critical
+
     double adel0 = alfadelta(j, k, l, 0, HadrMass);
-    //#pragma omp critical
+
     double adel1 = alfadelta(j, k, l, 1, HadrMass);
-    //#pragma omp critical
+
     double adel2 = alfadelta(j, k, l, 2, HadrMass);
 
     switch(finalcharge){
       case -1: {
         delta0 = 0;
         delta1 = 0;
-        //#pragma omp critical
+
         delta2 = cr_sec_delta(FFSet, delta_axial_mass, delta_C5A, Enu, HadrMass,
           q0, NeutrinoPdg, StruckNucleonPdg, 2112, -211, IsCC) * adel2;
         break;
       }
       case 0: {
         delta0 = 0;
-        //#pragma omp critical
+
         delta1 = cr_sec_delta(FFSet, delta_axial_mass, delta_C5A, Enu, HadrMass,
           q0, NeutrinoPdg, StruckNucleonPdg, 2112, 111, IsCC) * adel1;
-        //#pragma omp critical
+
         delta2 = cr_sec_delta(FFSet, delta_axial_mass, delta_C5A, Enu, HadrMass,
           q0, NeutrinoPdg, StruckNucleonPdg, 2212, -211, IsCC) * adel2;
         break;
       }
       case 1: {
-        //#pragma omp critical
+
         delta0 = cr_sec_delta(FFSet, delta_axial_mass, delta_C5A, Enu, HadrMass,
           q0, NeutrinoPdg, StruckNucleonPdg, 2112, 211, IsCC) * adel0;
-        //#pragma omp critical
+
         delta1 = cr_sec_delta(FFSet, delta_axial_mass, delta_C5A, Enu, HadrMass,
           q0, NeutrinoPdg, StruckNucleonPdg, 2212, 111, IsCC) * adel1;
         delta2 = 0;
         break;
       }
       case 2: {
-        //#pragma omp critical
+
         delta0 = cr_sec_delta(FFSet, delta_axial_mass, delta_C5A, Enu, HadrMass,
           q0, NeutrinoPdg, StruckNucleonPdg, 2212, 211, IsCC) * adel0;
         delta1 = 0;
@@ -277,18 +265,7 @@ double GetWghtPropToResXSec(event const &nuwro_event, params const & rwparams,
 #ifdef DEBUG_RES_REWEIGHT
     double test = (dis0 + dis1 + dis2 + delta0 + delta1 + delta2);
     assert((test == test));
-    std::cout << "[INFO]: result = " << test << ". Return Low HadrMass: "
-      << HadrMass << ", fromdis: " << fromdis
-      << " { Enu: " << Enu << ", W: " << HadrMass << ", q0: "
-      << q0 << " }" << std::endl;
 #endif
-    if(RTDebug){
-      double test = (dis0 + dis1 + dis2 + delta0 + delta1 + delta2);
-      std::cout << "[INFO]: result = " << test << ". Return Low HadrMass: "
-        << HadrMass << ", fromdis: " << fromdis
-        << " { Enu: " << Enu << ", W: " << HadrMass << ", q0: "
-        << q0 << " }" << std::endl;
-    }
     return (dis0 + dis1 + dis2 + delta0 + delta1 + delta2);
   } else { //(HadrMass > 1210) && (fromdis != 0)
     //With DIS contribution
@@ -312,11 +289,7 @@ double GetWghtPropToResXSec(event const &nuwro_event, params const & rwparams,
         << "size: " << nuwro_event.out.size() << ")" << std::endl;
       throw std::exception();
     }
-#ifdef DEBUG_RES_REWEIGHT
-    std::cout << "[INFO]: IsPythiaSPP: " << (IsPythiaSPP?"true":"false")
-      << ", event_out size: " << nuwro_event.out.size() << ", Found PionPdg? "
-      << OutPionPdg << std::endl;
-#endif
+
     //Event was Single Pion Production
     if(IsPythiaSPP){
 
@@ -328,99 +301,42 @@ double GetWghtPropToResXSec(event const &nuwro_event, params const & rwparams,
       }
 
       //DIS contribution
-      //#pragma omp critical
+
       double dis_spp = fromdis * alfadis(j, k, l, t, HadrMass);
 
       int StruckNucleonChrg = finalcharge + t - 1;
       int ProducedNucleonPdg = ( (StruckNucleonChrg == 1) ? 2212 : 2112 );
-      //#pragma omp critical
+
       double SPPFact = SPPF(j, k, l, t, HadrMass);
-      //#pragma omp critical
+
       double AlfaFact = alfadelta(j, k, l, t, HadrMass);
 #ifdef DEBUG_RES_REWEIGHT
-      if(!(fabs(SPPFact)>0)){
-        std::cout << "[SPPFACT-INFO]: " << NeutrinoPdg << ", " << IsCC << ", "
-          << StruckNucleonPdg << std::endl;
-        std::cout << "[SPPFACT-INFO]: " << j << "," << k << "," << l << ","
-          << t << "," << HadrMass << std::endl;
-      }
-      //#pragma omp critical
       SPPF(j, k, l, t, HadrMass);
       assert(fabs(SPPFact)>0);
 #endif
       //resonant SPP contribution
-      //#pragma omp critical
-      double test_crsec_delta_orig = cr_sec_delta (FFSet, delta_axial_mass, delta_C5A,
+      double src_sec_delta_bare = cr_sec_delta (FFSet, delta_axial_mass, delta_C5A,
         Enu, HadrMass, q0, NeutrinoPdg, StruckNucleonPdg, ProducedNucleonPdg,
             OutPionPdg, IsCC);
-      double odelta_spp = test_crsec_delta_orig / SPPFact * AlfaFact;
-      double delta_spp = odelta_spp;
-      double pdd_red_fact = 1.0;
+      double delta_spp = src_sec_delta_bare / SPPFact * AlfaFact;
 
       if( (rwparams.nucleus_p + rwparams.nucleus_n) > 7 ){
         //Pionless delta decay reduction.
-        //#pragma omp critical
-        pdd_red_fact *= pdd_red(nuwro_event.in[0].t);
+        double pdd_red_fact = pdd_red(nuwro_event.in[0].t);
         delta_spp *= pdd_red_fact;
       }
 #ifdef DEBUG_RES_REWEIGHT
     double test = (dis_spp + delta_spp);
 
-    //#pragma omp critical
-    double FACT_cr_sec_delta = cr_sec_delta (FFSet, delta_axial_mass, delta_C5A,
-        Enu, HadrMass, q0, NeutrinoPdg, StruckNucleonPdg, ProducedNucleonPdg,
-            OutPionPdg, IsCC);
-
     assert((test == test));
-    std::cout << "[INFO]: Result = " << test << ". Return Pythia SPP: dis_spp = "
-      << dis_spp << ", delta_spp: "
-      << delta_spp << " (" << pdd_red(nuwro_event.in[0].t)
-      << ") { Enu: " << Enu << ", W: " << HadrMass << ", q0: "
-      << q0 << " }" << std::endl;
-    std::cout << "SPP Factors: "
-      << "FACT_cr_sec_delta = " << FACT_cr_sec_delta
-      << ", FACT_SPPF = " << SPPFact
-      << ", FACT_alfadelta = " << AlfaFact << std::endl;
-    std::cout << FFSet << ", " << delta_axial_mass << ", " << delta_C5A
-      << ", " << Enu << ", " << HadrMass << ", " << q0 << ", "
-      << NeutrinoPdg << ", " << StruckNucleonPdg << ", "
-      << ProducedNucleonPdg << ", " << OutPionPdg << ", " << IsCC << std::endl;
-#endif
-    if(RTDebug){
-      double alfaDISFACT = alfadis(j, k, l, t, HadrMass);
-      double test = (dis_spp + delta_spp);
 
-      //#pragma omp critical
-      double FACT_cr_sec_delta = cr_sec_delta (FFSet, delta_axial_mass, delta_C5A,
-          Enu, HadrMass, q0, NeutrinoPdg, StruckNucleonPdg, ProducedNucleonPdg,
-              OutPionPdg, IsCC);
-      std::cout << "[INFO]: Result = " << test << ", SPP Factors: "
-        << "FACT_cr_sec_delta = " << FACT_cr_sec_delta
-        << ", FACT_SPPF = " << SPPFact
-        << ", FACT_alfadelta = " << AlfaFact
-        << ", fromdis = " << fromdis
-        << ", delta_spp = " << delta_spp
-        << ", delta_spp_prePBred = " << odelta_spp
-        << ", delta_cr_sec_orig = " << test_crsec_delta_orig
-        << ", pdd_red_fact = " << pdd_red_fact
-        << ", alfaDISFACT = " << alfaDISFACT << std::endl;
-    }
+#endif
       return (dis_spp + delta_spp);
     } else { //inelastic pion production and single kaon production
       //Event was all pythia just return DIS xsec.
 #ifdef DEBUG_RES_REWEIGHT
     assert((fromdis == fromdis));
-    std::cout << "[INFO]: Result = " << fromdis
-      << ". Return Pythia DIS fromdis: "
-      << fromdis << " { Enu: " << Enu << ", W: " << HadrMass << ", q0: "
-      << q0 << " }" <<  std::endl;
 #endif
-      if(RTDebug){
-        std::cout << "[INFO]: Result = " << fromdis
-          << ". Return Pythia DIS fromdis: "
-          << fromdis << " { Enu: " << Enu << ", W: " << HadrMass << ", q0: "
-          << q0 << " }" <<  std::endl;
-      }
       return fromdis;
     }
   }
@@ -454,10 +370,10 @@ double NuwroReWeight_MaRES_CA5::CalcWeight(event* nuwro_event){
 
   weight *= newweight/oldweight;
 #ifdef DEBUG_RES_REWEIGHT
-  std::cout << "Returning event weight of " << weight << " = " << newweight
-    << "/" << oldweight << std::endl;
-#endif
+  std::cout << "[INFO]: Returning event weight of " << weight << " = "
+    << newweight << "/" << oldweight << std::endl;
   assert(std::isfinite(weight));
+#endif
 
   return weight;
 }

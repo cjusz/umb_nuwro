@@ -102,5 +102,8 @@ void PlotVar2D(VarToPlot2D &v, PlotData &pd);
 
 void PlotVar1D_2Dial(VarToPlot1D_2Dial &v, PlotData &pd);
 
+void PlotValiFitResults(TH1D* FDDistrib, TH1D* MCPreFit, TH1D* MCPostFit,
+  TH1D* MCTrueReweight, std::string XAxisName, std::string YAxisName,
+  std::string LegendTitle, std::string PDFOutName);
 
 }

@@ -204,6 +204,7 @@ int main (int argc, char *argv[]){
           }else{
             if(extended_mode){
               rtEv.fStdHepPdg[rtEv.fStdHepN] = NucleusPdg;
+              rtEv.fStdHepPdg[rtEv.fStdHepN] = 0;
 
               rtEv.fStdHepN++; // fill out the rest of this entry as usual
               rtEv.fStdHepPdg[rtEv.fStdHepN] = in_part.pdg;
@@ -264,7 +265,6 @@ int main (int argc, char *argv[]){
         //Out particles (particles leaving the vertex, preFSI)
         for (int nout = 0; nout < nwEv->out.size(); nout++){
           particle &out_part = nwEv->out[nout];
-          // Don't bother saving preFSI lepton separately
           rtEv.fStdHepPdg[rtEv.fStdHepN] = out_part.pdg;
           rtEv.fStdHepStatus[rtEv.fStdHepN] = 14; //Hadron in the nucleus
           for(int k = 0; k < 4; k++){

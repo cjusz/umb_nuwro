@@ -456,4 +456,66 @@ void PlotVar2D(VarToPlot2D &v, PlotData &pd){
 
 }
 
+void PlotValiFitResults(TH1D* FDDistrib, TH1D* MCPreFit, TH1D* MCPostFit,
+  TH1D* MCTrueReweight, std::string XAxisName, std::string YAxisName,
+  std::string LegendTitle, std::string PDFOutName){
+
+  TCanvas* c1 = new TCanvas("ValiFitResults","");
+  c1->SetMargin(0.15,0.03,0.13,0.06);
+  ValiStyle()->cd();
+
+  FDDistrib->SetLineColor(kBlack);
+  FDDistrib->SetLineWidth(2);
+  FDDistrib->SetLineStyle(1);
+  FDDistrib->SetTitle("Fake Data");
+
+  MCPreFit->SetLineColor(kRed);
+  MCPreFit->SetLineWidth(2);
+  MCPreFit->SetLineStyle(2);
+  MCPreFit->SetTitle("MC pre-fit");
+
+  MCPostFit->SetLineColor(kBlue);
+  MCPostFit->SetLineWidth(2);
+  MCPostFit->SetLineStyle(2);
+  MCPostFit->SetTitle("MC post-fit");
+
+  MCTrueReweight->SetLineColor(kMagenta);
+  MCTrueReweight->SetLineWidth(2);
+  MCTrueReweight->SetLineStyle(2);
+  MCTrueReweight->SetTitle("MC reweighted with true params.");
+
+  TLegend * leg = new TLegend(0.5,0.5,0.85,0.9);
+  leg->SetHeader(LegendTitle.c_str());
+  leg->SetTextSize(leg->GetTextSize()*1.25);
+  leg->SetFillColor(kWhite);
+  leg->SetFillStyle(-1);
+  leg->SetBorderSize(-1);
+  leg->AddEntry(FDDistrib, FDDistrib->GetTitle(), "l");
+  leg->AddEntry(MCPreFit, MCPreFit->GetTitle(), "l");
+  leg->AddEntry(MCPostFit, MCPostFit->GetTitle(), "l");
+  leg->AddEntry(MCTrueReweight, MCTrueReweight->GetTitle(), "l");
+
+  if(FDDistrib->GetMaximum() > MCPreFit->GetMaximum()){
+    FDDistrib->GetYaxis()->SetRangeUser(0,FDDistrib->GetMaximum()*1.2);
+    FDDistrib->GetYaxis()->SetTitle(YAxisName.c_str());
+    FDDistrib->GetXaxis()->SetTitle(XAxisName.c_str());
+    FDDistrib->Draw("");
+    MCPreFit->Draw("SAME");
+  } else {
+    MCPreFit->GetYaxis()->SetRangeUser(0,MCPreFit->GetMaximum()*1.2);
+    MCPreFit->GetYaxis()->SetTitle(YAxisName.c_str());
+    MCPreFit->GetXaxis()->SetTitle(XAxisName.c_str());
+    MCPreFit->Draw("");
+    FDDistrib->Draw("SAME");
+  }
+
+  MCPostFit->Draw("SAME");
+  MCTrueReweight->Draw("SAME");
+
+  leg->Draw();
+
+  c1->SaveAs(PDFOutName.c_str());
+  delete c1;
+}
+
 }
