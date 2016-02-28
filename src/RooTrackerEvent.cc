@@ -208,6 +208,7 @@ event GetNuWroEvent1(RooTrackerEvent const & rt, Double_t EScale){
       "will not work (or cause segfaults).\n[INFO]: nuwro2rootracker might need"
       " to be run in extended mode to output these particles." << std::endl;
   }
+  ev.weight = rt.fEvtWght*1.e-38;
   return ev;
 }
 

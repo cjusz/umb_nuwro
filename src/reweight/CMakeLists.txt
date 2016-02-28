@@ -7,16 +7,18 @@ set(REWEIGHT_SOURCES
   NuwroSyst.cc
   NuwroSystSet.cc
   NuwroSystUncertainty.cc
+  PythiaQuiet.f
 )
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
   add_library(reweight STATIC ${REWEIGHT_SOURCES})
+  set(FOMP "-fopenmp")
+  set_target_properties(reweight PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP}" )
+  set_target_properties(reweight PROPERTIES COMPILE_FLAGS "${FOMP} ")
 else()
   add_library(reweight SHARED ${REWEIGHT_SOURCES})
   set_target_properties(reweight PROPERTIES VERSION
     "${NUWRO_VERSION_MAJOR}.${NUWRO_VERSION_MINOR}.${NUWRO_VERSION_REVISION}")
 endif()
-
-target_include_directories(reweight PUBLIC ${PROJECT_INCLUDE_PATHS})
 
 install(TARGETS reweight DESTINATION lib)

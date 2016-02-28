@@ -6,11 +6,17 @@ set (NUWRO_VERSION_MAJOR 11)
 set (NUWRO_VERSION_MINOR 18) #The q+1'th letter of the alphabet
 set (NUWRO_VERSION_REVISION 0)
 
+enable_language(Fortran)
+
 set (VERBOSE TRUE)
 
 set (CMAKE_SKIP_BUILD_RPATH TRUE)
 
-set (CMAKE_BUILD_TYPE DEBUG)
+if(NOT CMAKE_BUILD_TYPE)
+  set (CMAKE_BUILD_TYPE DEBUG)
+endif()
+
+set (NUWRO_SINGLE_LIB TRUE)
 
 if(DEFINED ENV{INSTALL_PREFIX})
   set(CMAKE_INSTALL_PREFIX $ENV{INSTALL_PREFIX})
@@ -30,65 +36,45 @@ endif()
 include ($ENV{ROOTSYS}/etc/cmake/FindROOT.cmake)
 
 if ( NOT ROOT_FOUND )
-  message (FATAL_ERROR "root-config could not be found, is ROOT built in $ROOTSYS = $ENV{ROOTSYS}")
+  message (FATAL_ERROR "[ROOT]: FindROOT.cmake could not be found, or did not execute as expected is ROOT installed in $ROOTSYS = $ENV{ROOTSYS}?")
 else()
   execute_process (COMMAND root-config --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process (COMMAND root-config --libs OUTPUT_VARIABLE ROOT_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-  message ( STATUS "root-config --cflags: " ${ROOT_CXX_FLAGS} )
-  message ( STATUS "root-config --libs: " ${ROOT_LD_FLAGS} )
+  execute_process (COMMAND root-config --version OUTPUT_VARIABLE ROOT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+  message ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
+  message ( STATUS "[ROOT]: root-config --cflags: " ${ROOT_CXX_FLAGS} )
+  message ( STATUS "[ROOT]: root-config --libs: " ${ROOT_LD_FLAGS} )
 endif()
 
-#Function for building dictionaries
-function(gen_root_dicts TAR Header)
-  get_filename_component(HeaderName ${Header} NAME_WE)
-  string(REPLACE " " ";" LIST_CMAKE_CXX_FLAGS ${CURRENT_CMAKE_CXX_FLAGS})
+if(${ROOT_VERSION} MATCHES "6.*")
+  set(ISROOT6 TRUE)
+  message( STATUS "[ROOT]: Using ROOT 6.")
+else()
+  set(ISROOT6 FALSE)
+endif()
 
-  SET(LIST_PROJECT_INCLUDE_PATHS "")
-   FOREACH(incp ${PROJECT_INCLUDE_PATHS})
-      LIST(APPEND LIST_PROJECT_INCLUDE_PATHS "-I${incp}")
-   ENDFOREACH()
+################################## Pythia6 ####################################
 
-  #Learn how to generate the Dict.cxx and Dict.hxx
-  add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${HeaderName}Dict.cc"
-    "${CMAKE_CURRENT_BINARY_DIR}/${HeaderName}Dict.h"
-    COMMAND rootcint
-    ARGS -f ${CMAKE_CURRENT_BINARY_DIR}/${HeaderName}Dict.cc -c
-    -p ${LIST_PROJECT_INCLUDE_PATHS} ${LIST_CMAKE_CXX_FLAGS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/${HeaderName}.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/${HeaderName}LinkDef.h
-    )
-
-  add_custom_target(${HeaderName}Dict
-    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${HeaderName}Dict.cc"
-            "${CMAKE_CURRENT_BINARY_DIR}/${HeaderName}Dict.h" )
-  add_dependencies(${TAR} ${HeaderName}Dict)
-
-  if(VERBOSE)
-    message(STATUS "[ROOT DICT GEN]: Target: ${TAR} depends on generated ${CMAKE_CURRENT_BINARY_DIR}/${HeaderName}Dict.cc, ${CMAKE_CURRENT_BINARY_DIR}/${HeaderName}Dict.h")
-  endif()
-endfunction()
-
-if(DEFINED ENV{PYTHIA6}) #Latest ROOT 5 doesn't seem to add libPythia6.so to its
-                         #lib dir.
+if(DEFINED ENV{PYTHIA6})
   set(PYTHIA6LIBLOC "-L$ENV{PYTHIA6}")
 else()
-  set(PYTHIA6LIBLOC "")
+  set(PYTHIA6LIBLOC)
 endif()
 
 ################################## COMPILER ####################################
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 ${ROOT_CXX_FLAGS} -Wall -Wno-unused-variable -Wno-sign-compare -Wno-unused-function -Wno-unused-but-set-variable -Wno-reorder")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${ROOT_CXX_FLAGS} -fPIC")
+set(CXX_WARNINGS "-Wall -Wno-unused-variable -Wno-sign-compare -Wno-unused-function -Wno-unused-but-set-variable -Wno-reorder")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 ${ROOT_CXX_FLAGS} ${CXX_WARNINGS} ")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -O3 ${ROOT_CXX_FLAGS} ${CXX_WARNINGS} ")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
   set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS_DEBUG} ${ROOT_LD_FLAGS} -lEG -lEGPythia6 -lGeom -lMinuit ${PYTHIA6LIBLOC} -lPythia6")
   set(CURRENT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
 elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
-  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS_RELEASE} ${ROOT_LD_FLAGS} -lEG -lEGPythia6 -lGeom -lMinuit ${PYTHIA6LIBLOC} -lPythia6")
+  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS_RELEASE} ${ROOT_LD_FLAGS} -lEG -lEGPythia6 -lGeom -lMinuit ${PYTHIA6LIBLOC} -lPythia6 -Wl,--no-as-needed")
   set(CURRENT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_RELEASE})
 else()
-  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS_RELEASE} ${ROOT_LD_FLAGS} -lEG -lEGPythia6 -lGeom -lMinuit  ${PYTHIA6LIBLOC} -lPythia6-Wl,--no-as-needed")
+  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS_RELEASE} ${ROOT_LD_FLAGS} -lEG -lEGPythia6 -lGeom -lMinuit  ${PYTHIA6LIBLOC} -lPythia6 -Wl,--no-as-needed")
   set(CURRENT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_RELEASE})
 endif()
 
@@ -98,7 +84,6 @@ if (VERBOSE)
   message (STATUS "    Debug flags   : " ${CMAKE_CXX_FLAGS_DEBUG})
   message (STATUS "    Link Flags    : " ${CMAKE_LINK_FLAGS})
 endif()
-
 
 
 ################################################################################

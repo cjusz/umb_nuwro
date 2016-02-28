@@ -62,8 +62,8 @@ public:
 	inline void krok_czasowy(double dt);         ///< move the particle by v*dt
 	inline void krok(double dl);                 ///< move the particle by dl
 	inline void krok(vec dl);                 ///< move the particle by dl
-	inline double momentum ();                   ///< value of the momentum
-	inline double momentum2 ();                  ///< momenutm squared
+	inline double momentum () const ;                   ///< value of the momentum
+	inline double momentum2 () const ;                  ///< momenutm squared
 	inline bool is_valid();                             ///< checkes for nan in energy an momentum
 	inline bool decay (particle & p1, particle & p2);   ///< cause particle to decay into p1 and p2
 												 ///< (preserves the masses of p1 and p2)
@@ -252,12 +252,12 @@ double particle::v2 ()
     return (x*x+y*y+z*z)/t/t;
   }
 
-double particle::momentum ()
+double particle::momentum () const
   {
     return vec(x,y,z).length();
   }
 
-double particle::momentum2 ()
+double particle::momentum2 () const
   {
     return x*x+y*y+z*z;
   }

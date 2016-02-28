@@ -9,27 +9,35 @@ set(SRC_SUBDIRS
   #rpa -- Not included by default
   )
 
-set(PROJECT_INCLUDE_PATHS ${PROJECT_INCLUDE_PATHS} ${CMAKE_CURRENT_SOURCE_DIR})
+set(EVENT_LIBS event)
+if(NOT NUWRO_SINGLE_LIB)
+  set(EVENT_LIBS dis sf ${EVENT_LIBS})
+endif()
+
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 foreach (dir ${SRC_SUBDIRS})
   if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
-    set(PROJECT_INCLUDE_PATHS ${PROJECT_INCLUDE_PATHS} ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/${dir})
   else()
     message(FATAL_ERROR "Directory ${CMAKE_CURRENT_SOURCE_DIR}/${dir} doesn't exist and it was expected to.")
   endif()
 endforeach()
 
-set(SUBDIRS vali ${SRC_SUBDIRS}) # don't add vali headers to main project
-foreach (dir ${SUBDIRS})
+get_directory_property(incdirs INCLUDE_DIRECTORIES)
+message(STATUS "Include Paths: ${incdirs}")
+
+set(EVENT_SOURCES)
+
+foreach (dir ${SRC_SUBDIRS};vali)
+  message(STATUS "Adding subdirectory src/${dir}")
   add_subdirectory(${dir})
 endforeach()
 
-
-message(STATUS "FULL INCLUDE PATH: ${PROJECT_INCLUDE_PATHS}")
-
-set(EVENT_SOURCES
+set(EVENT_SOURCES ${EVENT_SOURCES}
   event1.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/event1Dict.cc #Generated
+  ${CMAKE_CURRENT_BINARY_DIR}/event1Dict.cxx #The ROOT dictionary gen function appends .cxx
   generatormt.cc
   particle.cc
   pauli.cc
@@ -75,9 +83,8 @@ else()
     "${NUWRO_VERSION_MAJOR}.${NUWRO_VERSION_MINOR}.${NUWRO_VERSION_REVISION}")
 endif()
 
-target_include_directories(event PUBLIC ${PROJECT_INCLUDE_PATHS})
-
-gen_root_dicts(event event1.h)
+ROOT_GENERATE_DICTIONARY( ${CMAKE_CURRENT_BINARY_DIR}/event1Dict event1.h
+  LINKDEF event1LinkDef.h)
 
 install(TARGETS event DESTINATION lib)
 
@@ -85,11 +92,15 @@ install(TARGETS event DESTINATION lib)
 # Executables
 ########################
 
+message(STATUS "Building libevent with: ${EVENT_SOURCES}")
+
 add_executable(nuwro main.cc)
 target_link_libraries(nuwro event)
-target_link_libraries(nuwro sf)
-target_link_libraries(nuwro dis)
-target_link_libraries(nuwro reweight) # for debugging
+if(NOT NUWRO_SINGLE_LIB)
+  target_link_libraries(nuwro sf)
+  target_link_libraries(nuwro dis)
+endif()
+
 set_target_properties(nuwro PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 
 add_executable(nuwro2rootracker nuwro2rootracker.cc)
@@ -100,3 +111,7 @@ install(TARGETS
   nuwro
   nuwro2rootracker
   DESTINATION bin)
+
+if(ISROOT6)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/event1Dict_rdict.pcm DESTINATION lib)
+endif()

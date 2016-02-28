@@ -10,7 +10,11 @@ namespace rew  {
 
 //#define DEBUG_RES_REWEIGHT
 
-double GetWghtPropToResXSec(event &nuwro_event, params const & rwparams);
+void SetupSPP(void);
+void SetupSPP(params & param);
+
+double GetWghtPropToResXSec(event const &nuwro_event, params const & rwparams,
+  bool RTDebug=false);
 
 class NuwroReWeight_MaRES_CA5 : public NuwroWghtEngineI {
 public:
@@ -19,9 +23,6 @@ public:
   NuwroReWeight_MaRES_CA5(params const & param);
   ~NuwroReWeight_MaRES_CA5();
 
-
-  void SetupSPP(void);
-  void SetupSPP(params & param);
   bool SystIsHandled(NuwroSyst_t syst);
   void SetSystematic(NuwroSyst_t syst, double val);
   void Reset(void);

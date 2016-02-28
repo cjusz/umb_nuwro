@@ -72,6 +72,7 @@ class event:public TObject
 		}
 
 		event ():weight(0),norm(1){}///< default constructor
+		~event(){}
 		inline void check();        ///< stop program if event weight or momentum of any particle is NaN (not a number)
 		inline void clear_fsi();    ///< clear the fsi intermediate particles tracks
 		inline particle nu ();	    ///< initial neutrino
@@ -84,7 +85,7 @@ class event:public TObject
 		inline double costheta ();  ///< cos theta lab
 		inline double E ();         ///< initial neutrino energy
 		inline int charge (int r);  ///< total charge: 0 - initial, 1 - before fsi, 2 - after fsi
-		inline double W ();         ///< invariant mass (before fsi, all particles except the rescattered lepton)
+		inline double W () const;         ///< invariant mass (before fsi, all particles except the rescattered lepton)
 		inline int n ();            ///< number of particles after primery vertex (before fsi)
 		inline int f ();            ///< number of particles leaving nucleous
 		inline int nof (int pdg);                     ///< number of particles after primery vertex
@@ -302,7 +303,7 @@ int event::charge (int r)
 
 /// invaraint mass
 double event::W ()
-{
+const {
 	vect h = out[1];
 	for (int a = 2; a < out.size (); a++)
 		h = h + out[a];

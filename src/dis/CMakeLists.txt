@@ -18,6 +18,7 @@ set(DIS_SOURCES
   singlepion.cc
   singlepionhadr.cc
 )
+#Will not compile by default.
 set(DIS_EXTRA
   dishadr.cc
   disweight.cc
@@ -26,14 +27,23 @@ set(DIS_EXTRA
   resweight.cc
   )
 
-if("${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
-  add_library(dis STATIC ${DIS_SOURCES})
-else()
-  add_library(dis SHARED ${DIS_SOURCES})
-  set_target_properties(dis PROPERTIES VERSION
-    "${NUWRO_VERSION_MAJOR}.${NUWRO_VERSION_MINOR}.${NUWRO_VERSION_REVISION}")
-endif()
+if(NUWRO_SINGLE_LIB)
+  message(STATUS "Adding DIS sources to event lib: ${DIS_SOURCES}")
 
-target_include_directories(dis PUBLIC ${PROJECT_INCLUDE_PATHS})
+  set(ABS_DIS_SOURCES "")
+  foreach(src ${DIS_SOURCES})
+    list(APPEND ABS_DIS_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/${src}")
+  endforeach(src)
 
-install(TARGETS dis DESTINATION lib)
+  set(EVENT_SOURCES ${EVENT_SOURCES} ${ABS_DIS_SOURCES} PARENT_SCOPE)
+else(NUWRO_SINGLE_LIB)
+  message(STATUS "Building libdis with: ${DIS_SOURCES}")
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
+    add_library(dis STATIC ${DIS_SOURCES})
+  else()
+    add_library(dis SHARED ${DIS_SOURCES})
+    set_target_properties(dis PROPERTIES VERSION
+      "${NUWRO_VERSION_MAJOR}.${NUWRO_VERSION_MINOR}.${NUWRO_VERSION_REVISION}")
+  endif()
+  install(TARGETS dis DESTINATION lib)
+endif(NUWRO_SINGLE_LIB)
