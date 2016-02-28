@@ -8,12 +8,6 @@
 #include <cstdlib>
 using namespace std;
 
-double Masa = M12;
-
-double MM = Masa * Masa;
-
-int znak;
-
 const int neutrino = 1;
 
 const int antyneutrino = -1;
@@ -21,20 +15,11 @@ const int antyneutrino = -1;
 const int CC = 1;
 const int NC = -1;
 
-double masa_leptonu;
-
-int W_Z;			// Decyduje czy mamy prady naladowane czy neutralne
- //int Form_Faktory;
-
-//double sin2thetaW = sin_2_theta_W;
-double masa_rezonansu;
-
-
-double W_limit (1000 * GeV);	// --- jesli nie jest ustalna to az 1000*GeV !!!
+const double W_limit = 1000 * GeV;	// --- jesli nie jest ustalna to az 1000*GeV !!!
 
 int
 form_faktory_wektorowe (int FFset, double Q2, double W, int NC_czy_CC,
-			double *c3v, double *c4v, double *c5v, double *c6v)
+			double *c3v, double *c4v, double *c5v, double *c6v, double Masa)
 {
   double funkcja;
 
@@ -130,7 +115,7 @@ switch (FFset)
       *c6v = 0;
       break;
     }
-      
+
     }
   if (NC_czy_CC == NC)
     {
@@ -198,7 +183,7 @@ switch (FFset)
 
 int
 form_faktory_aksjalne (int FFset, double delta_axial_mass, double delta_C5A, double Q2, double W, double *c3a,
-		       double *c4a, double *c5a, double *c6a)
+		       double *c4a, double *c5a, double *c6a, double MM)
 {
 
   double MA;			// 1.00*GeV;
@@ -226,7 +211,7 @@ double a3A, b3A, c3A, d3A, e3A, a4A, b4A, c4A, d4A, e4A, a5A, b5A, c5A, d5A, e5A
       funkcja6 = funkcja5 * MM / (Q2 + m_pi * m_pi);
       break;
 
-    
+
     case 2:
       MA = 1.05 * GeV;
       MA2 = MA * MA;
@@ -353,7 +338,7 @@ break;
 
 int
 tensor_hadronowy (int FFset, double delta_axial_mass, double delta_C5A, double E, double Q2, double W, double *W1,
-		  double *W2, double *W3, double *W4, double *W5, double *W6)
+		  double *W2, double *W3, double *W4, double *W5, double *W6, double masa_rezonansu, double MM, double Masa, int W_Z)
 /* Ta funkcja zwraca funkcje struktury (patrz notattki k.g.), ktore sa lorentzowsko niezmiennicze */
 {
 
@@ -366,9 +351,9 @@ tensor_hadronowy (int FFset, double delta_axial_mass, double delta_C5A, double E
   double c3v, c4v, c5v, c6v;
   double c3a, c4a, c5a, c6a;
 
-  form_faktory_wektorowe (FFset, Q2, W, W_Z, &c3v, &c4v, &c5v, &c6v);
+  form_faktory_wektorowe (FFset, Q2, W, W_Z, &c3v, &c4v, &c5v, &c6v, Masa);
 
-  form_faktory_aksjalne (FFset, delta_axial_mass, delta_C5A, Q2, W, &c3a, &c4a, &c5a, &c6a);
+  form_faktory_aksjalne (FFset, delta_axial_mass, delta_C5A, Q2, W, &c3a, &c4a, &c5a, &c6a, MM);
 
 // Wklady tensorowe z praca: O. Lalakulich, E. Paschos, Phys. ReV. D 71, 074003 (2005) //
 
@@ -450,7 +435,7 @@ tensor_hadronowy (int FFset, double delta_axial_mass, double delta_C5A, double E
 }
 
 double
-qw (double W)
+qw (double W, double MM)
 {
   double l = pow (W * W + MM - m_pi * m_pi, 2) - 4 * W * W * MM;
 
@@ -459,7 +444,9 @@ qw (double W)
 
 
 double
-dif_cross_q0_W (int FFset, double delta_axial_mass, double delta_C5A, double E, double q0, double W)
+dif_cross_q0_W (int FFset, double delta_axial_mass, double delta_C5A, double E,
+  double q0, double W, double masa_leptonu, double MM, int znak, double Masa,
+  int W_Z)
 {
   double Q2 = 2 * Masa * q0 + Masa * Masa - W * W;
 
@@ -474,9 +461,10 @@ dif_cross_q0_W (int FFset, double delta_axial_mass, double delta_C5A, double E, 
 
   double kp = E * Masa;		// w ukladzie LAB
 
-  masa_rezonansu = 1232 * MeV;
+  double masa_rezonansu = 1232 * MeV;
 
-  tensor_hadronowy (FFset, delta_axial_mass, delta_C5A, E, Q2, W, &W1, &W2, &W3, &W4, &W5, &W6);
+  tensor_hadronowy (FFset, delta_axial_mass, delta_C5A, E, Q2, W, &W1, &W2, &W3,
+    &W4, &W5, &W6, masa_rezonansu, MM, Masa, W_Z);
 
   double czynnik =
     (2 * W1 * (-Q2 - mm2) +
@@ -484,13 +472,13 @@ dif_cross_q0_W (int FFset, double delta_axial_mass, double delta_C5A, double E, 
      2 * znak * (W3 / MM) * (Q2 * kp - 0.5 * qp * (Q2 + mm2)) +
      2 * (W4 / MM) * mm2 * (Q2 + mm2) / 2 -
      (W5 / MM) * mm2 * kp) * masa_rezonansu;
-  // mnoze przez 2 Md aby odzyskac normalizacje Paschosa 
+  // mnoze przez 2 Md aby odzyskac normalizacje Paschosa
 
 
   double Gamma_0 = 120 * MeV;
 
   double Gamma_D =
-    Gamma_0 * pow (qw (W) / qw (masa_rezonansu), 3) * masa_rezonansu / W;
+    Gamma_0 * pow (qw (W, MM) / qw (masa_rezonansu, MM), 3) * masa_rezonansu / W;
 
   double GAMMA =
     Gamma_D * masa_rezonansu /
@@ -513,15 +501,15 @@ dif_cross_q0_W (int FFset, double delta_axial_mass, double delta_C5A, double E, 
 
 // Ponizsza ma za argumenty Energia=Energia neutrina, q0=przekaz energii k_0 - {k'}_O m_l =masa leptonu
 // Zwraca ona 8 liczb
-// Przekrojow czynnych NC, 
-// 4 pierwsze: rozpraszanie neutrin: 
-//             produkcja proton  pi_0 :  *NC_n_p_p0   
-//             produkcja neutron pi_+ :  *NC_n_n_pi_plus  
+// Przekrojow czynnych NC,
+// 4 pierwsze: rozpraszanie neutrin:
+//             produkcja proton  pi_0 :  *NC_n_p_p0
+//             produkcja neutron pi_+ :  *NC_n_n_pi_plus
 //             produkcja neutron pi_0 :  *NC_n_n_p0
 //             produkcja proton  po_- :  *NC_n_p_pi_minus
-// 4 nastepne: rozpraszanie antyneutrin: 
-//             produkcja proton  pi_0 :  *NC_an_p_p0   
-//             produkcja neutron pi_+ :  *NC_an_n_pi_plus  
+// 4 nastepne: rozpraszanie antyneutrin:
+//             produkcja proton  pi_0 :  *NC_an_p_p0
+//             produkcja neutron pi_+ :  *NC_an_n_pi_plus
 //             produkcja neutron pi_0 :  *NC_an_n_p0
 //             produkcja proton  po_- :  *NC_an_p_pi_minus
 
@@ -530,20 +518,19 @@ Przekroje_Czynne_q0_W_NC (int FFset, double delta_axial_mass, double delta_C5A, 
 			  int FF, double *NC_n_p_p0, double *NC_n_n_pi_plus,
 			  double *NC_n_n_p0, double *NC_n_p_pi_minus,
 			  double *NC_an_p_p0, double *NC_an_n_pi_plus,
-			  double *NC_an_n_p0, double *NC_an_p_pi_minus)
+			  double *NC_an_n_p0, double *NC_an_p_pi_minus, double MM, double Masa)
 {
 
-  masa_rezonansu = 1232 * MeV;
-
-  W_Z = NC;
+  int W_Z = NC;
 
   double czynnik_n, czynnik_an;
 
-  znak = neutrino;
+  int znak = neutrino;
 
-  masa_leptonu = 0;
+  double masa_leptonu = 0;
 
-  czynnik_n = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, Energia, q0, W);
+  czynnik_n = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, Energia, q0,
+    W, masa_leptonu, MM, znak, Masa, W_Z);
 
   *NC_n_p_p0 = (2 / 9.) * czynnik_n;
   *NC_n_n_pi_plus = (1 / 9.) * czynnik_n;
@@ -552,7 +539,8 @@ Przekroje_Czynne_q0_W_NC (int FFset, double delta_axial_mass, double delta_C5A, 
 
   znak = antyneutrino;
 
-  czynnik_an = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, Energia, q0, W);
+  czynnik_an = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, Energia,
+    q0, W, masa_leptonu, MM, znak, Masa, W_Z);
 
   *NC_an_p_p0 = (2 / 9.) * czynnik_an;
   *NC_an_n_pi_plus = (1 / 9.) * czynnik_an;
@@ -564,14 +552,14 @@ Przekroje_Czynne_q0_W_NC (int FFset, double delta_axial_mass, double delta_C5A, 
 
 // Ponizsza ma za argumenty Energia=Energia neutrina, q0=przsekaz energii k_0 - {k'}_O m_l =masa leptonu
 // Zwraca ona 6 liczb
-// Przekrojow czynnych CC, 
-// 3 pierwsze: rozpraszanie neutrin: 
-//             produkcja proton  pi_+ :  *CC_n_p_plus   
-//             produkcja neutron pi_+ :  *CC_n_n_p_plus  
+// Przekrojow czynnych CC,
+// 3 pierwsze: rozpraszanie neutrin:
+//             produkcja proton  pi_+ :  *CC_n_p_plus
+//             produkcja neutron pi_+ :  *CC_n_n_p_plus
 //             produkcja proton  pi_0 :  *CC_n_p_p0
-// 3 nastepne: rozpraszanie antyneutrin: 
-//             produkcja proton  pi_+ :  *CC_an_p_plus   
-//             produkcja neutron pi_+ :  *CC_an_n_p_plus  
+// 3 nastepne: rozpraszanie antyneutrin:
+//             produkcja proton  pi_+ :  *CC_an_p_plus
+//             produkcja neutron pi_+ :  *CC_an_n_p_plus
 //             produkcja proton  pi_0 :  *CC_an_p_p0
 
 
@@ -580,17 +568,16 @@ Przekroje_Czynne_q0_W_CC (int FFset, double delta_axial_mass, double delta_C5A, 
 			  double m_l, int FF, double *CC_n_p_plus,
 			  double *CC_n_n_p_plus, double *CC_n_p_p0,
 			  double *CC_an_p_plus, double *CC_an_n_p_plus,
-			  double *CC_an_p_p0)
+			  double *CC_an_p_p0, double MM, double Masa)
 {
 
-  masa_rezonansu = 1232 * MeV;
+  int W_Z = CC;
+  double masa_leptonu = m_l;
 
-  W_Z = CC;
-  masa_leptonu = m_l;
+  int znak = neutrino;
 
-  znak = neutrino;
-
-  double liczba_a = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, Energia, q0, W);
+  double liczba_a = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, Energia,
+    q0, W, masa_leptonu, MM, znak, Masa, W_Z);
 
   *CC_n_p_plus = liczba_a;
   *CC_n_n_p_plus = (1 / 9.) * liczba_a;
@@ -599,7 +586,8 @@ Przekroje_Czynne_q0_W_CC (int FFset, double delta_axial_mass, double delta_C5A, 
 
   znak = antyneutrino;
 
-  double liczba_an = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, Energia, q0, W);
+  double liczba_an = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A,
+    Energia, q0, W, masa_leptonu, MM, znak, Masa, W_Z);
 
   *CC_an_p_plus = liczba_an;
   *CC_an_n_p_plus = (1 / 9.) * liczba_an;
@@ -617,7 +605,14 @@ cr_sec_delta (int FFset, double delta_axial_mass, double delta_C5A, double E, do
 
   double przekroj = 0, wynik = 0;
 
-  masa_rezonansu = 1232 * MeV;
+  double Masa = M12;
+
+  double MM = Masa * Masa;
+
+  double masa_rezonansu = 1232 * MeV;
+  double masa_leptonu = 0;
+  int znak = 0;
+  int W_Z = 0;
 
   switch (current)
     {
@@ -632,7 +627,8 @@ cr_sec_delta (int FFset, double delta_axial_mass, double delta_C5A, double E, do
 	{
 	  znak = antyneutrino;
 	}
-      przekroj = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, E, nu, W);
+      przekroj = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, E, nu, W,
+         masa_leptonu, MM, znak, Masa, W_Z);
 ////////////?????????????????????????????????????????????sprawdzic czy w porzadku sa reguly izospuinowe//////////////////////
 //neutrino
       if (lepton_in > 0 && nukleon_in == proton && nukleon_out == proton
@@ -679,7 +675,8 @@ cr_sec_delta (int FFset, double delta_axial_mass, double delta_C5A, double E, do
 	{
 	  znak = antyneutrino;
 	}
-      przekroj = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, E, nu, W);
+      przekroj = dif_cross_q0_W (FFset, delta_axial_mass, delta_C5A, E, nu, W,
+        masa_leptonu, MM, znak, Masa, W_Z);
       //neutrino & antyneutrino
       if (nukleon_in == proton && nukleon_out == proton
 	  && meson_out == pizero)
