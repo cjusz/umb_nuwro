@@ -43,13 +43,6 @@
 #include "pauli.h"
 #include "singlepion.h"
 
-#include "reweight/NuwroReWeight_MaRES_CA5.h"
-
-// #define DEBUG_SPP
-#ifdef DEBUG_SPP
-  int bla_mode = 0;
-#endif
-
 TPythia6 *pythia71 = new TPythia6 ();
 extern "C" int pycomp_ (const int *);
 extern double SPP[2][2][2][3][40];
@@ -70,7 +63,7 @@ resevent2 (params & p, event & e, bool cc)
 ///////////////////////////////////////////////////////////////////
 {
   double M2 = M12 * M12;
-  bool current = cc;		//cc==true for charge current
+  bool current = cc;		//cc==true for charge current 
   int nukleon = e.in[1].pdg;
   int lepton = e.in[0].pdg;
 
@@ -78,7 +71,7 @@ resevent2 (params & p, event & e, bool cc)
   double m2 = m * m;
 
   vect nu0 = e.in[0];
-
+  
   e.weight=0;  // in case of error it is not changed
 
 
@@ -105,11 +98,11 @@ int numneu=p.nucleus_n;
 	break;
 	case 4: _E_bind = binen (ped, numpro, numneu);//effective SF
 	break;
-	case 5: _E_bind= deuter_binen (ped);//deuterium
+	case 5: _E_bind= deuter_binen (ped);//deuterium 
 	break;
 	case 6: _E_bind= p.nucleus_E_b; //deuterium like Fermi gas
 	break;
-
+	
 //in the future it is possible to add SF for other nuclei as well
 	default: _E_bind=0;
 	}
@@ -202,9 +195,9 @@ double Meff2=Meff*Meff;
       double cth = (E2 + kprim * kprim - q * q) / 2 / E / kprim;//final lepton
 
       vec kkprim;		//the unit vector in the direction of scattered lepton
-      if(abs(cth)>1)
+      if(abs(cth)>1) 
 		return; // e.weight=0 already
-      kinfinder (numom, kkprim, cth);	//produces kkprim
+      kinfinder (numom, kkprim, cth);	//produces kkprim 
 
       kkprim = kprim * kkprim;	//multiplied by its length
 
@@ -267,9 +260,6 @@ double Meff2=Meff*Meff;
 
       if (W < 1210 || fromdis==0)		//PYTHIA does not work in this region and special treatment is required
 	{
-#ifdef DEBUG_SPP
-    bla_mode = 1;
-#endif
 	  double spp0 = SPP[j][k][l][0][0];
 	  double spp1 = SPP[j][k][l][1][0];
 	  double spp2 = SPP[j][k][l][2][0];
@@ -359,7 +349,7 @@ double Meff2=Meff*Meff;
 	  vect finnuk, finpion;
 
 	  kin2part (W, nukleon2, pion, finnuk, finpion);	//produces 4-momenta of final pair: nucleon + pion
-
+	  
 	  finnuk = finnuk.boost (hadrspeed);
 	  finnuk = finnuk.boost (nuc0.v ());
 
@@ -374,18 +364,6 @@ double Meff2=Meff*Meff;
 
 	  e.out.push_back (ppion);
 	  e.out.push_back (nnukleon);
-
-#ifdef DEBUG_RES_REWEIGHT
-    double recalc = nuwro::rew::GetWghtPropToResXSec(e,p);
-    if(! (fabs(recalc-wsumie) < 1e-10 ) ){
-      std::cout << "[ERROR]: resevent2 wsumie = " << wsumie
-        << " { ENu: " << E << ", W: " << W << ", q0: "
-        << nu << " }" << std::endl;
-    }
-    assert(std::isfinite(wsumie));
-    assert(std::isfinite(recalc));
-    assert(fabs(recalc-wsumie) < 1e-10);
-#endif
 	}
 //end of W<1210 ||fromdis==0
 
@@ -403,22 +381,22 @@ double Meff2=Meff*Meff;
 
 	  pythia71->SetMSTU (20, 1);	//advirsory warning for unphysical flavour switch off
 	  pythia71->SetMSTU (23, 1);	//It sets counter of errors at 0
-	  pythia71->SetMSTU (26, 0);	//no warnings printed
+	  pythia71->SetMSTU (26, 0);	//no warnings printed 
 
 	  // PARJ(32)(D=1GeV) is, with quark masses added, used to define the minimum allowable enrgy of a colour singlet parton system
 	  pythia71->SetPARJ (33, 0.1);
 
-	  // PARJ(33)-PARJ(34)(D=0.8GeV, 1.5GeV) are, with quark masses added, used to define the remaining energy below which
+	  // PARJ(33)-PARJ(34)(D=0.8GeV, 1.5GeV) are, with quark masses added, used to define the remaining energy below which 
 	  //the fragmentation of a parton system is stopped and two final hadrons formed.
 	  pythia71->SetPARJ (34, 0.5);
 	  pythia71->SetPARJ (35, 1.0);
 
-	  //PARJ(36) (D=2.0GeV) represents the dependence of the mass of final quark pair for defining the stopping point of the
+	  //PARJ(36) (D=2.0GeV) represents the dependence of the mass of final quark pair for defining the stopping point of the 
 	  //fragmentation. Strongly corlated with PARJ(33-35)
 
 	  pythia71->SetPARJ (37, 1.);	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
-	  //MSTJ(17) (D=2) number of attemps made to find two hadrons that have a combined mass below the cluster mass and thus allow
+	  //MSTJ(17) (D=2) number of attemps made to find two hadrons that have a combined mass below the cluster mass and thus allow 
 	  // a cluster to decay rather than collaps
 	  pythia71->SetMSTJ (18, 3);	//do not change
 
@@ -449,9 +427,6 @@ double Meff2=Meff*Meff;
 
 	  if (NPar == 5 && (pythiaParticle->K[1][3] == 211 || pythiaParticle->K[1][4] == 211 || pythiaParticle->K[1][3] == 111 || pythiaParticle->K[1][4] == 111 || pythiaParticle->K[1][3] == -211 || pythiaParticle->K[1][4] == -211))	//spp condition
 	    {
-#ifdef DEBUG_SPP
-        bla_mode = 2;
-#endif
 
 	      if (pythiaParticle->K[1][3] == 211 || pythiaParticle->K[1][4] == 211)	//the second part
 		{
@@ -497,12 +472,6 @@ double Meff2=Meff*Meff;
 			      pion, current) / SPPF (j, k, l, t,
 						     W) * alfadelta (j, k, l,
 								     t, W);
-#ifdef DEBUG_RES_REWEIGHT
-       assert(fabs(SPPF(j, k, l, t, W)) > 0);
-      double FACT_cr_sec_delta = cr_sec_delta (FFset, delta_axial_mass, delta_C5A, E, W, nu, lepton, nukleon, nukleon2, pion, current);
-      double FACT_SPPF = SPPF (j, k, l, t,W);
-      double FACT_alfadelta = alfadelta (j, k, l, t, W);
-#endif
 //cout<<delta_spp<<endl;
 
 //approximate implementation of pionless delta decays
@@ -513,8 +482,8 @@ double Meff2=Meff*Meff;
 	  delta_spp*=pdd_red(e.in[0].t );
 	  //cout<<ennergy<<"  "<<rescale<<"  "<<delta_spp<<endl;
 	}
-//approximate implementation of pionless delta decays
-
+//approximate implementation of pionless delta decays	
+	  
 	      double spp_strength = dis_spp + delta_spp;
 //cout<<"spp "<<W<<" "<<nu<<" "<<spp_strength<<endl;
 	      e.weight = spp_strength * 1e-38 * przedzial;
@@ -549,23 +518,22 @@ double Meff2=Meff*Meff;
 			  e.out.push_back (part);
 			}
 		    }
-                assert(e.out.size()==3); // well this is fun
 		}
 	      else		//deltaevent
 		{
 		  vect finnuk, finpion;
 
-
+		  
 		  nu0.boost (-hadrspeed);//a boost from nu-N CMS to the hadronic CMS
 		  lepton_out.boost (-hadrspeed);//a boost from nu-N CMS to the hadronic CMS
 		  kin4part (nu0, lepton_out, W, nukleon2, pion, finnuk, finpion,p.delta_angular); //produces 4-momenta of final pair: nucleon + pion with density matrix information
 		  e.weight*= angrew;//reweight according to angular correlation
-
+		 
 		  //kin2part (W, nukleon2, pion, finnuk, finpion);	//produces 4-momenta of the final pair: nucleon + pion
-
+		  
 			nu0.boost (hadrspeed);//a boost back to the nu-N CMS frame
 			nu0.boost (nuc0.v ());//a boost back to tha LAB frame
-
+			
 		  lepton_out.boost (hadrspeed);//a boost back to the nu-N CMS frame
 		  lepton_out.boost (nuc0.v ());//a boost back to tha LAB frame
 
@@ -583,29 +551,7 @@ double Meff2=Meff*Meff;
 
 		  e.out.push_back (ppion);
 		  e.out.push_back (nnukleon);
-#ifdef DEBUG_RES_REWEIGHT
-    std::cout << "__FILE__:__LINE__: " << e.out[1].pdg << ", " << e.out[2].pdg
-      << std::endl;
-    double recalc = nuwro::rew::GetWghtPropToResXSec(e,p);
-    if(! (fabs(recalc-spp_strength) < 1e-10) ){
-      std::cout << "[ERROR]: resevent2 spp_strength = " << spp_strength
-        << " = (" << dis_spp << " + " << delta_spp
-        << "), pdd_red = " << pdd_red(e.in[0].t) << ", { ENu: " << E
-        << ", W: " << W << ", q0: " << nu
-        << " }" << std::endl;
-      std::cout << "SPP Factors: "
-        << "FACT_cr_sec_delta = " << FACT_cr_sec_delta
-        << ", FACT_SPPF = " << FACT_SPPF
-        << ", FACT_alfadelta = " << FACT_alfadelta << std::endl;
-      std::cout << FFset << ", " << delta_axial_mass << ", " << delta_C5A
-        << ", " << E << ", " << W << ", " << nu << ", " << lepton << ", "
-        << nukleon << ", " << nukleon2 << ", " << pion << ", " << current
-        << std::endl;
-    }
-    assert(std::isfinite(spp_strength));
-    assert(std::isfinite(recalc));
-    assert(fabs(recalc-spp_strength) < 1e-10);
-#endif
+
 		}
 
 
@@ -615,9 +561,6 @@ double Meff2=Meff*Meff;
 	  else			//more inelastic final state or single kaon production
 
 	    {			//cout<<"inel "<<W<<" "<<nu<<endl;
-#ifdef DEBUG_SPP
-      bla_mode = 3;
-#endif
 	      e.weight = fromdis * 1e-38 * przedzial;
 
 	      for (int i = 0; i < NPar; i++)
@@ -643,46 +586,17 @@ double Meff2=Meff*Meff;
 		      e.out.push_back (part);
 		    }
 		}
-#ifdef DEBUG_RES_REWEIGHT
-    double recalc = nuwro::rew::GetWghtPropToResXSec(e,p);
-    if(! (fabs(recalc-fromdis) < 1e-10) ){
-      std::cout << "[ERROR]: resevent2 fromdis = " << fromdis
-        << " { ENu: " << E << ", W: " << W << ", q0: "
-        << nu << " }" << std::endl;
-    }
-    assert(std::isfinite(fromdis));
-    assert(std::isfinite(recalc));
-    assert(fabs(recalc-fromdis) < 1e-10);
-#endif
-
 	    }
 //end of more inelastic part or single kaon production
 
-
+	
 }//end of W>1210 &&  !fromdis==0
 
  }
 // E above threshold
-#ifdef DEBUG_SPP
-  size_t NLeps = 0;
-#endif
-	for(size_t j=0;j<e.out.size();j++){
+	for(int j=0;j<e.out.size();j++)
 		e.out[j].r=e.in[1].r;
-#ifdef DEBUG_SPP
-    NLeps += e.out[j].lepton();
-#endif
-  }
-#ifdef DEBUG_SPP
-  if(NLeps > 1){
-    std::cout << "[WARN]: Found " << NLeps << " final state leptons." << std::endl;
-    for(size_t j=0;j<e.out.size();j++){
-      if(e.out[j].lepton()){
-        std::cout << "\t["<<j<<"]: PDG: " << e.out[j].pdg << std::endl;
-      }
-    }
-  }
-  assert(NLeps < 2);
-#endif
+
 }
 
 //the end of main
