@@ -85,12 +85,9 @@ inline void ReWeightRESEvents(std::vector<event> const &nwEvs,
 
   # pragma omp parallel for
   for(size_t i = 0; i < nwEvs.size(); ++i){
-  #pragma omp critical
-    {
     OutWeights[i] = GetRESWeight(nwEvs[i],to_CA5,to_MaRES,
       HaveNomWeights ? InWeights[i] :
                       0xDEADBEEF);
-    }
 #ifdef DEBUG_SRW_OMP
     if(omp_get_thread_num()<9){
       ThreadEvs[omp_get_thread_num()]++;
