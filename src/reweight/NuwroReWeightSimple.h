@@ -205,4 +205,54 @@ inline bool LoadSignalEventsIntoVector(std::string NuWroEvFileName,
   return true;
 }
 
+inline bool LoadSignalEventsIntoSAFVector(std::string NuWroEvFileName,
+  std::vector<PODSimpleAnalysisFormat>& SAFs, SignalFunction IsSignal){
+
+  TFile *NuWroEvFile = NULL;
+  TTree *NuWroEvTree = NULL;
+
+  if( (!LoadTree(NuWroEvFileName,"treeout",NuWroEvFile,NuWroEvTree)) ){
+    return false;
+  }
+
+  event *nwEv = 0; // ROOT is in control of object life cycle
+  NuWroEvTree->SetBranchAddress("e", &nwEv);
+
+  Long64_t nEntries = NuWroEvTree->GetEntries();
+  Long64_t Loaded = 0;
+
+  SAFs.reserve(nEntries);
+  std::cout << "[INFO]: Loading the SAF event signal..." << std::endl;
+  size_t CacheSize = 0;
+  for(Long64_t ent = 0; ent < nEntries; ++ent){
+    size_t CacheSize_Mb = (CacheSize/size_t(8E6));
+    size_t Res_Mb = ((CacheSize
+        + ((SAFs.capacity()-SAFs.size())*sizeof(event)) ) /
+        size_t(8E6));
+    std::cout << "\r[LOADING]: " << int((ent+1)*100/nEntries) << "\% loaded "
+      << "(" << CacheSize_Mb << " Mb / " << Res_Mb << " Mb reserved)"
+      << std::flush;
+    NuWroEvTree->GetEntry(ent);
+
+    event const & nwev = (*nwEv);
+
+    PODSimpleAnalysisFormat const &podsaf =
+      MakePODSimpleAnalysisFormat(nwev);
+
+    if(!IsSignal(podsaf)){
+      continue;
+    }
+    SAFs.push_back(podsaf);
+    //Add proper xsec norm
+    SAFs.back().EvtWght /= double(nEntries);
+    CacheSize += sizeof(podsaf);
+    Loaded++;
+  } std::cout << std::endl;
+  std::cout << "[INFO]: Loaded " << Loaded << " SAF signal events out of "
+    << nEntries << " input events." << std::endl;
+
+  NuWroEvFile->Close();
+  return true;
+}
+
 }

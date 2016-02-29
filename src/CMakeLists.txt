@@ -15,6 +15,8 @@ if(NOT NUWRO_SINGLE_LIB)
   set(EVENT_LIBS dis sf ${EVENT_LIBS})
 endif()
 
+set(AEVENT_LIBS ${EVENT_LIBS} PARENT_SCOPE)
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -28,6 +30,8 @@ endforeach()
 
 get_directory_property(incdirs INCLUDE_DIRECTORIES)
 message(STATUS "Include Paths: ${incdirs}")
+
+set(AINCDIRS ${incdirs} PARENT_SCOPE)
 
 set(EVENT_SOURCES)
 
