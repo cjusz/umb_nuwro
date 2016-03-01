@@ -196,12 +196,17 @@ void nuwro::rew::NuwroReWeight_FlagNorm::Reconfigure(void)
 
 
 //__________________________________________________________________
+<<<<<<< HEAD
 double nuwro::rew::NuwroReWeight_FlagNorm::CalcWeight(event* event)
+=======
+double nuwro::rew::NuwroReWeight_FlagNorm::CalcWeight(const event & event)
+>>>>>>> 4c21c12100da71ec3e7a4d9c6fe90e0ad27196d1
 {
 
   double weight = 1.;
 
   // Apply norm scaling for each flag (Can have multiple flags..)
+
   if (event->flag.qel)  weight *= fNormCurr_QEL;
   if (event->flag.res)  weight *= fNormCurr_RES;
   if (event->flag.dis)  weight *= fNormCurr_DIS;
