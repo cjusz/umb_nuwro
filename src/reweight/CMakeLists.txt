@@ -1,8 +1,9 @@
 set(REWEIGHT_SOURCES
   NuwroReWeight.cc
-  NuwroReWeight_MaCCQE.cc
+  NuwroReWeight_QEL.cc
   NuwroReWeight_MaRES_CA5.cc
-  NuwroReWeight_MECNorm.cc
+  NuwroReWeight_FlagNorm.cc
+  NuwroReWeight_BBBA07.cc
   NuwroSyst.cc
   NuwroSystSet.cc
   NuwroSystUncertainty.cc
