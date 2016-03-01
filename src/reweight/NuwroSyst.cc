@@ -6,24 +6,79 @@ using namespace nuwro::rew;
 
 std::string NuwroSyst::AsString(NuwroSyst_t syst){
   switch(syst) {
-    case kNullSystematic: {
-      return "kNullSystematic";
-    }
-    case kNuwro_MaCCQE: {
-      return "kNuwro_MaCCQE";
-    }
-    case kNuwro_MECNorm: {
-      return "kNuwro_MECNorm";
-    }
-    case kNuwro_MaRES: {
-      return "kNuwro_MaRES";
-    }
-    case kNuwro_CA5: {
-      return "kNuwro_CA5";
-    }
-    default: {
-      return "-";
-    }
+  case kNullSystematic: {
+    return "kNullSystematic";
+  }
+  case kNuwro_Ma_CCQE: {  return "kNuwro_Ma_CCQE";  }
+  case kNuwro_Ma_NCEL: {  return "kNuwro_Ma_NCEL";  }
+  case kNuwro_SMa_NCEL:{  return "kNuwro_SMa_NCEL"; }
+  case kNuwro_DeltaS_NCEL:  {  return "kNuwro_DeltaS_NCEL";    }
+
+    // FLAGS  Norm
+  case kNuwro_QELNorm: {  return "kNuwro_QELNorm";  }
+  case kNuwro_RESNorm: {  return "kNuwro_RESNorm";  }
+  case kNuwro_DISNorm: {  return "kNuwro_DISNorm";  }
+  case kNuwro_COHNorm: {  return "kNuwro_COHNorm";  }
+  case kNuwro_MECNorm: {  return "kNuwro_MECNorm";  }
+  case kNuwro_CCNorm:  {  return "kNuwro_CCNorm";   }
+  case kNuwro_NCNorm:  {  return "kNuwro_NCNorm";   }
+
+  case kNuwro_AntiNuNorm: {  return "kNuwro_AntiNuNorm";  }
+
+    // DYN Norm
+  case kNuwro_DYNNorm_0: {  return "kNuwro_DYNNorm_0";  }
+  case kNuwro_DYNNorm_1: {  return "kNuwro_DYNNorm_1";  }
+  case kNuwro_DYNNorm_2: {  return "kNuwro_DYNNorm_2";  }
+  case kNuwro_DYNNorm_3: {  return "kNuwro_DYNNorm_3";  }
+  case kNuwro_DYNNorm_4: {  return "kNuwro_DYNNorm_4";  }
+  case kNuwro_DYNNorm_5: {  return "kNuwro_DYNNorm_5";  }
+  case kNuwro_DYNNorm_6: {  return "kNuwro_DYNNorm_6";  }
+  case kNuwro_DYNNorm_7: {  return "kNuwro_DYNNorm_7";  }
+  case kNuwro_DYNNorm_8: {  return "kNuwro_DYNNorm_8";  }
+  case kNuwro_DYNNorm_9: {  return "kNuwro_DYNNorm_9";  }
+
+    // BBBA07 FF
+  case kNuwro_BBBA07_AEp1: { return "kNuwro_BBBA07_AEp1"; }
+  case kNuwro_BBBA07_AEp2: { return "kNuwro_BBBA07_AEp2"; }
+  case kNuwro_BBBA07_AEp3: { return "kNuwro_BBBA07_AEp3"; }
+  case kNuwro_BBBA07_AEp4: { return "kNuwro_BBBA07_AEp4"; }
+  case kNuwro_BBBA07_AEp5: { return "kNuwro_BBBA07_AEp5"; }
+  case kNuwro_BBBA07_AEp6: { return "kNuwro_BBBA07_AEp6"; }
+  case kNuwro_BBBA07_AEp7: { return "kNuwro_BBBA07_AEp7"; }  
+
+  case kNuwro_BBBA07_AMp1: { return "kNuwro_BBBA07_AMp1"; }
+  case kNuwro_BBBA07_AMp2: { return "kNuwro_BBBA07_AMp2"; }
+  case kNuwro_BBBA07_AMp3: { return "kNuwro_BBBA07_AMp3"; }
+  case kNuwro_BBBA07_AMp4: { return "kNuwro_BBBA07_AMp4"; }
+  case kNuwro_BBBA07_AMp5: { return "kNuwro_BBBA07_AMp5"; }
+  case kNuwro_BBBA07_AMp6: { return "kNuwro_BBBA07_AMp6"; }
+  case kNuwro_BBBA07_AMp7: { return "kNuwro_BBBA07_AMp7"; }
+
+  case kNuwro_BBBA07_AEn1: { return "kNuwro_BBBA07_AEn1"; }
+  case kNuwro_BBBA07_AEn2: { return "kNuwro_BBBA07_AEn2"; }
+  case kNuwro_BBBA07_AEn3: { return "kNuwro_BBBA07_AEn3"; }
+  case kNuwro_BBBA07_AEn4: { return "kNuwro_BBBA07_AEn4"; }
+  case kNuwro_BBBA07_AEn5: { return "kNuwro_BBBA07_AEn5"; }
+  case kNuwro_BBBA07_AEn6: { return "kNuwro_BBBA07_AEn6"; }
+  case kNuwro_BBBA07_AEn7: { return "kNuwro_BBBA07_AEn7"; }
+    
+  case kNuwro_BBBA07_AMn1: { return "kNuwro_BBBA07_AMn1"; }
+  case kNuwro_BBBA07_AMn2: { return "kNuwro_BBBA07_AMn2"; }
+  case kNuwro_BBBA07_AMn3: { return "kNuwro_BBBA07_AMn3"; }
+  case kNuwro_BBBA07_AMn4: { return "kNuwro_BBBA07_AMn4"; }
+  case kNuwro_BBBA07_AMn5: { return "kNuwro_BBBA07_AMn5"; }
+  case kNuwro_BBBA07_AMn6: { return "kNuwro_BBBA07_AMn6"; }
+  case kNuwro_BBBA07_AMn7: { return "kNuwro_BBBA07_AMn7"; }
+    
+  case kNuwro_MaRES: {
+    return "kNuwro_MaRES";
+  }
+  case kNuwro_CA5: {
+    return "kNuwro_CA5";
+  }
+  default: {
+    return "-";
+  }
   }
 }
 

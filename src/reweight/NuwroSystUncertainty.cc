@@ -50,8 +50,68 @@ void NuwroSystUncertainty::SetUncertainty(NuwroSyst_t syst,
 }
 
 void NuwroSystUncertainty::SetDefaults(void){
-  SetUncertainty(kNuwro_MaCCQE, 100.0, 100.0); //MeV
+
+  SetUncertainty(kNuwro_Ma_CCQE,  0.16, 0.16); //MeV
+  SetUncertainty(kNuwro_Ma_NCEL,  0.16, 0.16); //MeV     
+  SetUncertainty(kNuwro_SMa_NCEL, 0.16, 0.16); //MeV     
+  SetUncertainty(kNuwro_DeltaS_NCEL,   0.10, 0.10); //MeV     
+
+  // FLAGS Norm
+  SetUncertainty(kNuwro_QELNorm, 1.0, 1.0);
+  SetUncertainty(kNuwro_RESNorm, 1.0, 1.0);
+  SetUncertainty(kNuwro_DISNorm, 1.0, 1.0);
+  SetUncertainty(kNuwro_COHNorm, 1.0, 1.0);
   SetUncertainty(kNuwro_MECNorm, 1.0, 1.0);
+  SetUncertainty(kNuwro_CCNorm, 1.0, 1.0);
+  SetUncertainty(kNuwro_NCNorm, 1.0, 1.0);
+  SetUncertainty(kNuwro_AntiNuNorm, 1.0, 1.0);
+
+  // DYN Norm
+  SetUncertainty(kNuwro_DYNNorm_0, 1.0, 1.0);
+  SetUncertainty(kNuwro_DYNNorm_1, 1.0, 1.0);
+  SetUncertainty(kNuwro_DYNNorm_2, 1.0, 1.0);
+  SetUncertainty(kNuwro_DYNNorm_3, 1.0, 1.0);
+  SetUncertainty(kNuwro_DYNNorm_4, 1.0, 1.0);
+  SetUncertainty(kNuwro_DYNNorm_5, 1.0, 1.0);
+  SetUncertainty(kNuwro_DYNNorm_6, 1.0, 1.0);
+  SetUncertainty(kNuwro_DYNNorm_7, 1.0, 1.0);
+  SetUncertainty(kNuwro_DYNNorm_8, 1.0, 1.0);
+  SetUncertainty(kNuwro_DYNNorm_9, 1.0, 1.0);
+
+  // BBBA07
+  SetUncertainty(kNuwro_BBBA07_AEp1, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEp2, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEp3, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEp4, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEp5, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEp6, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEp7, 0.10, 0.10);
+
+  SetUncertainty(kNuwro_BBBA07_AMp1, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMp2, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMp3, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMp4, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMp5, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMp6, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMp7, 0.10, 0.10);
+  
+  SetUncertainty(kNuwro_BBBA07_AEn1, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEn2, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEn3, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEn4, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEn5, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEn6, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AEn7, 0.10, 0.10);
+  
+  SetUncertainty(kNuwro_BBBA07_AMn1, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMn2, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMn3, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMn4, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMn5, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMn6, 0.10, 0.10);
+  SetUncertainty(kNuwro_BBBA07_AMn7, 0.10, 0.10);
+  
+  // RES
   SetUncertainty(kNuwro_MaRES, 0.1, 0.1); // GeV
   SetUncertainty(kNuwro_CA5, 0.1, 0.1);
 }
