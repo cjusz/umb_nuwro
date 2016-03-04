@@ -16,7 +16,7 @@ double inline pow2(double x)
 static const double M2=pow2(0.5*(PDG::mass_proton+PDG::mass_neutron));
 
 //________________________________________________________
-/// Form Factor Parameters 
+/// Form Factor Parameters
 static double MV2=0.71*GeV2;
 static double MA_cc=1030*MeV;
 static double MA_nc=1030*MeV;
@@ -39,8 +39,8 @@ static double p_AEn[7] = {1., 1.1011, 1.1392, 1.0203, 1.1093, 1.5429, 0.9706};
 static double p_AMn[7] = {1., 0.9958, 0.9877, 1.0193, 1.0350, 0.9164, 0.7300};
 
 //strange =0 nie strange FF
-//strange =1 old implementation (recover old bahaviour) 
-//strange =2 new implementation (uses strange axial mass != nc axial mass) 
+//strange =1 old implementation (recover old bahaviour)
+//strange =2 new implementation (uses strange axial mass != nc axial mass)
 
 static int strangeEM=0;
 
@@ -49,12 +49,12 @@ struct FF
 	double Q2;
 	double GEp,GEn;
 	double GMp,GMn;
-	
+
 	FF(): Q2(0), GEp(0), GEn(0), GMp(0), GMn(0)
 	{
 	}
-	
-    inline pair <double,double>  f12(int kind);    
+
+    inline pair <double,double>  f12(int kind);
 };
 
 //_________________________________________________________
@@ -78,7 +78,7 @@ typedef FFs (*FFspointer)(const double);
 
 /// strange correction
 
-FFs strange_cor(double q2)//,double & f1,double & f2,double & fa) 
+FFs strange_cor(double q2)//,double & f1,double & f2,double & fa)
 {
 	double F1s_0 = 0.53;
 	double F2s_0 = -0.40;
@@ -130,8 +130,8 @@ pair<double,double> FF::f12(int kind)
 		case 2: case 8: //nc neutron and mec qel part
 			Ge=0.5*(GEn-GEp)-2*sin2thetaW*GEn;//-0.5*GEs;
 			Gm=0.5*(GMn-GMp)-2*sin2thetaW*GMn;//-0.5*GMs;
-			break; 
-		case 3: //cc mec 
+			break;
+		case 3: //cc mec
 			Ge = GEp - GEn;
 			Gm = sqrt(1 + 6.0*Q2/1e6*exp(-Q2/0.35/1e6)) * (GMp - GMn);
 			break;
@@ -142,19 +142,19 @@ pair<double,double> FF::f12(int kind)
 		case 5: //nc neutron mec
 			Ge = 0.5 * (GEn - GEp) - 2 * sin2thetaW * GEn;//-0.5*GEs;
 			Gm = sqrt(1 + 6.0*Q2/1e6*exp(-Q2/0.35/1e6)) * (0.5 * (GMn - GMp) - 2 * sin2thetaW * GMn);//-0.5*GMs;
-			break; 
+			break;
 	}
-	
+
     const double tau = Q2/(4*M2);
-    
+
 	f1= (Ge + tau*Gm)/(1 + tau);
 	f2= (Gm - Ge)/(1 + tau) ;
     if((kind == 1 or kind == 2) and strangeEM)// strangeness in F1, F2 (only for kind!=0 i.e. nc)
     switch(strangeEM)
     {
-    case 1:{ 
+    case 1:{
 			  double mian=(1+tau)*pow2(1+Q2/MV2);
-			  f1-= 0.5*( 0.53/mian);  
+			  f1-= 0.5*( 0.53/mian);
 			  f2-= 0.5*(-0.40/mian );
 			  break;
 		   }
@@ -163,9 +163,9 @@ pair<double,double> FF::f12(int kind)
 			double mian=(1+tau)*pow2(1+Q2/MV2);;
 			double mus=-0.39;
 			double f1s=0.49;
-					
+
 			f1-=0.5*mus/mian;
-			f2-=0.5*f1s*Q2/GeV2/mian;	 	
+			f2-=0.5*f1s*Q2/GeV2/mian;
 			break;
 		 }
 	  default: break;// no strange correction
@@ -184,14 +184,14 @@ FF DipoleFF(const double q2) //dipole electric form factor G_E^V
 	ff.Q2=-q2;
 	ff.GEp= 1.0/a2;
 	ff.GEn= 0;
-	ff.GMp= mu_p/a2; 
+	ff.GMp= mu_p/a2;
 	ff.GMn= mu_n/a2;
-	
+
 	return ff;
 };
 
 /////////////////////////////////////////////////////////////
-FF bba03_FF(const double q2) 
+FF bba03_FF(const double q2)
 {
 	const double Q2=-q2/GeV2;
 	const double tau= Q2/(4*M2);
@@ -208,14 +208,14 @@ FF bba03_FF(const double q2)
 }
 
 ///////////////////////////////////////////////////////////////
-FF bbba05_FForig(const double q2) 
+FF bbba05_FForig(const double q2)
 {
     const double tau = -q2/(4*M2);
 
 	FF ff;
 	ff.Q2=-q2;
-	
-	//arXiv:hep-ex/0602017 BBBA05 for Q2<18 GeV	
+
+	//arXiv:hep-ex/0602017 BBBA05 for Q2<18 GeV
 	ff.GEp =     ( 1.0-tau*0.0578)/( 1.0 + tau*(11.1+tau*(13.6+tau*33.0)));
 	ff.GEn = tau*( 1.25+tau*1.30 )/( 1.0 +tau*(-9.86+tau*(305.0+tau*(-758.0+tau*802.0))));
 	ff.GMp = mu_p*( 1.0+tau*0.15 )/( 1.0 + tau*(11.1+tau*(19.6+tau*7.54)));
@@ -229,7 +229,7 @@ double Gmn=-1.91*(1+1.82*tau)/(1+14.1*tau+20.7*tau2+69.7*tau3);
 	return ff;
 }
 
-FF bbba05_FF(const double q2) 
+FF bbba05_FF(const double q2)
 {
 	FF ff;
 	ff.Q2=-q2;
@@ -256,13 +256,13 @@ double GetA(const double q2, const double* x){
     double mod = x[j];
     for(int k = 0; k < 7; k++){
 
-      if (k==j)continue;      
+      if (k==j)continue;
       mod *= (eps - eps_int[k])/(eps_int[j] - eps_int[k]);
 
     }
     A += mod;
   }
-  
+
   return A;
 };
 
@@ -275,7 +275,7 @@ FF bbba07_FF(const double q2)
   double Q2=-q2;
   double tau= -q2/ 4.0/ M2;
   double eps = 2.0 / ( 1 + sqrt(1 + (1./tau) ) );
-  
+
   // Calculate Lagrange
   double AEp   = GetA(q2, p_AEp);
   double GK_Ep = (1. - 0.24*tau) / (1.0 + tau*(10.98 + tau*(12.82 + tau*(21.97) ) ) );
@@ -298,41 +298,41 @@ FF bbba07_FF(const double q2)
   // b = 3.3
   ff.GEn = AEn * ff.GEp * ( (1.7*tau)/(1+3.3*tau) );
   ff.GMn = AMn * ff.GMp * mu_n / mu_p;
-  
+
   return ff;
 };
 
 
 /////////////////////////////////////////////////////////////
-FF JLab_FF(const double q2) 
+FF JLab_FF(const double q2)
 {
 	const double Q2=-q2/GeV2;
-	const double Q =sqrt(Q2); 
+	const double Q =sqrt(Q2);
 	const double tau=-q2/4/M2;
-	
+
 	FF ff;
 	ff.Q2=-q2;
 	//PHYSICAL REVIEW C, VOLUME 65, 051001(R)
-	ff.GEp = (1.0 - 0.13*(Q2 - 0.04))/(1.0 + (0.116 + (0.241 + 0.345*Q2)*Q2)*Q + (2.874 + 1.006*Q2)*Q2);	
+	ff.GEp = (1.0 - 0.13*(Q2 - 0.04))/(1.0 + (0.116 + (0.241 + 0.345*Q2)*Q2)*Q + (2.874 + 1.006*Q2)*Q2);
 	ff.GMp = mu_p/(1.0 + (0.116 + (0.241 + 0.345*Q2)*Q2)*Q + (2.874 + 1.006*Q2)*Q2);
 
 	//PHYSICAL REVIEW C, VOLUME 51, 409 (1995)
 	ff.GEn =  -1.25*mu_n*tau/(1 + 18.3*tau)/(1 + Q2*1.0e+6/MV2)/(1 + Q2*1.0e+6/MV2);
 	ff.GMn = mu_n/(1.0 - (1.74 + 7.63*Q2)*Q + (9.29 + 4.63*Q2)*Q2);
 
-    return ff;	
+    return ff;
 };
 
 /////////////////////////////////////////////////////////////
-FF npar_FF(const double q2) 
+FF npar_FF(const double q2)
 {
 	const double Q2=-q2/GeV2;
-	const double Q=sqrt(Q2); 
+	const double Q=sqrt(Q2);
 	const double tau=-q2/4/M2;
-	
+
 	FF ff;
 	ff.Q2=-q2;
-	
+
 	double mu_p=2.793;  // moment dipolowy protonu
 	double mu_n=-1.913; // moment dipolowy neutronu
 
@@ -343,30 +343,30 @@ FF npar_FF(const double q2)
 	const double a=1.25;
 	const double b=10.4;
 	double GD=1/pow2(1-q2/(0.71*GeV2));
-	
+
 	ff.GEn = -a *mu_n*tau*GD/(1+b*tau);
-	 
+
 	bool strange=false; // comment out next 2 lines
 	if (strange)
-	  ff.GEp=ff.GMp/mu_p *(1-0.14*(-q2/GeV2-0.3)); 
+	  ff.GEp=ff.GMp/mu_p *(1-0.14*(-q2/GeV2-0.3));
 
-    return ff;	
+    return ff;
 };
 
 /*
 /////////////////////////////////////////////////////////////
 double newFA(const double q2, double MA) //axial form factor
-{ 
+{
 	//double MA=p.sf_axial_mass;
 	double MA2=MA*MA;
 	double a = 1.0/(1.0 - q2/MA2);
-	return gA*a*a; 
+	return gA*a*a;
 }
 
 /////////////////////////////////////////////////////////////
 double newFP(const double q2,double MA) //pseudoscalar form factor
 {
-	return 2.0*M2*newFA(q2,MA)/(piMass2 - q2); 
+	return 2.0*M2*newFA(q2,MA)/(piMass2 - q2);
 }
 */
 
@@ -385,16 +385,16 @@ static double funkcja2( double Q2, double *w )
 {
 double q2 = Q2/GeV/GeV;
 
-return w[6]/(1 + exp( - (q2*w[0] + w[1]) ) ) 
-     + w[7]/(1 + exp( - (q2*w[2] + w[3]) )) 
-     + w[8]/(1 + exp( - (q2*w[4] + w[5]) )) 
+return w[6]/(1 + exp( - (q2*w[0] + w[1]) ) )
+     + w[7]/(1 + exp( - (q2*w[2] + w[3]) ))
+     + w[8]/(1 + exp( - (q2*w[4] + w[5]) ))
      + w[9];
 
 }
 
 /////////////////////////////////////////////////////////////
 FF kg_FF(const double q2)
-{ 
+{
 	static double tab_gen[7]  = { 10.19704, 2.36812, -1.144266,-4.274101,0.8149924,2.985524,-0.7864434};
 	static double tab_gmn[10] = { 3.19646, 2.565681, 6.441526, -2.004055, -0.2972361, 3.606737, -3.135199, 0.299523, 1.261638, 2.64747};
 	static double tab_gep[10] = { 3.930227, 0.1108384, -5.325479, -2.846154, -0.2071328, 0.8742101, 0.4283194, 2.568322, 2.577635, -1.185632};
@@ -406,10 +406,10 @@ FF kg_FF(const double q2)
 	static const double magneton_neutron_nnff =-1.913*magneton_N_nnff;
 
 	static double gA_nnff = -1.267;
-	static double MA_nnff =  1.015*GeV;     // 1.03*GeV;	
+	static double MA_nnff =  1.015*GeV;     // 1.03*GeV;
 
 
-	double Q2=-q2; 
+	double Q2=-q2;
 	double y=pow2(1.0 +Q2/0.71/GeV/GeV);
 
 	FF ff;
@@ -430,14 +430,14 @@ pair <double,double> f12(double q2, int kind)
   FF ff=FFfromq2(q2);
   ff.Q2=-q2;
 //  cout<<ff.GEp<< ' '<<ff.GMp<<' '<<ff.GEn<<' '<<ff.GMn<<endl;
- return ff.f12(kind);	
+ return ff.f12(kind);
 }
 
 ///////////////////////////////////////////////////////////////
 // Calculate the axial form factors
 pair<double,double> fap(double q2,int kind)
 {
-  
+
 	double ksi=3.706;
 
 	static const double M12=(PDG::mass_proton+PDG::mass_neutron)/2;
@@ -445,13 +445,13 @@ pair<double,double> fap(double q2,int kind)
 
 	double Ga, Fpa, Gas,Fpas;
 	double Fa=0,Fp=0;
-	
+
 	//	std::cout<<"MA FAP FUNC "<<MA_cc<<std::endl;
 	//	std::cout<<"Factor "<<pow2 (1 - q2 / MA_cc / MA_cc)<<std::endl;
 	switch(kind)
 	{
 		case 0: // cc
- 
+
 			Fa = -1.267 / pow2 (1 - q2 / MA_cc / MA_cc);
 
 			Fa *= axialcorr(axialFFset,q2);
@@ -479,37 +479,37 @@ pair<double,double> fap(double q2,int kind)
 			Fa=0.5* 1.267/pow2(1-q2/MA_nc_mec/MA_nc_mec);
 			//Fp=2.0*M2*Fa/(piMass2 - q2) ;
 			break;
-    } 
+    }
     if((kind == 1 or kind == 2) and strange)
     {
     	switch(strange)
     	{case 1:
     	  {
     	   Fa-= -0.5* delta_s/pow2(1-q2/MA_nc/MA_nc);
-	       }  
+	       }
     	   break;
     	 case 2: // new implementation
-		  {  
+		  {
 		   Fa-= -0.5* delta_s/pow2(1-q2/MA_s/MA_s);
 		  }
     	 default:break; //no strange content
 	    }
 	}
-    
 
-    return pair<double,double>(Fa,Fp); 
+
+    return pair<double,double>(Fa,Fp);
 }
 
 ///////////////////////////////////////////////////////////////
 double axialcorr(int axialFF,double q2)
-{   
+{
 	//////////////////////////////
 	double min;//maximal reduction
 	double max; //maximal enhancement
 	double szer;//reduction in Q2
 	double dlug;//enhancement range
-		
-	switch(axialFF)			
+
+	switch(axialFF)
 	{
 	case 2:	min=0.9;//maximal reduction
 		    max=1.1; //maximal enhancement
@@ -521,17 +521,17 @@ double axialcorr(int axialFF,double q2)
 		    max=1.2; //maximal enhancement
 		    szer=0.2;//reduction in Q2
 		    dlug=2.0;//enhancement range
-		    
+
 	default:return 1;
 	}
-	
+
 	//parabolic approximation
 	double x=-q2/GeV2;
 	if (x<szer) return 1.0 + 4.0/szer/szer * (1.0 - min) * x * ( x - szer );
 	  else
 	if (x<dlug) return 1.0 - 4.0 * (max - 1.0)/pow2(dlug-szer) * ( x - szer ) * ( x - dlug );
-      else        
-                return 1.0;		
+      else
+                return 1.0;
 }
 
 
@@ -540,15 +540,15 @@ double axialcorr(int axialFF,double q2)
 void ff_configure(params& p)
 {
 
-  switch(p.qel_vector_ff_set)	
+  switch(p.qel_vector_ff_set)
 	 {
-		case 1: FFfromq2=DipoleFF;  break; 	
+		case 1: FFfromq2=DipoleFF;  break;
 		case 2: FFfromq2=bbba05_FF; break;
 		case 3: FFfromq2=bba03_FF;  break;
 		case 4: FFfromq2=JLab_FF;   break;
 		case 5: FFfromq2=kg_FF;     break;
 	 	case 6: FFfromq2=npar_FF;   break;
-        	case 7: FFfromq2=bbba07_FF; break;
+    case 7: FFfromq2=bbba07_FF; break;
 		default: throw("bad ffset");
 	 };
   axialFFset=p.qel_axial_ff_set;
@@ -557,12 +557,40 @@ void ff_configure(params& p)
   delta_s=p.delta_s;
 
   if (p.qel_vector_ff_set == 7){
-    p_AEp = {p.bba07_AEp1, p.bba07_AEp2, p.bba07_AEp3, p.bba07_AEp4, p.bba07_AEp5, p.bba07_AEp6, p.bba07_AEp7};
-    p_AMp = {p.bba07_AMp1, p.bba07_AMp2, p.bba07_AMp3, p.bba07_AMp4, p.bba07_AMp5, p.bba07_AMp6, p.bba07_AMp7};
-    p_AEn = {p.bba07_AEn1, p.bba07_AEn2, p.bba07_AEn3, p.bba07_AEn4, p.bba07_AEn5, p.bba07_AEn6, p.bba07_AEn7};
-    p_AMn = {p.bba07_AMn1, p.bba07_AMn2, p.bba07_AMn3, p.bba07_AMn4, p.bba07_AMn5, p.bba07_AMn6, p.bba07_AMn7};    
+
+    p_AEp[0] = p.bba07_AEp1;
+    p_AEp[1] = p.bba07_AEp2;
+    p_AEp[2] = p.bba07_AEp3;
+    p_AEp[3] = p.bba07_AEp4;
+    p_AEp[4] = p.bba07_AEp5;
+    p_AEp[5] = p.bba07_AEp6;
+    p_AEp[6] = p.bba07_AEp7;
+
+    p_AMp[0] = p.bba07_AMp1;
+    p_AMp[1] = p.bba07_AMp2;
+    p_AMp[2] = p.bba07_AMp3;
+    p_AMp[3] = p.bba07_AMp4;
+    p_AMp[4] = p.bba07_AMp5;
+    p_AMp[5] = p.bba07_AMp6;
+    p_AMp[6] = p.bba07_AMp7;
+
+    p_AEn[0] = p.bba07_AEn1;
+    p_AEn[1] = p.bba07_AEn2;
+    p_AEn[2] = p.bba07_AEn3;
+    p_AEn[3] = p.bba07_AEn4;
+    p_AEn[4] = p.bba07_AEn5;
+    p_AEn[5] = p.bba07_AEn6;
+    p_AEn[6] = p.bba07_AEn7;
+
+    p_AMn[0] = p.bba07_AMn1;
+    p_AMn[1] = p.bba07_AMn2;
+    p_AMn[2] = p.bba07_AMn3;
+    p_AMn[3] = p.bba07_AMn4;
+    p_AMn[4] = p.bba07_AMn5;
+    p_AMn[5] = p.bba07_AMn6;
+    p_AMn[6] = p.bba07_AMn7;
   }
-  
+
   MA_cc=p.qel_cc_axial_mass;
   MA_nc=p.qel_nc_axial_mass;
   MA_s=p.qel_s_axial_mass;

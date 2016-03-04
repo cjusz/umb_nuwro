@@ -204,6 +204,92 @@
       <option key="6"><![CDATA[(1990:) parametryzacja JS z old qelcc]]></option>
     </options>
   </param>
+
+  <param name="bba07_AEp1" type="text" ctype="double" default="1.0">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEp2" type="text" ctype="double" default="0.9927">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEp3" type="text" ctype="double" default="0.9898">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEp4" type="text" ctype="double" default="0.9975">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEp5" type="text" ctype="double" default="0.9812">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEp6" type="text" ctype="double" default="0.9340">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEp7" type="text" ctype="double" default="1.0">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMp1" type="text" ctype="double" default="1.0">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMp2" type="text" ctype="double" default="1.0011">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMp3" type="text" ctype="double" default="0.9992">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMp4" type="text" ctype="double" default="0.9974">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMp5" type="text" ctype="double" default="1.0010">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMp6" type="text" ctype="double" default="1.0003">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMp7" type="text" ctype="double" default="1.0">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEn1" type="text" ctype="double" default="1.0">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEn2" type="text" ctype="double" default="1.011">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEn3" type="text" ctype="double" default="1.1392">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEn4" type="text" ctype="double" default="1.0203">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEn5" type="text" ctype="double" default="1.1093">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEn6" type="text" ctype="double" default="1.5429">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AEn7" type="text" ctype="double" default="0.9706">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMn1" type="text" ctype="double" default="1.0">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMn2" type="text" ctype="double" default="0.9958">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMn3" type="text" ctype="double" default="0.9877">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMn4" type="text" ctype="double" default="1.0193">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMn5" type="text" ctype="double" default="1.0350">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMn6" type="text" ctype="double" default="0.9164">
+      <description><![CDATA[]]></description>
+  </param>
+  <param name="bba07_AMn7" type="text" ctype="double" default="0.7300">
+      <description><![CDATA[]]></description>
+  </param>
+
   <param name="qel_axial_ff_set" type="select" ctype="int" default="1">
     <description></description>
     <options>
