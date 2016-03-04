@@ -13,7 +13,7 @@
 
 //nuwro reweighting
 #include "NuwroReWeight.h"
-#include "NuwroReWeight_MaCCQE.h"
+#include "NuwroReWeight_QEL.h"
 #include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
 #include "NuwroSystSet.h"
