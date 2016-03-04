@@ -39,7 +39,7 @@ template < class T > inline bool read (T & x, istream & s, char z)
 
 
 template < class T > inline void
-write (T x, ostream & s)
+write (T x, ostream & s, char const * name="")
 {
   s << ' ' << x;		// space looks nice ofter in "a = 1"
 }
@@ -54,7 +54,7 @@ read (vec & a, istream & s, char z)
 
 
 inline void
-write (vec a, ostream & s)
+write (vec a, ostream & s, char const * name="")
 {
   s << ' ' << a.x << ' ' << a.y << ' ' << a.z;
 }
@@ -86,9 +86,15 @@ read (line & x, istream & s, char z)
 }
 
 inline void
-write (line a, ostream & s)
+write (line a, ostream & s, char const * name="")
 {
-  s << a;
+  std::string printstr = a;
+  size_t nlineloc = printstr.find_first_of('\n');
+  while(nlineloc!=std::string::npos){
+    printstr = printstr.replace(nlineloc,nlineloc+1,std::string("\n")+name+" += ");
+    nlineloc = printstr.find_first_of('\n',nlineloc+1);
+  }
+  s << printstr;
 }
 
 
@@ -225,7 +231,7 @@ public:
   {
 #define PARAM(type,name,default_value) \
 				out<< #name" ="; \
-				write(name,out); \
+				write(name, out, #name); \
 				out<<endl;
     PARAMS_ALL ();
 #undef PARAM
