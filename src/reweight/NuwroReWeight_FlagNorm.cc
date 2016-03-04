@@ -41,7 +41,7 @@ void nuwro::rew::NuwroReWeight_FlagNorm::Init(void)
   fTwkDial_COH = 0.;
   fNormDef_COH = 1.;
   fNormCurr_COH = 1.;
-  
+
   fTwkDial_MEC = 0.;
   fNormDef_MEC = 1.;
   fNormCurr_MEC = 1.;
@@ -72,7 +72,7 @@ bool nuwro::rew::NuwroReWeight_FlagNorm::SystIsHandled(NuwroSyst_t syst)
   bool handle;
 
   switch(syst) {
- 
+
   case(kNuwro_QELNorm) :
   case(kNuwro_RESNorm) :
   case(kNuwro_DISNorm) :
@@ -139,7 +139,7 @@ void nuwro::rew::NuwroReWeight_FlagNorm::SetSystematic(NuwroSyst_t syst, double 
 //__________________________________________________________________
 void nuwro::rew::NuwroReWeight_FlagNorm::Reset(void)
 {
-  
+
 
   this->Reconfigure();
 }
@@ -156,7 +156,7 @@ void nuwro::rew::NuwroReWeight_FlagNorm::Reconfigure(void)
 
   fNormError_RES   = fracerr->OneSigmaErr(kNuwro_RESNorm,   fTwkDial_RES > 0);
   fNormCurr_RES = fNormDef_RES * ( 1.0 + fNormError_RES * fTwkDial_RES );
-  
+
   fNormError_DIS   = fracerr->OneSigmaErr(kNuwro_DISNorm,   fTwkDial_DIS > 0);
   fNormCurr_DIS = fNormDef_DIS * ( 1.0 + fNormError_DIS * fTwkDial_DIS );
 
@@ -164,7 +164,8 @@ void nuwro::rew::NuwroReWeight_FlagNorm::Reconfigure(void)
   fNormCurr_COH = fNormDef_COH * ( 1.0 + fNormError_COH * fTwkDial_COH );
 
   fNormError_MEC   = fracerr->OneSigmaErr(kNuwro_MECNorm,   fTwkDial_MEC > 0);
-  fNormCurr_MEC = fNormDef_MEC * ( 1.0 + fNormError_MEC * fTwkDial_MEC );
+  fNormCurr_MEC = fNormDef_MEC + fNormError_MEC * fTwkDial_MEC;
+  // fNormCurr_MEC = fNormDef_MEC * ( 1.0 + fNormError_MEC * fTwkDial_MEC );
 
   fNormError_CC   = fracerr->OneSigmaErr(kNuwro_CCNorm,   fTwkDial_CC > 0);
   fNormCurr_CC = fNormDef_CC * ( 1.0 + fNormError_CC * fTwkDial_CC );

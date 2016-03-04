@@ -16,7 +16,7 @@ NuwroReWeight_QEL::NuwroReWeight_QEL(){
   fTwkDial_MaCCQE = 0;
   fDef_MaCCQE = 1200;
   fCurr_MaCCQE = fDef_MaCCQE;
-  
+
   fTwkDial_MaNCEL = 0;
   fDef_MaNCEL = 1350;
   fCurr_MaNCEL = fDef_MaNCEL;
@@ -57,7 +57,7 @@ bool NuwroReWeight_QEL::SystIsHandled(NuwroSyst_t syst){
   case kNuwro_Ma_CCQE: { return true; }
   case kNuwro_Ma_NCEL: { return true; }
   case kNuwro_SMa_NCEL: { return true; }
-  case kNuwro_DeltaS_NCEL: { return true; }  
+  case kNuwro_DeltaS_NCEL: { return true; }
   default: { return false; }
   }
 }
@@ -86,7 +86,8 @@ void NuwroReWeight_QEL::Reconfigure(void){
       << ")" << std::endl;
 #endif
   }
-  fCurr_MaCCQE = fDef_MaCCQE * (1 + fError_MaCCQE * fTwkDial_MaCCQE);
+  // fCurr_MaCCQE = fDef_MaCCQE * (1 + fError_MaCCQE * fTwkDial_MaCCQE);
+  fCurr_MaCCQE = fDef_MaCCQE + fError_MaCCQE * fTwkDial_MaCCQE;
 
   // Set NCEL Dials
   fError_MaNCEL = fracerr->OneSigmaErr(kNuwro_Ma_NCEL, (fTwkDial_MaNCEL > 0)?1:-1);

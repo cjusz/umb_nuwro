@@ -51,17 +51,17 @@ void NuwroSystUncertainty::SetUncertainty(NuwroSyst_t syst,
 
 void NuwroSystUncertainty::SetDefaults(void){
 
-  SetUncertainty(kNuwro_Ma_CCQE,  0.16, 0.16); //MeV
-  SetUncertainty(kNuwro_Ma_NCEL,  0.16, 0.16); //MeV     
-  SetUncertainty(kNuwro_SMa_NCEL, 0.16, 0.16); //MeV     
-  SetUncertainty(kNuwro_DeltaS_NCEL,   0.10, 0.10); //MeV     
+  SetUncertainty(kNuwro_Ma_CCQE,  160, 160); //MeV
+  SetUncertainty(kNuwro_Ma_NCEL,  0.16, 0.16); //MeV
+  SetUncertainty(kNuwro_SMa_NCEL, 0.16, 0.16); //MeV
+  SetUncertainty(kNuwro_DeltaS_NCEL,   0.10, 0.10); //MeV
 
   // FLAGS Norm
   SetUncertainty(kNuwro_QELNorm, 1.0, 1.0);
   SetUncertainty(kNuwro_RESNorm, 1.0, 1.0);
   SetUncertainty(kNuwro_DISNorm, 1.0, 1.0);
   SetUncertainty(kNuwro_COHNorm, 1.0, 1.0);
-  SetUncertainty(kNuwro_MECNorm, 1.0, 1.0);
+  SetUncertainty(kNuwro_MECNorm, 0.25, 0.25);
   SetUncertainty(kNuwro_CCNorm, 1.0, 1.0);
   SetUncertainty(kNuwro_NCNorm, 1.0, 1.0);
   SetUncertainty(kNuwro_AntiNuNorm, 1.0, 1.0);
@@ -94,7 +94,7 @@ void NuwroSystUncertainty::SetDefaults(void){
   SetUncertainty(kNuwro_BBBA07_AMp5, 0.10, 0.10);
   SetUncertainty(kNuwro_BBBA07_AMp6, 0.10, 0.10);
   SetUncertainty(kNuwro_BBBA07_AMp7, 0.10, 0.10);
-  
+
   SetUncertainty(kNuwro_BBBA07_AEn1, 0.10, 0.10);
   SetUncertainty(kNuwro_BBBA07_AEn2, 0.10, 0.10);
   SetUncertainty(kNuwro_BBBA07_AEn3, 0.10, 0.10);
@@ -102,7 +102,7 @@ void NuwroSystUncertainty::SetDefaults(void){
   SetUncertainty(kNuwro_BBBA07_AEn5, 0.10, 0.10);
   SetUncertainty(kNuwro_BBBA07_AEn6, 0.10, 0.10);
   SetUncertainty(kNuwro_BBBA07_AEn7, 0.10, 0.10);
-  
+
   SetUncertainty(kNuwro_BBBA07_AMn1, 0.10, 0.10);
   SetUncertainty(kNuwro_BBBA07_AMn2, 0.10, 0.10);
   SetUncertainty(kNuwro_BBBA07_AMn3, 0.10, 0.10);
@@ -110,7 +110,7 @@ void NuwroSystUncertainty::SetDefaults(void){
   SetUncertainty(kNuwro_BBBA07_AMn5, 0.10, 0.10);
   SetUncertainty(kNuwro_BBBA07_AMn6, 0.10, 0.10);
   SetUncertainty(kNuwro_BBBA07_AMn7, 0.10, 0.10);
-  
+
   // RES
   SetUncertainty(kNuwro_MaRES, 0.1, 0.1); // GeV
   SetUncertainty(kNuwro_CA5, 0.1, 0.1);
