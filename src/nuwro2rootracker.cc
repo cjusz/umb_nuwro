@@ -205,6 +205,10 @@ int main (int argc, char *argv[]){
             if(extended_mode){
               rtEv.fStdHepPdg[rtEv.fStdHepN] = NucleusPdg;
               rtEv.fStdHepStatus[rtEv.fStdHepN] = 0;
+              rtEv.fStdHepP4[rtEv.fStdHepN][3] = 0;
+              rtEv.fStdHepP4[rtEv.fStdHepN][0] = 0;
+              rtEv.fStdHepP4[rtEv.fStdHepN][1] = 0;
+              rtEv.fStdHepP4[rtEv.fStdHepN][2] = 0;
               rtEv.fStdHepN++; // fill out the rest of this entry as usual
 
               rtEv.fStdHepPdg[rtEv.fStdHepN] = in_part.pdg;
