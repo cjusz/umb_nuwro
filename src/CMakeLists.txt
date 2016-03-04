@@ -123,9 +123,15 @@ add_executable(nuwro2rootracker nuwro2rootracker.cc)
 target_link_libraries(nuwro2rootracker event)
 set_target_properties(nuwro2rootracker PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 
+add_executable(dumpParams dumpParams.cc)
+target_link_libraries(dumpParams event)
+set_target_properties(dumpParams PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+
+
 install(TARGETS
   nuwro
   nuwro2rootracker
+  dumpParams
   DESTINATION bin)
 
 if(ISROOT6)
