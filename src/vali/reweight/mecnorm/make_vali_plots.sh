@@ -22,7 +22,7 @@ fi
 
 source ${NUWRO_ROOT}/src/vali/reweight/scripts/reweight_vali_script_base.sh
 
-DIALNAME="kNuwro_Ma_CCQE"
+DIALNAME="kNuwro_MECNorm"
 DIALPRETTYNAME="M_{A}^{QE}"
 DIALVALM2="1000"
 DIALVAL0="1200"

@@ -7,6 +7,7 @@
 
 #include "NuwroReWeight.h"
 #include "NuwroReWeight_QEL.h"
+#include "NuwroReWeight_FlagNorm.h"
 #include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
 #include "NuwroSystSet.h"
@@ -22,12 +23,15 @@ NuwroWghtEngineI* GetWghtEngineFromDial(ENuWroSyst sys, params const &param){
   if(sys == kNullSystematic){ return NULL; }
 
   switch(sys){
-    case kNuwro_Ma_CCQE:
-    case kNuwro_Ma_NCEL:
-    case kNuwro_SMa_NCEL:
-    case kNuwro_DeltaS_NCEL:
+    case kNuwro_Ma_CCQE: {
       return new NuwroReWeight_QEL(param);
-  
+    }
+    case kNuwro_MECNorm: {
+      return new NuwroReWeight_FlagNorm();
+    }
+    case kNuwro_DeltaS_NCEL:{
+      return new NuwroReWeight_QEL(param);
+    }
     case kNuwro_MaRES:{
       return new NuwroReWeight_SPP(param);
     }
