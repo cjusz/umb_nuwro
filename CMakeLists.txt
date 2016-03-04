@@ -123,7 +123,7 @@ add_subdirectory(src)
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/setup.sh
   "source $ENV{ROOTSYS}/bin/thisroot.sh\n")
-file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export NUWRO_ROOT=${PROJECT_SOURCE_DIR}\n")
+file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export NUWRO=${PROJECT_SOURCE_DIR}\n")
 file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export PATH=${CMAKE_INSTALL_PREFIX}/bin:\${PATH}\n")
 if(DEFINED ENV{PYTHIA6})
   file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export PYTHIA6=$ENV{PYTHIA6}\n")
