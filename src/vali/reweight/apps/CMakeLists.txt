@@ -11,12 +11,6 @@ target_link_libraries(SimpleReweighterProfiler reweight;${EVENT_LIBS})
 set_target_properties(SimpleReweighterProfiler PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP}" )
 set_target_properties(SimpleReweighterProfiler PROPERTIES COMPILE_FLAGS "${FOMP} ")
 
-add_executable(SimpleFitter SimpleFitter.cc)
-
-target_link_libraries(SimpleFitter reweight;${EVENT_LIBS};vali)
-set_target_properties(SimpleFitter PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP} -lMinuit2")
-set_target_properties(SimpleFitter PROPERTIES COMPILE_FLAGS "${FOMP} ")
-
 add_executable(SimpleFitterProfiler SimpleFitterProfiler.cc)
 
 target_link_libraries(SimpleFitterProfiler reweight;${EVENT_LIBS};vali)
@@ -32,7 +26,6 @@ set_target_properties(DumpDialTweaks PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS}"
 install(TARGETS
   SimpleReweighter
   SimpleReweighterProfiler
-  SimpleFitter
   SimpleFitterProfiler
   DumpDialTweaks
   DESTINATION bin)

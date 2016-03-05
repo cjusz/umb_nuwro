@@ -26,7 +26,7 @@ DIALNAME="kNuwro_CA5"
 DIALPARAMNAME="pion_C5A"
 DIALPRETTYNAME="C_{A}^{5}"
 DIALUNITS="MeV"
-NEVS="1000"
+NEVS="5000"
 
 echo "[INFO]: Using ${PARAM_BASE}, specialised with ${FLUX_HIST}, and ${TARGET_PARAMS}, generating ${NEVS} events to test dial: ${DIALNAME}"
 
