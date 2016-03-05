@@ -322,15 +322,13 @@ struct PODSimpleAnalysisFormat {
 
 };
 
-inline PODSimpleAnalysisFormat MakePODSimpleAnalysisFormat(event const & ev){
-
+inline SimpleAnalysisFormat const MakeSimpleAnalysisFormat(event const &ev){
   //Shamelessly nicked from nuwro2rootracker.cc
 
-  //Proxy object for doing the calculation;
-  SimpleAnalysisFormat SAFProxy;
-  SAFProxy.NeutConventionReactionCode =
+  SimpleAnalysisFormat SAFEv;
+  SAFEv.NeutConventionReactionCode =
     RooTrackerUtils::GetNeutReactionCodeFromNuwroEvent1(ev);
-  SAFProxy.EvtWght = ev.weight;
+  SAFEv.EvtWght = ev.weight;
 
   int NucleusPdg = 1e9 + (ev.par.nucleus_p*1e4)
         + (ev.par.nucleus_p+ev.par.nucleus_n)*10;
@@ -352,7 +350,7 @@ inline PODSimpleAnalysisFormat MakePODSimpleAnalysisFormat(event const & ev){
         StdHepPDG = NucleusPdg;
         StdHepP4[0] = 0; StdHepP4[1] = 0; StdHepP4[2] = 0; StdHepP4[3] = 0;
         StdHepStatus = 0;
-        SAFProxy.HandleStdHepParticle(StdHepPDG,StdHepStatus,StdHepP4);
+        SAFEv.HandleStdHepParticle(StdHepPDG,StdHepStatus,StdHepP4);
 
         //Handle struck nucleon alone.
         StdHepPDG = in_part.pdg;
@@ -361,7 +359,7 @@ inline PODSimpleAnalysisFormat MakePODSimpleAnalysisFormat(event const & ev){
         StdHepP4[1] = in_part.y/1000.0;
         StdHepP4[2] = in_part.z/1000.0;
         StdHepStatus = 0;
-        SAFProxy.HandleStdHepParticle(StdHepPDG,StdHepStatus,StdHepP4);
+        SAFEv.HandleStdHepParticle(StdHepPDG,StdHepStatus,StdHepP4);
       }
     //else assume neutrino (gief ewro)
     }else{
@@ -371,7 +369,7 @@ inline PODSimpleAnalysisFormat MakePODSimpleAnalysisFormat(event const & ev){
       StdHepP4[1] = in_part.y/1000.0;
       StdHepP4[2] = in_part.z/1000.0;
       StdHepStatus = 0;
-      SAFProxy.HandleStdHepParticle(StdHepPDG,StdHepStatus,StdHepP4);
+      SAFEv.HandleStdHepParticle(StdHepPDG,StdHepStatus,StdHepP4);
     }
   }
 
@@ -383,7 +381,7 @@ inline PODSimpleAnalysisFormat MakePODSimpleAnalysisFormat(event const & ev){
     StdHepP4[1] = out_part.y/1000.0;
     StdHepP4[2] = out_part.z/1000.0;
     StdHepStatus = 14;
-    SAFProxy.HandleStdHepParticle(StdHepPDG,StdHepStatus,StdHepP4);
+    SAFEv.HandleStdHepParticle(StdHepPDG,StdHepStatus,StdHepP4);
   }
   for (int npost = 0; npost < ev.post.size();npost++){
     particle const &post_part = ev.post[npost];
@@ -393,9 +391,16 @@ inline PODSimpleAnalysisFormat MakePODSimpleAnalysisFormat(event const & ev){
     StdHepP4[1] = post_part.y/1000.0;
     StdHepP4[2] = post_part.z/1000.0;
     StdHepStatus = 1;
-    SAFProxy.HandleStdHepParticle(StdHepPDG,StdHepStatus,StdHepP4);
+    SAFEv.HandleStdHepParticle(StdHepPDG,StdHepStatus,StdHepP4);
   }
-  SAFProxy.Finalise();
+  SAFEv.Finalise();
+  return SAFEv;
+}
+
+inline PODSimpleAnalysisFormat MakePODSimpleAnalysisFormat(event const & ev){
+  //Proxy object for doing the calculation;
+
+  SimpleAnalysisFormat const &SAFProxy = MakeSimpleAnalysisFormat(ev);
 
   PODSimpleAnalysisFormat rtnPODSAF;
 

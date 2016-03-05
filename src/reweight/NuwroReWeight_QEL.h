@@ -19,6 +19,8 @@ public:
 
   bool SystIsHandled(NuwroSyst_t syst);
   void SetSystematic(NuwroSyst_t syst, double val);
+  double GetSystematic(NuwroSyst_t syst);
+  double GetSystematicValue(NuwroSyst_t syst);
   void Reset(void);
   void Reconfigure(void);
   double CalcWeight(event* nuwro_event);
@@ -36,12 +38,12 @@ private:
   double fDef_MaNCEL;
   double fCurr_MaNCEL;
   double fError_MaNCEL;
-  
+
   double fTwkDial_MaNCEL_s;
   double fDef_MaNCEL_s;
   double fCurr_MaNCEL_s;
   double fError_MaNCEL_s;
-  
+
   double fTwkDial_DeltaS;
   double fDef_DeltaS;
   double fCurr_DeltaS;

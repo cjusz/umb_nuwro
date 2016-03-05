@@ -9,29 +9,37 @@
 
 void PrintUsage(char const * rcmd){
   std::cout << "[USAGE]: " << rcmd
-    << " <TChain::Add specifer of NuWro rootracker files> "
+    << " [-n] <TChain::Add specifer of input event files> "
     "<output ROOT file name>" << std::endl;
+  std::cout << "\t -n: if specified input is expected to be NuWro event files,"
+    << " otherwise rootracker." << std::endl;
 }
 
-int main(int argc, char const * argv[]){
+std::pair<TFile*,TTree*> MakeOutputFile(SimpleAnalysisFormat &safEv,
+  char const *OutputFileName){
 
-  if(argc != 3){
-    std::cerr << "[ERROR]: Found " << (argc-1) << " cli args. Expected 2."
+  TFile* outputFile = TFile::Open(OutputFileName,"RECREATE");
+  if(!outputFile || ! outputFile->IsOpen()){
+    std::cerr << "[ERROR]: Couldn't open " << OutputFileName << " for writing."
       << std::endl;
-    PrintUsage(argv[0]);
-    return 1;
+    return std::pair<TFile*,TTree*>(NULL,NULL);
   }
+  TTree* outputTree = new TTree("nwSAF","");
+  safEv.AddBranches(outputTree);
+  return std::pair<TFile*,TTree*>(outputFile, outputTree);
+}
 
-  TFile *inputFile = TFile::Open(argv[1]);
+int ReadRooTracker(char const * RooTrackerFile, char const * OutputFileName){
+  TFile *inputFile = TFile::Open(RooTrackerFile);
   if(!inputFile || ! inputFile->IsOpen()){
-    std::cerr << "[ERROR]: Couldn't open " << argv[1] << " for reading."
+    std::cerr << "[ERROR]: Couldn't open " << RooTrackerFile << " for reading."
       << std::endl;
     return 2;
   }
   TTree *rootracker = dynamic_cast<TTree*>(inputFile->Get("nRooTracker"));
   if(!rootracker){
     std::cerr << "[ERROR]: Couldn't find TTree (\"nRooTracker\") in file "
-      << argv[1] << "." << std::endl;
+      << RooTrackerFile << "." << std::endl;
     return 4;
   }
 
@@ -44,16 +52,11 @@ int main(int argc, char const * argv[]){
     std::cout << "[INFO]: StdHepEvent jacked in, here we go." << std::endl;
   }
 
-  TFile* outputFile = TFile::Open(argv[2],"RECREATE");
-  if(!outputFile || ! outputFile->IsOpen()){
-    std::cerr << "[ERROR]: Couldn't open " << argv[2] << " for writing."
-      << std::endl;
+  SimpleAnalysisFormat safEv;
+  std::pair<TFile*,TTree*> outputters = MakeOutputFile(safEv, OutputFileName);
+  if(!outputters.first){
     return 16;
   }
-  TTree* outputTree = new TTree("nwSAF","");
-  SimpleAnalysisFormat safEv;
-
-  safEv.AddBranches(outputTree);
 
   Long64_t nEntries = rootracker->GetEntries();
 
@@ -66,13 +69,77 @@ int main(int argc, char const * argv[]){
     }
     safEv.EvtWght = inpEv.fEvtWght;
     safEv.Finalise();
-    outputTree->Fill();
+    outputters.second->Fill();
     safEv.Reset();
     std::cout << "\r" << int((ent+1)*100/nEntries) << "\% done."
       << std::flush;
   }
   std::cout << std::endl << "[INFO]: Wrote " << nEntries << " entries."
     << std::endl;
-  outputFile->Write();
-  outputFile->Close();
+  outputters.first->Write();
+  outputters.first->Close();
+  inputFile->Close();
+  return 0;
+}
+
+int ReadNuWroEvent(char const * NuWroEvsFile, char const * OutputFileName){
+  TFile *inputFile = TFile::Open(NuWroEvsFile);
+  if(!inputFile || ! inputFile->IsOpen()){
+    std::cerr << "[ERROR]: Couldn't open " << NuWroEvsFile << " for reading."
+      << std::endl;
+    return 2;
+  }
+  TTree *NuWroEvTree = dynamic_cast<TTree*>(inputFile->Get("treeout"));
+  if(!NuWroEvTree){
+    std::cerr << "[ERROR]: Couldn't find TTree (\"treeout\") in file "
+      << NuWroEvsFile << "." << std::endl;
+    return 4;
+  }
+
+  event *nwEv = 0; // ROOT is in control of object life cycle
+  NuWroEvTree->SetBranchAddress("e", &nwEv);
+
+  SimpleAnalysisFormat safEv;
+  std::pair<TFile*,TTree*> outputters = MakeOutputFile(safEv, OutputFileName);
+  if(!outputters.first){
+    return 16;
+  }
+
+  Long64_t nEntries = NuWroEvTree->GetEntries();
+
+  for(Long64_t ent = 0; ent < nEntries; ++ent){
+    NuWroEvTree->GetEntry(ent);
+    safEv = MakeSimpleAnalysisFormat(*nwEv);
+    outputters.second->Fill();
+    safEv.Reset();
+    std::cout << "\r" << int((ent+1)*100/nEntries) << "\% done."
+      << std::flush;
+  }
+  std::cout << std::endl << "[INFO]: Wrote " << nEntries << " entries."
+    << std::endl;
+  outputters.first->Write();
+  outputters.first->Close();
+  inputFile->Close();
+  return 0;
+}
+
+int main(int argc, char const * argv[]){
+
+  if((argc < 3) || (argc > 4)){
+    std::cerr << "[ERROR]: Found " << (argc-1) << " cli args. Expected 2 or 3."
+      << std::endl;
+    PrintUsage(argv[0]);
+    return 1;
+  }
+
+  if( (argc == 4) && std::string(argv[1]) == "-n"){
+    return ReadNuWroEvent(argv[2], argv[3]);
+  } else if (argc == 4){
+    std::cout << "[ERROR]: Recieved 3 cli args, but the first was not \"-n\" as"
+      " expected." << std::endl;
+    return 1;
+  }
+
+  return ReadRooTracker(argv[1], argv[2]);
+
 }

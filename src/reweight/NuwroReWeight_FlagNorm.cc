@@ -11,8 +11,6 @@
 //__________________________________________________________________
 nuwro::rew::NuwroReWeight_FlagNorm::NuwroReWeight_FlagNorm()
 {
-  std::cout << "creating NuwroReWeight_FlagNorm" << std::endl;
-
   Init();
 }
 

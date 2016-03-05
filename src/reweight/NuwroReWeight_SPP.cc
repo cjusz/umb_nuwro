@@ -101,6 +101,24 @@ void NuwroReWeight_SPP::SetSystematic(NuwroSyst_t syst, double val){
   if(syst == kNuwro_SPPDISBkgScale){ fTwkDial_SPPDISBkgScale = val; }
 }
 
+double NuwroReWeight_SPP::GetSystematic(NuwroSyst_t syst){
+  switch(syst){
+    case kNuwro_MaRES: { return fTwkDial_MaRES; }
+    case kNuwro_CA5: { return fTwkDial_CA5; }
+    case kNuwro_SPPDISBkgScale: { return fTwkDial_SPPDISBkgScale; }
+    default: { throw syst; }
+  }
+}
+
+double NuwroReWeight_SPP::GetSystematicValue(NuwroSyst_t syst){
+  switch(syst){
+    case kNuwro_MaRES: { return fCurr_MaRES; }
+    case kNuwro_CA5: { return fCurr_CA5; }
+    case kNuwro_SPPDISBkgScale: { return fCurr_SPPDISBkgScale; }
+    default: { throw syst; }
+  }
+}
+
 void NuwroReWeight_SPP::Reset(void){
   fTwkDial_MaRES = 0;
   fTwkDial_CA5 = 0;

@@ -69,6 +69,28 @@ void NuwroReWeight_QEL::SetSystematic(NuwroSyst_t syst, double val){
   if(syst == kNuwro_DeltaS_NCEL){ fTwkDial_DeltaS   = val; }
 }
 
+double NuwroReWeight_QEL::GetSystematic(NuwroSyst_t syst){
+  switch(syst){
+    case kNuwro_Ma_CCQE: { return fTwkDial_MaCCQE; }
+    case kNuwro_Ma_NCEL: { return fTwkDial_MaNCEL; }
+    case kNuwro_SMa_NCEL: { return fTwkDial_MaNCEL_s; }
+    case kNuwro_DeltaS_NCEL: { return fTwkDial_DeltaS; }
+    default: { throw syst; }
+  }
+  return 0xdeadbeef;
+}
+
+double NuwroReWeight_QEL::GetSystematicValue(NuwroSyst_t syst){
+  switch(syst){
+    case kNuwro_Ma_CCQE: { return fCurr_MaCCQE; }
+    case kNuwro_Ma_NCEL: { return fCurr_MaNCEL; }
+    case kNuwro_SMa_NCEL: { return fCurr_MaNCEL_s; }
+    case kNuwro_DeltaS_NCEL: { return fCurr_DeltaS; }
+    default: { throw syst; }
+  }
+  return 0xdeadbeef;
+}
+
 void NuwroReWeight_QEL::Reset(void){
   fTwkDial_MaCCQE = 0;
   this->Reconfigure();

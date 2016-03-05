@@ -24,6 +24,8 @@ public:
 
   bool SystIsHandled(NuwroSyst_t syst);
   void SetSystematic(NuwroSyst_t syst, double val);
+  double GetSystematic(NuwroSyst_t syst);
+  double GetSystematicValue(NuwroSyst_t syst);
   void Reset(void);
   void Reconfigure(void);
   double CalcWeight(event* nuwro_event);

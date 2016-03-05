@@ -1,1 +1,1 @@
-add_subdirectory(test_reweighter)
+add_subdirectory(apps)

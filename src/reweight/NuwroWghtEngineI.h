@@ -19,7 +19,19 @@ class NuwroWghtEngineI {
   /// update the value for the specified nuisance param
   virtual void SetSystematic (NuwroSyst_t syst, double val) = 0;
 
-  ///  set all nuisance parameters to default values
+  /// get the dial value for the specified nuisance param
+  virtual double GetSystematic (NuwroSyst_t syst){
+    throw syst;
+    return 0xdeadbeef;
+  };
+
+  /// get the value for the specified nuisance param
+  virtual double GetSystematicValue (NuwroSyst_t syst){
+    throw syst;
+    return 0xdeadbeef;
+  };
+
+  /// set all nuisance parameters to default values
   virtual void Reset (void) = 0;
 
   /// propagate updated nuisance parameter values to actual MC, etc

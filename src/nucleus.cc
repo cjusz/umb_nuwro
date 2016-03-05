@@ -1,17 +1,18 @@
 #include "nucleus.h"
 #include "nucleus_data.h"
 #include "particle.h"
-   
+
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Construct nucleus from params given in the input file 
+/// Construct nucleus from params given in the input file
 ///////////////////////////////////////////////////////////////////////////////
 nucleus::nucleus(params &par):
 	p   (par.nucleus_p),
 	n   (par.nucleus_n),
 	_Eb  (par.nucleus_E_b*MeV),
 	_kf  (par.nucleus_kf*MeV),
+	LFGkfScale(par.nucleus_LFGkfScale*MeV),
 	kMomDist(par.nucleus_target),
 	spectator(NULL),
 	d(NULL),
@@ -19,17 +20,17 @@ nucleus::nucleus(params &par):
 {
 	using namespace PDG;
 	pr=p;
-	nr=n;	 
-	if(p+n==1) 
-		_Eb=_kf=_r=0; /// ?????? 	    
-    i=isotope_find(p,n);     
+	nr=n;
+	if(p+n==1)
+		_Eb=_kf=_r=0; /// ??????
+    i=isotope_find(p,n);
     if(i->Z==p && i->N==n)
 		_Eb=i->binding_energy*keV;
-	///Potential -- 
+	///Potential --
 	using namespace PDG;
-	
+
 	if(par.nucleus_model==1)
-	{	
+	{
 		d=best_data(p,n);
 		_r=d->r() * cbrt( A() / d->A() );
 		_kf=d->kF();
@@ -45,15 +46,15 @@ nucleus::nucleus(params &par):
 }
 
 double nucleus::density (double r)
-{	
-	static double const Vol0=4.0/3*Pi*pow(1.2*fermi,3);		
+{
+	static double const Vol0=4.0/3*Pi*pow(1.2*fermi,3);
 
 	if(d)
 		return max(d->dens(r/_r*d->r())*Ar()/A(),0.);
 	else
 		return r < _r ? 1/Vol0*Ar()/A() : 0;
 }
-  
+
 ///////////////////////////////////////////////////////////////////////////////
 /// random distance from the center weighted with nuclear density
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,32 +64,32 @@ double nucleus::get_random_r()
 		return _r*(d->random_r()/d->r());
 	else
 		return _r*frandom_sqr();
-} 
+}
 ///////////////////////////////////////////////////////////////////////
 particle nucleus::get_nucleon ()
-{ 
+{
 	if(p+n==1)	//free nucleon
 	{
-		int pdg= ( p==1 ? PDG::pdg_proton : PDG::pdg_neutron);  
+		int pdg= ( p==1 ? PDG::pdg_proton : PDG::pdg_neutron);
 		return particle(pdg,PDG::mass(pdg)); //r=(0,0,0) //p=(0,0,0)
 	}
 
-	if(p==1 && n==1) //deuterium    
+	if(p==1 && n==1) //deuterium
 	{
 		int pdg=(frandom()<frac_proton() ? PDG::pdg_proton : PDG::pdg_neutron);
 		particle N(pdg,PDG::mass(pdg));
-		N.set_momentum(deuterium ()); 
-		N.r = get_random_r(); 
-		return N; 
+		N.set_momentum(deuterium ());
+		N.r = get_random_r();
+		return N;
 	}
 
 	//if more nucleons in the target
 	return get_nucleon (get_random_r () * rand_dir ());
 }
- 
+
 
 ////////////////////////////////////////////////////////////////////////
-particle nucleus::get_nucleon (vec r) 
+particle nucleus::get_nucleon (vec r)
 {
 	particle p0;
 	p0.r=r;
@@ -101,28 +102,28 @@ particle nucleus::get_nucleon (vec r)
 		//~ p0.set_momentum(vec(_p4));
 		//~ return p0;
 	//~ }
-	
+
 	if(p==1 and n==1)
 	{
 		p0.set_momentum(deuterium());
 		return p0;
 	}
-	
+
 
 	/* model_target=
-	* 0 for free target; 
-	* 1 for Fermi gas; 
-	* 2 for local Fermi gas; 
-	* 3 for Bodek; 
-	* 4 for spectral function; 
-	* 5 for deuterium; 
+	* 0 for free target;
+	* 1 for Fermi gas;
+	* 2 for local Fermi gas;
+	* 3 for Bodek;
+	* 4 for spectral function;
+	* 5 for deuterium;
 	* 6 for only proton in deuterium (for tests only);
 	*/
 
 	switch(kMomDist)
 	{
 		case  1: p0.set_momentum(rand_from_ball(_kf)); break; // fermi gas
-		case  2: p0.set_momentum(rand_from_ball(localkf(p0)));break; // local fermi gas		
+		case  2: p0.set_momentum(rand_from_ball(localkf(p0)));break; // local fermi gas
 		case  3: p0.set_momentum(bodek_rand_from_ball(_kf)); break; //Bodek
 		case  4: if(p==n && (p==6 || p==8))
 				{
@@ -146,7 +147,7 @@ particle nucleus::get_nucleon (vec r)
 			<<" v2="<< p0.v2()
 			<<" "<<p0.v()<<endl;
 	// assert(p0.v2()<1);
-	
+
 	return p0;
 }
 
@@ -154,13 +155,13 @@ double nucleus :: Ef (particle &pa)
 {
 	double const M = 0.5*(PDG::mass_proton + PDG::mass_neutron);
 	double kmom = 0;
-	
+
 	switch (kMomDist)
 	{
 		case 0: case 5: case 6: return 0; break;
 		case 2: kmom = localkf (pa); break;
 		default: kmom = kF(); break;
 	};
-	
+
 	return sqrt(kmom*kmom + M*M) - M;
 }

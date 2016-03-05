@@ -4,6 +4,7 @@
 #endif
 
 #include <iostream>
+#include <iomanip>
 
 #include <omp.h>
 
@@ -14,7 +15,7 @@
 
 #include "SimpleAnalysisFormat.h"
 
-#define DEBUG_SRW
+//#define DEBUG_SRW
 #ifdef _OPENMP
 //#define DEBUG_SRW_OMP
 #endif
@@ -38,8 +39,9 @@ inline void SetupSPP(params const &p){
 }
 
 inline Double_t GetRESWeight(event const & nwEv,
-  Double_t to_CA5,
-  Double_t to_MaRES,
+  Double_t to_CA5=0xDEADBEEF,
+  Double_t to_MaRES=0xDEADBEEF,
+  Double_t to_SPPDISBkgScale=0xDEADBEEF,
   Double_t NominalWeight=0xDEADBEEF){
 
   params rwParams = nwEv.par;
@@ -48,8 +50,15 @@ inline Double_t GetRESWeight(event const & nwEv,
     NominalWeight = nuwro::rew::GetWghtPropToResXSec(nwEv,rwParams);
   }
 
-  rwParams.pion_C5A = to_CA5;
-  rwParams.pion_axial_mass = to_MaRES;
+  if(to_CA5 != 0xDEADBEEF){
+    rwParams.pion_C5A = to_CA5;
+  }
+  if(to_MaRES != 0xDEADBEEF){
+    rwParams.pion_axial_mass = to_MaRES;
+  }
+  if(to_SPPDISBkgScale != 0xDEADBEEF){
+    rwParams.pion_SPPDISBkgScale = to_SPPDISBkgScale;
+  }
 
 #ifdef DEBUG_SRW
   Double_t NewWeight = nuwro::rew::GetWghtPropToResXSec(nwEv,rwParams);
@@ -63,9 +72,20 @@ inline Double_t GetRESWeight(event const & nwEv,
 }
 
 inline void ReWeightRESEvents(std::vector<event> const &nwEvs,
-  Double_t to_CA5,
-  Double_t to_MaRES, std::vector<Double_t> &OutWeights,
-  std::vector<Double_t> const&InWeights=std::vector<Double_t>()){
+  std::vector<Double_t> &OutWeights,
+  std::vector<Double_t> const&InWeights=std::vector<Double_t>(),
+  Double_t to_CA5=0xDEADBEEF,
+  Double_t to_MaRES=0xDEADBEEF,
+  Double_t to_SPPDISBkgScale=0xDEADBEEF){
+
+  if( (to_CA5 == 0xDEADBEEF) && (to_MaRES == 0xDEADBEEF) &&
+      (to_SPPDISBkgScale == 0xDEADBEEF) ){
+#ifdef DEBUG_SRW
+    std::cout << "[WARN]: found defaults for all reweighted parameter values."
+      << std::endl;
+#endif
+    return;
+  }
 
   bool HaveNomWeights = InWeights.size();
 
@@ -85,7 +105,7 @@ inline void ReWeightRESEvents(std::vector<event> const &nwEvs,
 
   # pragma omp parallel for
   for(size_t i = 0; i < nwEvs.size(); ++i){
-    OutWeights[i] = GetRESWeight(nwEvs[i],to_CA5,to_MaRES,
+    OutWeights[i] = GetRESWeight(nwEvs[i], to_CA5, to_MaRES, to_SPPDISBkgScale,
       HaveNomWeights ? InWeights[i] :
                       0xDEADBEEF);
 #ifdef DEBUG_SRW_OMP
@@ -129,7 +149,8 @@ inline void GenerateNominalRESWeights(std::vector<event> const &nwEvs,
 
 }
 
-typedef bool(*SignalFunction)(PODSimpleAnalysisFormat const &ev);
+typedef bool(*SAFSignalFunction)(PODSimpleAnalysisFormat const &ev);
+typedef bool(*NuWroSignalFunction)(event const &ev);
 
 inline bool LoadTree(std::string FileName, std::string TreeName, TFile * &file,
   TTree * &tree){
@@ -152,7 +173,7 @@ inline bool LoadTree(std::string FileName, std::string TreeName, TFile * &file,
 
 inline bool LoadSignalEventsIntoVector(std::string NuWroEvFileName,
   std::vector<event> &SignalEvents,
-  std::vector<PODSimpleAnalysisFormat>& SignalSAFs, SignalFunction IsSignal){
+  std::vector<PODSimpleAnalysisFormat>& SignalSAFs, SAFSignalFunction IsSignal){
 
   TFile *NuWroEvFile = NULL;
   TTree *NuWroEvTree = NULL;
@@ -206,7 +227,7 @@ inline bool LoadSignalEventsIntoVector(std::string NuWroEvFileName,
 }
 
 inline bool LoadSignalEventsIntoSAFVector(std::string NuWroEvFileName,
-  std::vector<PODSimpleAnalysisFormat>& SAFs, SignalFunction IsSignal){
+  std::vector<PODSimpleAnalysisFormat>& SAFs, SAFSignalFunction IsSignal){
 
   TFile *NuWroEvFile = NULL;
   TTree *NuWroEvTree = NULL;
@@ -249,6 +270,61 @@ inline bool LoadSignalEventsIntoSAFVector(std::string NuWroEvFileName,
     Loaded++;
   } std::cout << std::endl;
   std::cout << "[INFO]: Loaded " << Loaded << " SAF signal events out of "
+    << nEntries << " input events." << std::endl;
+
+  NuWroEvFile->Close();
+  return true;
+}
+
+inline bool LoadSignalNuWroEventsIntoVector(std::string NuWroEvFileName,
+  std::vector<event>& evs, NuWroSignalFunction IsSignal){
+
+  TFile *NuWroEvFile = NULL;
+  TTree *NuWroEvTree = NULL;
+
+  if( (!LoadTree(NuWroEvFileName,"treeout",NuWroEvFile,NuWroEvTree)) ){
+    return false;
+  }
+
+  event *nwEv = 0; // ROOT is in control of object life cycle
+  NuWroEvTree->SetBranchAddress("e", &nwEv);
+
+  Long64_t nEntries = NuWroEvTree->GetEntries();
+  Long64_t Loaded = 0;
+
+  evs.reserve(nEntries);
+  std::cout << "[INFO]: Loading the event signal..." << std::endl;
+  size_t CacheSize = 0;
+  for(Long64_t ent = 0; ent < nEntries; ++ent){
+    double CacheSize_Mb = (CacheSize/double(8E6));
+    double Res_Mb = ((CacheSize
+        + ((evs.capacity()-evs.size())*sizeof(event)) ) /
+        double(8E6));
+
+    if(Res_Mb < 1){
+      std::cout.precision(2);
+    } else {
+      CacheSize_Mb = int(CacheSize_Mb);
+      Res_Mb = int(Res_Mb);
+    }
+    std::cout << "\r[LOADING]: "
+      << int((ent+1)*100/nEntries) << "\% loaded "
+      << "(" << CacheSize_Mb << " Mb / " << Res_Mb << " Mb reserved)"
+      << std::flush;
+    NuWroEvTree->GetEntry(ent);
+    std::cout.unsetf(std::ios::floatfield);
+    event const & nwev = (*nwEv);
+
+    if(!IsSignal(nwev)){
+      continue;
+    }
+    evs.push_back(nwev);
+    //Add proper xsec norm
+    evs.back().weight /= double(nEntries);
+    CacheSize += NuwroEvSize(nwev);
+    Loaded++;
+  } std::cout << std::endl;
+  std::cout << "[INFO]: Loaded " << Loaded << " NuWro signal events out of "
     << nEntries << " input events." << std::endl;
 
   NuWroEvFile->Close();

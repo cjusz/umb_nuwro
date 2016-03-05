@@ -11,68 +11,18 @@
 #include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
 #include "NuwroSystSet.h"
-#include "RooTrackerEvent.h"
+#include "NuwroReWeightSimple.h"
 
 //#define TW_DEBUG
 
+#include "DialUtils.h"
+
 using namespace nuwro::rew;
-using namespace RooTrackerUtils;
-
-NuwroWghtEngineI* GetWghtEngineFromDial(ENuWroSyst sys, params const &param){
-
-  if(sys == kNullSystematic){ return NULL; }
-
-  switch(sys){
-    case kNuwro_Ma_CCQE: {
-      return new NuwroReWeight_QEL(param);
-    }
-    case kNuwro_MECNorm: {
-      return new NuwroReWeight_FlagNorm();
-    }
-    case kNuwro_DeltaS_NCEL:{
-      return new NuwroReWeight_QEL(param);
-    }
-    case kNuwro_MaRES:{
-      return new NuwroReWeight_SPP(param);
-    }
-    case kNuwro_CA5:{
-      return new NuwroReWeight_SPP(param);
-    }
-    case kNuwro_SPPDISBkgScale:{
-      return new NuwroReWeight_SPP(param);
-    }
-    default:{
-      return NULL;
-    }
-  }
-}
-
-NuwroWghtEngineI* GetWghtEngineFromDialString(std::string DialName,
-  params const &param){
-  ENuWroSyst sys = NuwroSyst::FromString(DialName);
-  return GetWghtEngineFromDial(sys, param);
-}
-
-void PrintDialsImplemented(){
-  NuwroReWeight_SPP::DoSetupSPP = false;
-  params dummy;
-  std::cout << "[INFO]: Currently implemented dials." << std::endl;
-  for(ENuWroSyst sys = kNullSystematic; sys != kNNuWroSystematics;
-    NuwroSyst::Adv(sys)){
-
-    NuwroWghtEngineI* eng =
-      GetWghtEngineFromDial(sys,dummy);
-    if(eng){
-      std::cout << "\t" << sys << std::endl;
-      delete eng;
-    }
-  }
-}
 
 void PrintUsage(char const * rcmd){
   std::cout << "[USAGE]: " << rcmd
-    << " <params file for nominal> <input rootracker file> "
-    "<output weights file name> <dial to reweight>" << std::endl;
+    << " <input NuWro eventsout file> <output weights file name> "
+    "<dial name to reweight> [dial name to reweight, ...]" << std::endl;
   PrintDialsImplemented();
 }
 
@@ -85,45 +35,27 @@ std::string GetDialValStr(Double_t dialval){
   return ss.str();
 }
 
+bool IsSignal(event const & ev){
+  return true;
+}
+
 int main(int argc, char const *argv[]){
 
-  if(argc < 5){
-    std::cout << "[ERROR]: Expected at least 4 CLI arguments." << std::endl;
+  if(argc < 4){
+    std::cout << "[ERROR]: Expected at least 3 CLI arguments." << std::endl;
     PrintUsage(argv[0]);
     return 1;
   }
 
-  params NomParams;
-  NomParams.read(argv[1]);
+  std::vector<event> evs;
+  SRW::LoadSignalNuWroEventsIntoVector(argv[1], evs, &IsSignal);
 
-  TFile *inputFile = TFile::Open(argv[2]);
-  if(!inputFile || ! inputFile->IsOpen()){
-    std::cerr << "[ERROR]: Couldn't open " << argv[2] << " for reading."
-      << std::endl;
-    PrintUsage(argv[0]);
-    return 2;
-  }
-  TTree *rootracker = dynamic_cast<TTree*>(inputFile->Get("nRooTracker"));
-  if(!rootracker){
-    std::cerr << "[ERROR]: Couldn't find TTree (\"nRooTracker\") in file "
-      << argv[1] << "." << std::endl;
-    PrintUsage(argv[0]);
-    return 4;
-  }
-
-  RooTrackerEvent inpEv;
-  if(!inpEv.JackIn(rootracker)){
-    std::cerr << "[ERROR]: Couldn't Jack the RooTrackerEvent into the input"
-      " tree. Was it malformed?" << std::endl;
-    PrintUsage(argv[0]);
-      return 8;
-  } else {
-    std::cout << "[INFO]: StdHepEvent jacked in, here we go." << std::endl;
-  }
+  params NomParams = evs[0].par; //Assume that all events in the file have the
+  //same theory params.
 
   NuwroReWeight WghtGen;
 
-  int argu = 4;
+  int argu = 3;
   std::vector<ENuWroSyst> Systs;
   std::vector<NuwroSystInfo*> SystInstances;
   std::vector<std::string> WghtEngineNames;
@@ -169,9 +101,9 @@ int main(int argc, char const *argv[]){
     argu++;
   }
 
-  TFile* outputFile = TFile::Open(argv[3],"RECREATE");
+  TFile* outputFile = TFile::Open(argv[2],"RECREATE");
   if(!outputFile || ! outputFile->IsOpen()){
-    std::cerr << "[ERROR]: Couldn't open " << argv[3] << " for writing."
+    std::cerr << "[ERROR]: Couldn't open " << argv[2] << " for writing."
       << std::endl;
     PrintUsage(argv[0]);
     return 16;
@@ -245,13 +177,11 @@ int main(int argc, char const *argv[]){
     outputTree->Branch(weights[i].first.c_str(),&(weights[i].second));
   }
 
-  Long64_t nEntries = rootracker->GetEntries();
-  Long64_t Filled = 0;
+  size_t nEntries = evs.size();
+  size_t Filled = 0;
 
-  for(Long64_t ent = 0; ent < nEntries; ++ent){
-    rootracker->GetEntry(ent);
-    event nwev = GetNuWroEvent1(inpEv, 1000.0);
-    nwev.par = NomParams;
+  for(size_t ent = 0; ent < nEntries; ++ent){
+    event &nwev = evs[ent];
 
     // The ordering of dial twiddling and CalcWeight must be kept in sync with
     // the above loop @ LABEL: Adding weight branches. Or a more sophisticated

@@ -126,7 +126,8 @@ int main(int argc, char const *argv[]){
   size_t NReconfigures = 100;
 
   for(size_t i = 0; i < NReconfigures; i++){
-    SRW::ReWeightRESEvents(SignalEvents,1.0,1.14, Weights);
+    SRW::ReWeightRESEvents(SignalEvents, Weights, std::vector<Double_t>(),
+      1.0,1.14);
     std::cout << "\r" << int((i+1)*100/NReconfigures) << "\% reconfigured."
       << std::flush;
   } std::cout << std::endl;
@@ -143,7 +144,7 @@ int main(int argc, char const *argv[]){
   wt1 = get_wall_time();
 
   for(size_t i = 0; i < NReconfigures; i++){
-    SRW::ReWeightRESEvents(SignalEvents,1.0,1.14, Weights, NominalWeights);
+    SRW::ReWeightRESEvents(SignalEvents, Weights, NominalWeights, 1.0,1.14);
     std::cout << "\r" << int((i+1)*100/NReconfigures) << "\% reconfigured."
       << std::flush;
   } std::cout << std::endl;

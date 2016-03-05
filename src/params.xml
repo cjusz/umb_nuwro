@@ -2,44 +2,44 @@
 <params>
   <param name="random_seed" type="text" ctype="int" default="0">
     <description>Control the random seed persistence
-    0 - use time(NULL) as a seed for random number generator
-    1 - read state from file "random_seed"  or use seed=time(NULL) if file not found
-    other values - use given number as the seed for the generator</description>
-  </param>
-  <param name="number_of_events" type="text" ctype="int" default="100000">
-    <description>The number of equally weighted events to be saved</description>
-  </param>
-  <param name="number_of_test_events" type="text" ctype="int" default="1000000">
-    <description>The number of events used to calculate the cross sections</description>
-  </param>
-  <param name="save_test_events" type="select" ctype="int" default="0">
-    <description>
-	0 - test events are not stored (default)
-	1 - test events are finalized and stored in weighted.eventsout.root
-		avg(weight)=total cross section
-	2 - test events of nonzero weight are finalized and stored in weighted.eventsout.root
-		avg(weight)=total cross section
-    </description>
-  <options>
+      0 - use time(NULL) as a seed for random number generator
+      1 - read state from file "random_seed"  or use seed=time(NULL) if file not found
+      other values - use given number as the seed for the generator</description>
+    </param>
+    <param name="number_of_events" type="text" ctype="int" default="100000">
+      <description>The number of equally weighted events to be saved</description>
+    </param>
+    <param name="number_of_test_events" type="text" ctype="int" default="1000000">
+      <description>The number of events used to calculate the cross sections</description>
+    </param>
+    <param name="save_test_events" type="select" ctype="int" default="0">
+      <description>
+        0 - test events are not stored (default)
+        1 - test events are finalized and stored in weighted.eventsout.root
+        avg(weight)=total cross section
+        2 - test events of nonzero weight are finalized and stored in weighted.eventsout.root
+        avg(weight)=total cross section
+      </description>
+      <options>
         <option key="0">0 - Make unweighted events - default</option>
         <option key="1">1 - Make weighted events from all test events</option>
         <option key="2">2 - Make weighted events from non-zero test events</option>
-  </options>
-  </param>
-  <param name="user_events" type="hidden" ctype="int" default="0">
-    <description>Enable axial mass analysis</description>
-	<conditions>
-	  <condition value="0" description="Normal nuwro run"></condition>
-	  <condition value="1" description="Fit axial mass to MiniBoone data">
+      </options>
+    </param>
+    <param name="user_events" type="hidden" ctype="int" default="0">
+      <description>Enable axial mass analysis</description>
+      <conditions>
+        <condition value="0" description="Normal nuwro run"></condition>
+        <condition value="1" description="Fit axial mass to MiniBoone data">
           <param name="user_params" type="hidden" ctype="line" default="">
-		<description>Parameters  for the user defined analyser</description>
-	   </param>
-	  </condition>
-        </conditions>
-  </param>
-  <param name="beam_type" type="radio" ctype="int" default="0">
-    <description></description>
-    <conditions>
+            <description>Parameters  for the user defined analyser</description>
+          </param>
+        </condition>
+      </conditions>
+    </param>
+    <param name="beam_type" type="radio" ctype="int" default="0">
+      <description></description>
+      <conditions>
         <condition value="0" description="0">
           <param name="beam_energy" type="text" ctype="line" default="1000">
             <description>beam particle energy in [MeV], (Monochromatics beam)</description>
@@ -78,19 +78,19 @@
           </param>
         </condition>
         <condition value="file" description="select from file" exclude="1">
-            <param name="beam" type="select" default="" path="beam/">
-                <description></description>
-            </param>
+          <param name="beam" type="select" default="" path="beam/">
+            <description></description>
+          </param>
         </condition>
-    </conditions>
-  </param>
-  <param name="beam_test_only" type="hidden" ctype="int" default="0">
-    <description></description>
-  </param>
+      </conditions>
+    </param>
+    <param name="beam_test_only" type="hidden" ctype="int" default="0">
+      <description></description>
+    </param>
 
-  <param name="target_type" type="radio" ctype="int" default="0">
-    <description></description>
-    <conditions>
+    <param name="target_type" type="radio" ctype="int" default="0">
+      <description></description>
+      <conditions>
         <condition value="0" description="0">
           <param name="nucleus_p" type="text" ctype="int" default="6">
             <description><![CDATA[Number of protons]]></description>
@@ -98,253 +98,256 @@
           <param name="nucleus_n" type="text" ctype="int" default="6">
             <description><![CDATA[Number of neutrons]]></description>
           </param>
-		  <param name="nucleus_E_b" type="text" ctype="double" default="34">
-			<description><![CDATA[[MeV] binding energy]]></description>
-		  </param>
-		  <param name="nucleus_kf" type="text" ctype="double" default="220">
-			<description><![CDATA[[MeV] Fermi momentum, used in Fermi gas model and in Pauli blocking]]></description>
-		  </param>
+          <param name="nucleus_E_b" type="text" ctype="double" default="34">
+            <description><![CDATA[[MeV] binding energy]]></description>
+          </param>
+          <param name="nucleus_kf" type="text" ctype="double" default="220">
+            <description><![CDATA[[MeV] Fermi momentum, used in Fermi gas model and in Pauli blocking]]></description>
+          </param>
         </condition>
         <condition value="1" description="1">
           <param name="target_content" type="text" ctype="line" default="">
-              <description></description>
+            <description></description>
           </param>
         </condition>
         <condition value="2" description="2">
           <param name="geo_file" type="text" ctype="string" default="target/ND280_v9r7p5.root">
-              <description></description>
+            <description></description>
           </param>
           <param name="geo_name" type="text" ctype="string" default="ND280Geometry_v9r7p5">
-              <description></description>
+            <description></description>
           </param>
           <param name="geo_volume" type="text" ctype="string" default="">
-              <description></description>
+            <description></description>
           </param>
           <param name="geo_o" type="text" ctype="vec" default="0 0 0">
-              <description></description>
+            <description></description>
           </param>
           <param name="geo_d" type="text" ctype="vec" default="2000 2000 5000">
-              <description></description>
+            <description></description>
           </param>
         </condition>
         <condition value="file" description="select from file" exclude="1">
-            <param name="target" type="select" default="" path="target/">
-                <description></description>
-            </param>
+          <param name="target" type="select" default="" path="target/">
+            <description></description>
+          </param>
         </condition>
-    </conditions>
-  </param>
-	  <param name="nucleus_target" type="select" ctype="int" default="2">
-		<description><![CDATA[Models for the description of nucleus as a target]]></description>
-		<options>
-		  <option key="0"><![CDATA[free target]]></option>
-		  <option key="1"><![CDATA[Fermi gas]]></option>
-		  <option key="2"><![CDATA[local Fermi gas]]></option>
-		  <option key="3"><![CDATA[Bodek-Ritchie]]></option>
-		  <option key="4"><![CDATA["effective" spectral function (carbon or oxygen)]]></option>
-		  <option key="5"><![CDATA[deuterium]]></option>
-		  <option key="6"><![CDATA[deuterium with constant binding energy nucleus_E_b (for tests only!)]]></option>
-		</options>
-	  </param>
-		  <param name="nucleus_model" type="select" ctype="int" default="1">
-			<description><![CDATA[Models for the description of nucleus]]></description>
-			<options>
-			  <option key="0"><![CDATA[constant density]]></option>
-			  <option key="1"><![CDATA[realistic density profile]]></option>
-			</options>
-		  </param>
-  <param name="dyn_qel_cc" type="checkbox" ctype="bool" default="1">
-    <description>Quasi elastic charged current</description>
-  </param>
-  <param name="dyn_qel_nc" type="checkbox" ctype="bool" default="1">
-    <description>Quasi elastic neutral current</description>
-  </param>
-  <param name="dyn_res_cc" type="checkbox" ctype="bool" default="1">
-    <description>Resonant charged current</description>
-  </param>
-  <param name="dyn_res_nc" type="checkbox" ctype="bool" default="1">
-    <description>Resonant neutral current</description>
-  </param>
-  <param name="dyn_dis_cc" type="checkbox" ctype="bool" default="1">
-    <description>Deep inelastic charged current</description>
-  </param>
-  <param name="dyn_dis_nc" type="checkbox" ctype="bool" default="1">
-    <description>Deep inelastic neutral current</description>
-  </param>
-  <param name="dyn_coh_cc" type="checkbox" ctype="bool" default="1">
-    <description>Coherent charged current</description>
-  </param>
-  <param name="dyn_coh_nc" type="checkbox" ctype="bool" default="1">
-    <description>Coherent neutral current</description>
-  </param>
-  <param name="dyn_mec_cc" type="checkbox" ctype="bool" default="0">
-    <description>Meson exchange charged current</description>
-  </param>
-  <param name="dyn_mec_nc" type="checkbox" ctype="bool" default="0">
-    <description>Meson exchange charged current</description>
-  </param>
-  <param name="qel_kinematics" type="select" ctype="int" default="0">
-    <description>Quasi elastic kinematics</description>
-    <options>
-      <option key="0"><![CDATA[Standard - please use this one]]></option>
-      <option key="1"><![CDATA["Bodek" - correlated nucleon pairs ????]]></option>
-      <option key="2"><![CDATA[effective nucleon mass - (BAD!!!)]]></option>
-      <option key="3"><![CDATA[Momentum dependent kinematics - version A]]></option>
-      <option key="4"><![CDATA[Momentum dependent kinematics - version B]]></option>
-    </options>
-  </param>
-  <param name="qel_vector_ff_set" type="select" ctype="int" default="2">
-    <description>electromagnetic Form factors</description>
-    <options>
-      <option key="1"><![CDATA[dipole, dipole electric form factor G_E^V]]></option>
-      <option key="2"><![CDATA[BBBA05, hep-ex/0602017 BBBA05 for Q2<18 GeV]]></option>
-      <option key="3"><![CDATA[BBA03, hep-ex/0308005 BBA-2003 for Q2<6 GeV]]></option>
-      <option key="4"><![CDATA[JLab, PHYSICAL REVIEW C, VOLUME 65, 051001(R)]]></option>
-      <option key="5"><![CDATA[Kgraczyk]]></option>
-      <option key="6"><![CDATA[(1990:) parametryzacja JS z old qelcc]]></option>
-    </options>
-  </param>
+      </conditions>
+    </param>
+    <param name="nucleus_target" type="select" ctype="int" default="2">
+      <description><![CDATA[Models for the description of nucleus as a target]]></description>
+      <options>
+        <option key="0"><![CDATA[free target]]></option>
+        <option key="1"><![CDATA[Fermi gas]]></option>
+        <option key="2"><![CDATA[local Fermi gas]]></option>
+        <option key="3"><![CDATA[Bodek-Ritchie]]></option>
+        <option key="4"><![CDATA["effective" spectral function (carbon or oxygen)]]></option>
+        <option key="5"><![CDATA[deuterium]]></option>
+        <option key="6"><![CDATA[deuterium with constant binding energy nucleus_E_b (for tests only!)]]></option>
+      </options>
+    </param>
+    <param name="nucleus_model" type="select" ctype="int" default="1">
+      <description><![CDATA[Models for the description of nucleus]]></description>
+      <options>
+        <option key="0"><![CDATA[constant density]]></option>
+        <option key="1"><![CDATA[realistic density profile]]></option>
+      </options>
+    </param>
+    <param name="nucleus_LFGkfScale" type="text" ctype="double" default="197.4">
+      <description><![CDATA[Factor which enters into local KF determination, in MeV]]></description>
+    </param>
+    <param name="dyn_qel_cc" type="checkbox" ctype="bool" default="1">
+      <description>Quasi elastic charged current</description>
+    </param>
+    <param name="dyn_qel_nc" type="checkbox" ctype="bool" default="1">
+      <description>Quasi elastic neutral current</description>
+    </param>
+    <param name="dyn_res_cc" type="checkbox" ctype="bool" default="1">
+      <description>Resonant charged current</description>
+    </param>
+    <param name="dyn_res_nc" type="checkbox" ctype="bool" default="1">
+      <description>Resonant neutral current</description>
+    </param>
+    <param name="dyn_dis_cc" type="checkbox" ctype="bool" default="1">
+      <description>Deep inelastic charged current</description>
+    </param>
+    <param name="dyn_dis_nc" type="checkbox" ctype="bool" default="1">
+      <description>Deep inelastic neutral current</description>
+    </param>
+    <param name="dyn_coh_cc" type="checkbox" ctype="bool" default="1">
+      <description>Coherent charged current</description>
+    </param>
+    <param name="dyn_coh_nc" type="checkbox" ctype="bool" default="1">
+      <description>Coherent neutral current</description>
+    </param>
+    <param name="dyn_mec_cc" type="checkbox" ctype="bool" default="0">
+      <description>Meson exchange charged current</description>
+    </param>
+    <param name="dyn_mec_nc" type="checkbox" ctype="bool" default="0">
+      <description>Meson exchange charged current</description>
+    </param>
+    <param name="qel_kinematics" type="select" ctype="int" default="0">
+      <description>Quasi elastic kinematics</description>
+      <options>
+        <option key="0"><![CDATA[Standard - please use this one]]></option>
+        <option key="1"><![CDATA["Bodek" - correlated nucleon pairs ????]]></option>
+        <option key="2"><![CDATA[effective nucleon mass - (BAD!!!)]]></option>
+        <option key="3"><![CDATA[Momentum dependent kinematics - version A]]></option>
+        <option key="4"><![CDATA[Momentum dependent kinematics - version B]]></option>
+      </options>
+    </param>
+    <param name="qel_vector_ff_set" type="select" ctype="int" default="2">
+      <description>electromagnetic Form factors</description>
+      <options>
+        <option key="1"><![CDATA[dipole, dipole electric form factor G_E^V]]></option>
+        <option key="2"><![CDATA[BBBA05, hep-ex/0602017 BBBA05 for Q2<18 GeV]]></option>
+        <option key="3"><![CDATA[BBA03, hep-ex/0308005 BBA-2003 for Q2<6 GeV]]></option>
+        <option key="4"><![CDATA[JLab, PHYSICAL REVIEW C, VOLUME 65, 051001(R)]]></option>
+        <option key="5"><![CDATA[Kgraczyk]]></option>
+        <option key="6"><![CDATA[(1990:) parametryzacja JS z old qelcc]]></option>
+      </options>
+    </param>
 
-  <param name="bba07_AEp1" type="text" ctype="double" default="1.0">
+    <param name="bba07_AEp1" type="text" ctype="double" default="1.0">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEp2" type="text" ctype="double" default="0.9927">
+    </param>
+    <param name="bba07_AEp2" type="text" ctype="double" default="0.9927">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEp3" type="text" ctype="double" default="0.9898">
+    </param>
+    <param name="bba07_AEp3" type="text" ctype="double" default="0.9898">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEp4" type="text" ctype="double" default="0.9975">
+    </param>
+    <param name="bba07_AEp4" type="text" ctype="double" default="0.9975">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEp5" type="text" ctype="double" default="0.9812">
+    </param>
+    <param name="bba07_AEp5" type="text" ctype="double" default="0.9812">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEp6" type="text" ctype="double" default="0.9340">
+    </param>
+    <param name="bba07_AEp6" type="text" ctype="double" default="0.9340">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEp7" type="text" ctype="double" default="1.0">
+    </param>
+    <param name="bba07_AEp7" type="text" ctype="double" default="1.0">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMp1" type="text" ctype="double" default="1.0">
+    </param>
+    <param name="bba07_AMp1" type="text" ctype="double" default="1.0">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMp2" type="text" ctype="double" default="1.0011">
+    </param>
+    <param name="bba07_AMp2" type="text" ctype="double" default="1.0011">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMp3" type="text" ctype="double" default="0.9992">
+    </param>
+    <param name="bba07_AMp3" type="text" ctype="double" default="0.9992">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMp4" type="text" ctype="double" default="0.9974">
+    </param>
+    <param name="bba07_AMp4" type="text" ctype="double" default="0.9974">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMp5" type="text" ctype="double" default="1.0010">
+    </param>
+    <param name="bba07_AMp5" type="text" ctype="double" default="1.0010">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMp6" type="text" ctype="double" default="1.0003">
+    </param>
+    <param name="bba07_AMp6" type="text" ctype="double" default="1.0003">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMp7" type="text" ctype="double" default="1.0">
+    </param>
+    <param name="bba07_AMp7" type="text" ctype="double" default="1.0">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEn1" type="text" ctype="double" default="1.0">
+    </param>
+    <param name="bba07_AEn1" type="text" ctype="double" default="1.0">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEn2" type="text" ctype="double" default="1.011">
+    </param>
+    <param name="bba07_AEn2" type="text" ctype="double" default="1.011">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEn3" type="text" ctype="double" default="1.1392">
+    </param>
+    <param name="bba07_AEn3" type="text" ctype="double" default="1.1392">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEn4" type="text" ctype="double" default="1.0203">
+    </param>
+    <param name="bba07_AEn4" type="text" ctype="double" default="1.0203">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEn5" type="text" ctype="double" default="1.1093">
+    </param>
+    <param name="bba07_AEn5" type="text" ctype="double" default="1.1093">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEn6" type="text" ctype="double" default="1.5429">
+    </param>
+    <param name="bba07_AEn6" type="text" ctype="double" default="1.5429">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AEn7" type="text" ctype="double" default="0.9706">
+    </param>
+    <param name="bba07_AEn7" type="text" ctype="double" default="0.9706">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMn1" type="text" ctype="double" default="1.0">
+    </param>
+    <param name="bba07_AMn1" type="text" ctype="double" default="1.0">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMn2" type="text" ctype="double" default="0.9958">
+    </param>
+    <param name="bba07_AMn2" type="text" ctype="double" default="0.9958">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMn3" type="text" ctype="double" default="0.9877">
+    </param>
+    <param name="bba07_AMn3" type="text" ctype="double" default="0.9877">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMn4" type="text" ctype="double" default="1.0193">
+    </param>
+    <param name="bba07_AMn4" type="text" ctype="double" default="1.0193">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMn5" type="text" ctype="double" default="1.0350">
+    </param>
+    <param name="bba07_AMn5" type="text" ctype="double" default="1.0350">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMn6" type="text" ctype="double" default="0.9164">
+    </param>
+    <param name="bba07_AMn6" type="text" ctype="double" default="0.9164">
       <description><![CDATA[]]></description>
-  </param>
-  <param name="bba07_AMn7" type="text" ctype="double" default="0.7300">
+    </param>
+    <param name="bba07_AMn7" type="text" ctype="double" default="0.7300">
       <description><![CDATA[]]></description>
-  </param>
+    </param>
 
-  <param name="qel_axial_ff_set" type="select" ctype="int" default="1">
-    <description></description>
-    <options>
-      <option key="1"><![CDATA[dipole]]>Axial forma factors</option>
-      <option key="2"><![CDATA[2-fold parabolic modification of axial FF]]></option>
-      <option key="3"><![CDATA[3-fold parabolic modification of axial FF]]></option>
-      <option key="4"><![CDATA[4-fold parabolic modification of axial FF]]></option>
-    </options>
-  </param>
-  <param name="qel_rpa" type="select" ctype="int" default="0">
-    <description>Use rpa corretions of KG in qel cc events</description>
-    <options>
-      <option key="0"><![CDATA[disabled]]></option>
-      <option key="1"><![CDATA[enabled RPA only]]></option>
-      <option key="2"><![CDATA[enabled effective mass only]]></option>
-      <option key="3"><![CDATA[enabled RPA and effective mass]]></option>
-    </options>
-  </param>
-  <param name="qel_strange" type="text" ctype="int" default="0">
-    <description><![CDATA[use the strangenes in the axial ff]]></description>
-  </param>
-  <param name="qel_strangeEM" type="text" ctype="int" default="0">
-    <description><![CDATA[[MeV]dont use the strangenes in the vector ff]]></description>
-  </param>
-  <param name="delta_s" type="text" ctype="double" default="-0.15">
-    <description><![CDATA[[Delta s parameter in the strange form factor]]></description>
-  </param>
-  <param name="qel_cc_axial_mass" type="text" ctype="double" default="1200">
-    <description><![CDATA[[MeV] axial mass]]></description>
-  </param>
-  <param name="qel_nc_axial_mass" type="text" ctype="double" default="1350">
-    <description><![CDATA[[MeV] axial mass]]></description>
-  </param>
-  <param name="qel_s_axial_mass" type="text" ctype="double" default="1200">
-    <description><![CDATA[[MeV] axial mass used in the strange dipole ff]]></description>
-  </param>
-  <param name="flux_correction" type="checkbox" ctype="bool" default="1">
-    <description><![CDATA[no flux correction]]></description>
-  </param>
-  <param name="sf_method" type="select" ctype="int" default="0">
-    <description><![CDATA[For certain nuclei (C12, O16, Ar40, Ca40, Fe56) it is possible to use the spectral function model instead of the Fermi gas model in the quasi ellastic events. For other nuclei the parameter is ignored.]]></description>
-    <options>
-      <option key="0"><![CDATA[don't use spectral function]]></option>
-      <option key="1"><![CDATA[use grid spectral function: (C12, O16, Ar40, Fe56)]]></option>
-      <option key="2"><![CDATA[use factorized spectral function: (O16, Ar40, Ca40)]]></option>
-    </options>
-  </param>
-  <param name="sf_pb" type="select" ctype="int" default="0">
-    <description><![CDATA[Pauli blocking model for SF.]]></description>
-    <options>
-      <option key="0"><![CDATA[average Fermi momentum]]></option>
-      <option key="1"><![CDATA[local Fermi momentum]]></option>
-      <option key="2"><![CDATA[TG approach - use MC method to decide about PB, according to a nucleon momentum distribution given by spectral function]]></option>
-    </options>
-  </param>  <param name="cc_smoothing" type="checkbox" ctype="bool" default="1">
+    <param name="qel_axial_ff_set" type="select" ctype="int" default="1">
+      <description></description>
+      <options>
+        <option key="1"><![CDATA[dipole]]>Axial forma factors</option>
+        <option key="2"><![CDATA[2-fold parabolic modification of axial FF]]></option>
+        <option key="3"><![CDATA[3-fold parabolic modification of axial FF]]></option>
+        <option key="4"><![CDATA[4-fold parabolic modification of axial FF]]></option>
+      </options>
+    </param>
+    <param name="qel_rpa" type="select" ctype="int" default="0">
+      <description>Use rpa corretions of KG in qel cc events</description>
+      <options>
+        <option key="0"><![CDATA[disabled]]></option>
+        <option key="1"><![CDATA[enabled RPA only]]></option>
+        <option key="2"><![CDATA[enabled effective mass only]]></option>
+        <option key="3"><![CDATA[enabled RPA and effective mass]]></option>
+      </options>
+    </param>
+    <param name="qel_strange" type="text" ctype="int" default="0">
+      <description><![CDATA[use the strangenes in the axial ff]]></description>
+    </param>
+    <param name="qel_strangeEM" type="text" ctype="int" default="0">
+      <description><![CDATA[[MeV]dont use the strangenes in the vector ff]]></description>
+    </param>
+    <param name="delta_s" type="text" ctype="double" default="-0.15">
+      <description><![CDATA[[Delta s parameter in the strange form factor]]></description>
+    </param>
+    <param name="qel_cc_axial_mass" type="text" ctype="double" default="1200">
+      <description><![CDATA[[MeV] axial mass]]></description>
+    </param>
+    <param name="qel_nc_axial_mass" type="text" ctype="double" default="1350">
+      <description><![CDATA[[MeV] axial mass]]></description>
+    </param>
+    <param name="qel_s_axial_mass" type="text" ctype="double" default="1200">
+      <description><![CDATA[[MeV] axial mass used in the strange dipole ff]]></description>
+    </param>
+    <param name="flux_correction" type="checkbox" ctype="bool" default="1">
+      <description><![CDATA[no flux correction]]></description>
+    </param>
+    <param name="sf_method" type="select" ctype="int" default="0">
+      <description><![CDATA[For certain nuclei (C12, O16, Ar40, Ca40, Fe56) it is possible to use the spectral function model instead of the Fermi gas model in the quasi ellastic events. For other nuclei the parameter is ignored.]]></description>
+      <options>
+        <option key="0"><![CDATA[don't use spectral function]]></option>
+        <option key="1"><![CDATA[use grid spectral function: (C12, O16, Ar40, Fe56)]]></option>
+        <option key="2"><![CDATA[use factorized spectral function: (O16, Ar40, Ca40)]]></option>
+      </options>
+    </param>
+    <param name="sf_pb" type="select" ctype="int" default="0">
+      <description><![CDATA[Pauli blocking model for SF.]]></description>
+      <options>
+        <option key="0"><![CDATA[average Fermi momentum]]></option>
+        <option key="1"><![CDATA[local Fermi momentum]]></option>
+        <option key="2"><![CDATA[TG approach - use MC method to decide about PB, according to a nucleon momentum distribution given by spectral function]]></option>
+      </options>
+    </param>  <param name="cc_smoothing" type="checkbox" ctype="bool" default="1">
     <description><![CDATA[A little performace gain in the QEL channel can be obtained by using: cc_smoothing=1]]></description>
   </param>
   <param name="delta_FF_set" type="select" ctype="int" default="1">
@@ -394,7 +397,7 @@
   </param>
   <param name="mec_kind" type="select" ctype="int" default="1">
     <description><![CDATA[MEC model]]></description>
-	<options>
+    <options>
       <option key="1"><![CDATA[TEM model]]></option>
       <option key="2"><![CDATA[Marteau model]]></option>
       <option key="3"><![CDATA[Nieves model]]></option>
@@ -468,4 +471,4 @@ typ parametru (int,double, select, bool- checkbox, radio)
 wartosc domyslna
 opis parametru
 - opcje parametru (jesli select)
-  -->
+-->

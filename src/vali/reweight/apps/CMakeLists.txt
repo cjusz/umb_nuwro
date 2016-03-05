@@ -1,36 +1,38 @@
-add_executable(test_reweighter test_reweighter.cc)
+add_executable(SimpleReweighter SimpleReweighter.cc)
 
-target_link_libraries(test_reweighter reweight;${EVENT_LIBS})
-set_target_properties(test_reweighter PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-
-
-add_executable(test_SimpleReweighter test_SimpleReweighter.cc)
-
-target_link_libraries(test_SimpleReweighter reweight;${EVENT_LIBS})
-set_target_properties(test_SimpleReweighter PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} -fopenmp")
-set_target_properties(test_SimpleReweighter PROPERTIES COMPILE_FLAGS -fopenmp)
-
-
-add_executable(test_SimpleFitter test_SimpleFitter.cc)
-
-target_link_libraries(test_SimpleFitter reweight;${EVENT_LIBS};vali)
+target_link_libraries(SimpleReweighter reweight;${EVENT_LIBS})
+set_target_properties(SimpleReweighter PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 
 set(FOMP "-fopenmp")
-set_target_properties(test_SimpleFitter PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP} -lMinuit2")
-set_target_properties(test_SimpleFitter PROPERTIES COMPILE_FLAGS "${FOMP} ")
 
-install (TARGETS test_SimpleFitter DESTINATION bin)
+add_executable(SimpleReweighterProfiler SimpleReweighterProfiler.cc)
 
-add_executable(test_SimpleFitterInterface test_SimpleFitterInterface.cc)
+target_link_libraries(SimpleReweighterProfiler reweight;${EVENT_LIBS})
+set_target_properties(SimpleReweighterProfiler PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP}" )
+set_target_properties(SimpleReweighterProfiler PROPERTIES COMPILE_FLAGS "${FOMP} ")
 
-target_link_libraries(test_SimpleFitterInterface reweight;${EVENT_LIBS};vali)
+add_executable(SimpleFitter SimpleFitter.cc)
 
-set_target_properties(test_SimpleFitterInterface PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP} ")
-set_target_properties(test_SimpleFitterInterface PROPERTIES COMPILE_FLAGS "${FOMP} ")
+target_link_libraries(SimpleFitter reweight;${EVENT_LIBS};vali)
+set_target_properties(SimpleFitter PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP} -lMinuit2")
+set_target_properties(SimpleFitter PROPERTIES COMPILE_FLAGS "${FOMP} ")
 
-install (TARGETS test_SimpleFitterInterface DESTINATION bin)
+add_executable(SimpleFitterProfiler SimpleFitterProfiler.cc)
+
+target_link_libraries(SimpleFitterProfiler reweight;${EVENT_LIBS};vali)
+set_target_properties(SimpleFitterProfiler PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP} ")
+set_target_properties(SimpleFitterProfiler PROPERTIES COMPILE_FLAGS "${FOMP} ")
+
+add_executable(DumpDialTweaks DumpDialTweaks.cc)
+
+target_link_libraries(DumpDialTweaks reweight;${EVENT_LIBS})
+set_target_properties(DumpDialTweaks PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS}")
+
 
 install(TARGETS
-  test_reweighter
-  test_SimpleReweighter
+  SimpleReweighter
+  SimpleReweighterProfiler
+  SimpleFitter
+  SimpleFitterProfiler
+  DumpDialTweaks
   DESTINATION bin)

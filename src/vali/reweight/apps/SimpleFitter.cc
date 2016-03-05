@@ -11,8 +11,9 @@
 #include "TTree.h"
 #include "TCanvas.h"
 
-#include "TFitterMinuit.h"
-#include "Minuit2/FCNBase.h"
+#include "Math/Minimizer.h"
+#include "Math/Factory.h"
+#include "Math/Functor.h"
 
 #include "TH1D.h"
 
@@ -25,7 +26,6 @@
 #include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
 #include "NuwroSystSet.h"
-#include "RooTrackerEvent.h"
 #include "NuwroReWeightSimple.h"
 
 //nuwro vali
@@ -40,6 +40,15 @@ double get_wall_time(){
     return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
+template <size_t N>
+std::ostream & operator<< (std::ostream &os, Double_t (&a)[N]){
+  os << "{ ";
+  for(size_t i = 0; i < N; ++i){
+    os << a[i] << ((i==(N-1)) ? ", ": "}" );
+  }
+  return os << std::flush;
+}
+
 std::string num2str(int i){
   std::stringstream ss("");
   ss << i;
@@ -52,57 +61,60 @@ std::string num2str(double i){
   return ss.str();
 }
 
-using namespace RooTrackerUtils;
-
-//#define DEBUG_SIMPFIT
+#define DEBUG_SIMPFIT
 
 #define PROFILE
 
 #ifdef _OPENMP
-static size_t const NumThreads = 4;
+static size_t NumThreads = 4;
 #else
-static size_t const NumThreads = 1;
+static size_t NumThreads = 1;
 #endif
 
 
-struct NPLLR_nwev : public ROOT::Minuit2::FCNBase {
+bool IsSignal(event const & ev){
+  return ev.flag.cc && ev.flag.res && (!ev.flag.anty);
+}
 
-  std::vector<event> const * Events;
-  std::vector<Double_t> GenWeights;
+struct NPLLR_nwev {
+
+  std::vector<event> Events;
   std::vector<Double_t> mutable NominalWeights;
   std::vector<Double_t> mutable Weights;
   std::vector<TH1D*> mutable PlotHistos;
   Double_t FileWeight;
   TH1D const *Data;
 
-  NPLLR_nwev(std::vector<event> const *evs, TH1D const *data, Long64_t NInTree) :
-    GenWeights(), NominalWeights(), Weights(), PlotHistos() {
-    Events = evs;
+  NPLLR_nwev(TH1D const *data, char const *InputFileName) :
+    NominalWeights(), Weights(), PlotHistos() {
+    SRW::LoadSignalNuWroEventsIntoVector(InputFileName, Events, &IsSignal);
+    if(!Events.size()){
+      std::cerr << "[ERROR]: MC Selection contains no events!!!!" << std::endl;
+      throw 5;
+    }
+    SRW::SetupSPP(Events.front().par);
+    NominalWeights.resize(Events.size());
+    Weights.resize(Events.size());
+    SRW::GenerateNominalRESWeights(Events, NominalWeights);
+
     Data = data;
-    NominalWeights.resize(Events->size());
-    Weights.resize(Events->size());
-    GenWeights.resize(Events->size());
-    SRW::GenerateNominalRESWeights((*Events), NominalWeights);
     PlotHistos.resize(NumThreads);
     for(size_t i = 0; i < NumThreads; i++){
       PlotHistos[i] = static_cast<TH1D*>(data->Clone());
       PlotHistos[i]->Sumw2(false);
       PlotHistos[i]->Reset();
     }
-    # pragma omp parallel for
-    for(size_t i = 0; i < Events->size(); ++i){
-      GenWeights[i] = Events->at(i).weight/double(NInTree)*1E40;
-    }
   }
 
   Double_t CalculateTestStat() const {
     double LLR = 0;
-    # pragma omp parallel for reduction(+ : LLR)
+    // # pragma omp parallel for reduction(+ : LLR)
     for(size_t i = 1; i < Data->GetNbinsX(); ++i){
       Double_t DataBin = Data->GetBinContent(i);
-      Double_t MCBin = PlotHistos[0]->GetBinContent(i);
-      Double_t LogEVal = ((DataBin>0)&&(MCBin>0))? DataBin*log(DataBin/MCBin) : 0;
-      LLR +=  MCBin - DataBin + LogEVal;
+      Double_t MCBin = (PlotHistos[0]->GetBinContent(i) > 0) ?
+        PlotHistos[0]->GetBinContent(i) : 1e-15;
+      Double_t LogEVal = (DataBin > 0)? DataBin*log(MCBin/DataBin) : 0;
+      LLR +=  MCBin - DataBin - LogEVal;
     }
 #ifdef DEBUG_SIMPFIT
     assert(std::isfinite(LLR));
@@ -110,21 +122,22 @@ struct NPLLR_nwev : public ROOT::Minuit2::FCNBase {
     return LLR;
   }
 
-  Double_t operator() (std::vector<Double_t> const &x) const {
+  Double_t operator() (Double_t const *x) const {
 
-    SRW::ReWeightRESEvents((*Events),x[0],x[1], Weights, NominalWeights);
+    SRW::ReWeightRESEvents(Events, Weights, NominalWeights, x[0], x[1], x[2]);
 
     PlotHistos[0]->Reset();
 
     # pragma omp parallel for
-    for(size_t i = 0; i < Events->size(); ++i){
+    for(size_t i = 0; i < Events.size(); ++i){
 
 #ifdef _OPENMP
       PlotHistos[omp_get_thread_num()]->Fill(
 #else
       PlotHistos[0]->Fill(
 #endif
-        Events->at(i).out[0].momentum(), Weights[i] * GenWeights[i]);
+        Events.at(i).out[0].momentum(),
+          Weights[i] * Events.at(i).weight);
     }
 
     for(size_t i = 1; i < NumThreads; ++i){
@@ -135,7 +148,7 @@ struct NPLLR_nwev : public ROOT::Minuit2::FCNBase {
     Double_t LLR = CalculateTestStat();
 #ifdef DEBUG_SIMPFIT
     std::cout << "[FIT]: LLR = " << LLR << " @ x[0] = " << x[0]
-      << ", & x[1] = " << x[1] << std::endl;
+      << ", x[1] = " << x[1] <<", x[2] = " << x[2] << std::endl;
 #endif
     return LLR;
   }
@@ -145,53 +158,56 @@ struct NPLLR_nwev : public ROOT::Minuit2::FCNBase {
   }
 };
 
-int PlotFakeData(TTree * FDRootracker, TH1D &FDDistrib){
-  RooTrackerEvent FDEv;
-  if(!FDEv.JackIn(FDRootracker)){
-    std::cerr << "[ERROR]: Couldn't Jack the FDRooTrackerEvent into the input"
-      " tree. Was it malformed?" << std::endl;
-    return 8;
+bool DoMinosErrors(ROOT::Math::Minimizer * min, int iparam){
+  double minos_elow, minos_eup;
+  bool minos_win;
+
+  std::cout << "[INFO]: Running MINOS errors for param: "
+    << min->VariableName(iparam) << "..." << std::endl;
+
+  minos_win = min->GetMinosError(iparam,minos_elow,minos_eup);
+
+  if(minos_win){
+    std::cout << "[FIT RESULT]: " << min->VariableName(iparam) << " : "
+      << min->X()[iparam] << " +/- " << min->Errors()[iparam] << std::endl;
+    std::cout << "\t MINOS: " << minos_elow << ", +" << minos_eup << std::endl;
   } else {
-    std::cout << "[INFO]: StdHepEvent jacked in, here we go." << std::endl;
+    std::cout << "\t MINOS: Failed." << std::endl;
   }
 
-  Long64_t nEntries = FDRootracker->GetEntries();
+  return minos_win;
+}
 
-  std::vector<event> SignalEvents;
-  std::cout << "[INFO]: Plotting the data events..." << std::endl;
+bool FDSignalSelection(event const & ev){
+  return ev.flag.cc && ev.flag.res && (!ev.flag.anty);
+}
 
-  for(Long64_t ent = 0; ent < nEntries; ++ent){
-    std::cout << "\r[LOADING]: " << int((ent+1)*100/nEntries) << "\% data read. "
-      << std::flush;
-    FDRootracker->GetEntry(ent);
-    event nwev = GetNuWroEvent1(FDEv, 1000.0);
-    //Look for CCRes
-    if( (nwev.dyn != 2) || (!nwev.flag.cc) || (!nwev.flag.anty)){
-      continue;
-    }
-    FDDistrib.Fill(nwev.out[0].momentum(),nwev.weight/double(nEntries)*1E40);
+int PlotFakeData(char const * FDEventFileName, TH1D &FDDistrib){
+  std::vector<event> DataEvs;
+  if(!SRW::LoadSignalNuWroEventsIntoVector(FDEventFileName, DataEvs,
+    FDSignalSelection)){
+    return 1;
+  }
+
+  size_t nEntries = DataEvs.size();
+  for(size_t ent = 0; ent < nEntries; ++ent){
+    event &nwev = DataEvs[ent];
+    FDDistrib.Fill(nwev.out[0].momentum(), nwev.weight);
   }
   std::cout << std::endl << "[INFO]: Data plotted!" << std::endl;
   return 0;
 }
 
-static const size_t eSize = sizeof(event);
-static const size_t pSize = sizeof(particle);
-
-inline size_t NuwroEvSize(event const & ev){
-  return ev.in.size()*pSize + ev.temp.size()*pSize + ev.out.size()*pSize +
-  ev.post.size()*pSize + ev.all.size()*pSize + eSize;
-}
-
 void PrintUsage(char const * rcmd){
   std::cout << "[USAGE]: " << rcmd
-    << " <Fake Data parameters file> <Fake Data Nuwro RooTracker File> "
-    "<Nominal parameters file> <MC Nuwro RooTracker File> <Output PDF File>"
+    << " <Fake Data parameters file> <Fake Data Nuwro eventsout File> "
+    "<Nominal parameters file> <MC Nuwro eventsout File> <Output PDF File>"
     << std::endl;
 }
 
 int main(int argc, char const *argv[]){
   TH1::SetDefaultSumw2(false);
+  // NumThreads = 1;
 #ifdef _OPENMP
   omp_set_num_threads(NumThreads);
   std::cout << "[THREADING]: Setting maximum number of concurrent OpenMP "
@@ -210,119 +226,41 @@ int main(int argc, char const *argv[]){
   params NomParams;
   NomParams.read(argv[3]);
 
-  TFile *InputFDFile = TFile::Open(argv[2]);
-  if(!InputFDFile || ! InputFDFile->IsOpen()){
-    std::cerr << "[ERROR]: Couldn't open " << argv[2] << " for reading."
-      << std::endl;
-    PrintUsage(argv[0]);
-    return 2;
-  }
-
-  TTree *FDRootracker = dynamic_cast<TTree*>(InputFDFile->Get("nRooTracker"));
-  if(!FDRootracker){
-    std::cerr << "[ERROR]: Couldn't find TTree (\"nRooTracker\") in file "
-      << argv[2] << "." << std::endl;
-    PrintUsage(argv[0]);
-    return 4;
-  }
-
   TH1D *FDDistrib = new TH1D("FakeDataDistribution","FakeDataDistribution",
     15,0,3000);
   FDDistrib->SetDirectory(NULL);
-  // FDDistrib->Sumw2(true);
-  if(PlotFakeData(FDRootracker,(*FDDistrib))){
+  if(PlotFakeData(argv[2],(*FDDistrib))){
     PrintUsage(argv[0]);
     return 8;
   }
-
-
-  TFile *InputMCFile = TFile::Open(argv[4]);
-  if(!InputMCFile || ! InputMCFile->IsOpen()){
-    std::cerr << "[ERROR]: Couldn't open " << argv[4] << " for reading."
-      << std::endl;
-    PrintUsage(argv[0]);
-    return 2;
-  }
-  TTree *MCRooTracker = dynamic_cast<TTree*>(InputMCFile->Get("nRooTracker"));
-  if(!MCRooTracker){
-    std::cerr << "[ERROR]: Couldn't find TTree (\"nRooTracker\") in file "
-      << argv[4] << "." << std::endl;
-    PrintUsage(argv[0]);
-    return 4;
-  }
-
-  RooTrackerEvent InpMCEv;
-  if(!InpMCEv.JackIn(MCRooTracker)){
-    std::cerr << "[ERROR]: Couldn't Jack the RooTrackerEvent into the input"
-      " tree. Was it malformed?" << std::endl;
-    PrintUsage(argv[0]);
-    return 8;
-  } else {
-    std::cout << "[INFO]: StdHepEvent jacked in, here we go." << std::endl;
-  }
-
-  Long64_t nEntries = MCRooTracker->GetEntries();
-  Long64_t Filled = 0;
-
-  std::vector<event> SignalEvents;
-  SignalEvents.reserve(nEntries);
-  std::cout << "[INFO]: Loading the signal..." << std::endl;
-#ifdef DEBUG_SIMPFIT
-  size_t CacheSize = 0;
-#endif
-  for(Long64_t ent = 0; ent < nEntries; ++ent){
-    std::cout << "\r[LOADING]: " << int((ent+1)*100/nEntries) << "\% loaded "
-#ifdef DEBUG_SIMPFIT
-      << "(" << (CacheSize/size_t(8E6)) << " Mb / " <<
-        ((CacheSize+((nEntries-SignalEvents.size())*sizeof(event)))/size_t(8E6))
-      << " Mb reserved)"
-#endif
-      << std::flush;
-    MCRooTracker->GetEntry(ent);
-    event nwev = GetNuWroEvent1(InpMCEv, 1000.0);
-    //Look for CCRes
-    if( (nwev.dyn != 2) || (!nwev.flag.cc) || (!nwev.flag.anty)){
-      continue;
-    }
-    SignalEvents.push_back(nwev);
-    SignalEvents.back().par = NomParams;
-#ifdef DEBUG_SIMPFIT
-    CacheSize += NuwroEvSize(nwev);
-#endif
-  }
-  std::cout << std::endl <<
-    "[INFO]: Loaded " << SignalEvents.size() << " signal events into memory."
-    << std::endl;
-
-  std::vector<Double_t> Weights;
-  Weights.resize(SignalEvents.size());
-
-  SRW::SetupSPP();
 
   std::cout << "[INFO]: Attempting the fittening. " << std::endl;
-  NPLLR_nwev Eval(&SignalEvents, FDDistrib, nEntries);
+  NPLLR_nwev Eval(FDDistrib, argv[4]);
 
-  std::vector<Double_t> FitStart;
-  FitStart.push_back(NomParams.pion_C5A);
-  FitStart.push_back(NomParams.pion_axial_mass);
+  Double_t FitStart[3];
+  FitStart[0] = NomParams.pion_C5A;
+  FitStart[1] = NomParams.pion_axial_mass;
+  FitStart[2] = NomParams.pion_SPPDISBkgScale;
 
-  // Eval.PlotHistos[0]->Sumw2(true);
   Eval(FitStart);
   TH1D* PreFit = static_cast<TH1D*>(Eval.PlotHistos[0]->Clone());
-  Eval.PlotHistos[0]->Sumw2(false);
 
-  TFitterMinuit * minuit = new TFitterMinuit();
-  minuit->SetMinuitFCN(&Eval);
-  minuit->SetPrintLevel(4);
-  minuit->SetParameter(0,"CA5",FitStart[0],0.01,0,3.0);
-  minuit->SetParameter(1,"MaRES",FitStart[1],0.01,0,3.0);
-  minuit->CreateMinimizer();
+  ROOT::Math::Minimizer * min =
+    ROOT::Math::Factory::CreateMinimizer("Minuit2","");
+  ROOT::Math::Functor f(Eval,3);
+  min->SetFunction(f);
+  min->SetMaxIterations(-1);
+  min->SetTolerance(1E-40);
+  min->SetPrintLevel(0);
+  min->SetLimitedVariable(0,"CA5",FitStart[0],0.25,0,5);
+  min->SetLimitedVariable(1,"MaRES",FitStart[1],0.25,0,5);
+  min->SetLimitedVariable(2,"SPPBkgScale",FitStart[2],0.5,0,5);
 
 #ifdef PROFILE
   Double_t wt1 = get_wall_time();
 #endif
 
-  int iret = minuit->Minimize();
+  min->Minimize();
 
 #ifdef PROFILE
   Double_t wt2 = get_wall_time();
@@ -330,40 +268,48 @@ int main(int argc, char const *argv[]){
     << (wt2-wt1) << " seconds." << std::endl;
 #endif
 
-  // Eval.PlotHistos[0]->Sumw2(true);
-  std::vector<Double_t> BestFit;
-  BestFit.push_back(minuit->GetParameter(0));
-  BestFit.push_back(minuit->GetParameter(1));
+#ifdef PROFILE
+  wt1 = get_wall_time();
+#endif
+  DoMinosErrors(min,0);
+  std::cout << "[TRUE]: pion_C5A: " << TargetParams.pion_C5A << std::endl;
+  DoMinosErrors(min,1);
+  std::cout << "[TRUE]: pion_axial_mass: " << TargetParams.pion_axial_mass
+    << std::endl;
+  DoMinosErrors(min,2);
+  std::cout << "[TRUE]: SPPDISBkgScale: " << TargetParams.pion_SPPDISBkgScale
+    << std::endl;
+#ifdef PROFILE
+  wt2 = get_wall_time();
+  std::cout << "[PROFILE]: MINOS errors took "
+    << (wt2-wt1) << " seconds." << std::endl;
+#endif
+
+  Double_t BestFit[3];
+  BestFit[0] = min->X()[0];
+  BestFit[1] = min->X()[1];
+  BestFit[2] = min->X()[2];
   Double_t TestStat_BF = Eval(BestFit);
 
   TH1D* MCBestFitH = static_cast<TH1D*>(Eval.PlotHistos[0]->Clone());
-  std::vector<Double_t> ActualBF;
-  ActualBF.push_back(TargetParams.pion_C5A);
-  ActualBF.push_back(TargetParams.pion_axial_mass);
+  Double_t ActualBF[3];
+  ActualBF[0] = TargetParams.pion_C5A;
+  ActualBF[1] = TargetParams.pion_axial_mass;
+  ActualBF[2] = TargetParams.pion_SPPDISBkgScale;
   Double_t TestStat_ABF = Eval(ActualBF);
+
+  std::cout << "BF: " << BestFit << ", Actual: " << ActualBF << std::endl;
 
   TH1D* MCTrueReWeightH = static_cast<TH1D*>(Eval.PlotHistos[0]->Clone());
 
   Vali::PlotValiFitResults(FDDistrib, PreFit, MCBestFitH, MCTrueReWeightH,
     "#it{p}_{#mu} (MeV/#it{c})", "#frac{d#sigma}{d#it{p}_{#mu}} (x10^{-40})",
     std::string("C_{A}^{5} True: ") + num2str(TargetParams.pion_C5A)
-    + ", BF: " + num2str(minuit->GetParameter(0))
+    + ", BF: " + num2str(min->X()[0])
     + " || M_{A}^{RES} True: " + num2str(TargetParams.pion_axial_mass)
-    + ", BF: " + num2str(minuit->GetParameter(1)),
+    + ", BF: " + num2str(min->X()[1])
+    + " || SPPDISBkgScale True: " + num2str(TargetParams.pion_SPPDISBkgScale)
+    + ", BF: " + num2str(min->X()[2]),
     argv[5]);
-
-  std::cout << "[FIT RESULTS]: MC Nom: CA5 = " << NomParams.pion_C5A
-    << ", FD True = " << TargetParams.pion_C5A
-    << ", Fit Result = " << minuit->GetParameter(0) << std::endl;
-  std::cout << "[FIT RESULTS]: MC Nom: MaRES = " << NomParams.pion_axial_mass
-    << ", FD True = " << TargetParams.pion_axial_mass
-    << ", Fit Result = " << minuit->GetParameter(1) << std::endl;
-  std::cout << "[FIT RESULTS]: LLR at best fit: " << TestStat_BF
-    << ", at true: " << TestStat_ABF << std::endl;
-
-  if (iret != 0) {
-    std::cout << "Minimization failed - exit " ;
-    return iret;
-  }
 
 }

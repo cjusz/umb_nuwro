@@ -99,7 +99,7 @@ endif()
 
 add_dependencies(event params_header)
 
-ROOT_GENERATE_DICTIONARY( ${CMAKE_CURRENT_BINARY_DIR}/event1Dict event1.h
+ROOT_GENERATE_DICTIONARY(${CMAKE_CURRENT_BINARY_DIR}/event1Dict event1.h
   LINKDEF event1LinkDef.h)
 
 install(TARGETS event DESTINATION lib)

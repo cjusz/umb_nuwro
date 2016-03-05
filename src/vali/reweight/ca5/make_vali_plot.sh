@@ -1,43 +1,89 @@
 #!/bin/sh
 
-if [ ! "${NUWRO_ROOT}" ]; then
-  echo "[ERROR]: NUWRO_ROOT is not set."
+if [ ! "${NUWRO}" ]; then
+  echo "[ERROR]: NUWRO is not set."
   exit 1
 fi
 
-if [ ! -e ${NUWRO_ROOT}/src/vali/reweight/scripts/reweight_vali_script_base.sh ]; then
-  echo "[ERROR]: Expected ${NUWRO_ROOT}/src/vali/reweight/scripts/reweight_vali_script_base.sh to exist. Cannot continue."
+if [ ! -e ${NUWRO}/src/vali/reweight/scripts/reweight_vali_script_base.sh ]; then
+  echo "[ERROR]: Expected ${NUWRO}/src/vali/reweight/scripts/reweight_vali_script_base.sh to exist. Cannot continue."
   exit 1
 fi
 
-if [ ! -e ${NUWRO_ROOT}/src/vali/reweight/scripts/generate_reweight_vali_data.sh ]; then
-  echo "[ERROR]: Expected ${NUWRO_ROOT}/src/vali/reweight/scripts/generate_reweight_vali_data.sh to exist. Cannot continue."
+if [ ! -e ${NUWRO}/src/vali/reweight/scripts/generate_reweight_vali_data.sh ]; then
+  echo "[ERROR]: Expected ${NUWRO}/src/vali/reweight/scripts/generate_reweight_vali_data.sh to exist. Cannot continue."
   exit 1
 fi
 
-if [ ! -e ${NUWRO_ROOT}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh ]; then
-  echo "[ERROR]: Expected ${NUWRO_ROOT}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh to exist. Cannot continue."
+if [ ! -e ${NUWRO}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh ]; then
+  echo "[ERROR]: Expected ${NUWRO}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh to exist. Cannot continue."
   exit 1
 fi
 
-source ${NUWRO_ROOT}/src/vali/reweight/scripts/reweight_vali_script_base.sh
+source ${NUWRO}/src/vali/reweight/scripts/reweight_vali_script_base.sh
 
 DIALNAME="kNuwro_CA5"
+DIALPARAMNAME="pion_C5A"
 DIALPRETTYNAME="C_{A}^{5}"
-DIALVALM2="0.99"
-DIALVAL0="1.19"
-DIALVAL2="1.39"
 DIALUNITS="MeV"
-NEVS="50000"
+NEVS="1000"
 
 echo "[INFO]: Using ${PARAM_BASE}, specialised with ${FLUX_HIST}, and ${TARGET_PARAMS}, generating ${NEVS} events to test dial: ${DIALNAME}"
 
-#Could do this is CLI overrides, but it is useful to have the parameters files for validation
-cat ${PARAM_BASE} | sed "s/number_of_events   = 100000/number_of_events = ${NEVS}/g" | sed "s/pion_C5A =.*$/pion_C5A=${DIALVAL0}/g" | sed "s:#@beam/ND280.txt:@${FLUX_HIST}:g" | sed "s:@target/C.txt:@${TARGET_PARAMS}:g" | sed -e "s/dyn_\([^r].\+_[nc]c\) =1/dyn_\1=0/g" | sed -e "s/dyn_res_nc =1/dyn_res_nc=0/g" > dial_0_params.txt
-cat ${PARAM_BASE} | sed "s/number_of_events   = 100000/number_of_events = ${NEVS}/g" | sed "s/pion_C5A =.*$/pion_C5A=${DIALVAL2}/g" | sed "s:#@beam/ND280.txt:@${FLUX_HIST}:g" | sed "s:@target/C.txt:@${TARGET_PARAMS}:g" | sed -e "s/dyn_\([^r].\+_[nc]c\) =1/dyn_\1=0/g" | sed -e "s/dyn_res_nc =1/dyn_res_nc=0/g" > dial_2_params.txt
-cat ${PARAM_BASE} | sed "s/number_of_events   = 100000/number_of_events = ${NEVS}/g" | sed "s/pion_C5A =.*$/pion_C5A=${DIALVALM2}/g" | sed "s:#@beam/ND280.txt:@${FLUX_HIST}:g" | sed "s:@target/C.txt:@${TARGET_PARAMS}:g" | sed -e "s/dyn_\([^r].\+_[nc]c\) =1/dyn_\1=0/g" | sed -e "s/dyn_res_nc =1/dyn_res_nc=0/g" > dial_m2_params.txt
+cat ${PARAM_BASE} | sed "s:#@beam/ND280.txt:@${FLUX_HIST}:g" | sed "s:@target/C.txt:@${TARGET_PARAMS}:g" > params.txt.in
 
-${NUWRO_ROOT}/src/vali/reweight/scripts/generate_reweight_vali_data.sh ${DIALNAME}
+DIALVALM2=$(DumpDialTweaks params.txt.in ${DIALNAME} | tail -3 | head -1)
+DIALVAL0=$(DumpDialTweaks params.txt.in ${DIALNAME} | tail -2 | head -1)
+DIALVAL2=$(DumpDialTweaks params.txt.in ${DIALNAME} | tail -1)
+
+echo "[INFO]: Parameter values: M2=${DIALVALM2}, 0=${DIALVAL0}, 2=${DIALVAL2}"
+
+dumpParams -i params.txt.in \
+  -p number_of_events=${NEVS} \
+  -p ${DIALPARAMNAME}=${DIALVALM2} \
+  -p dyn_qel_cc=0 \
+  -p dyn_qel_nc=0 \
+  -p dyn_res_cc=1 \
+  -p dyn_res_nc=1 \
+  -p dyn_dis_cc=1 \
+  -p dyn_dis_nc=1 \
+  -p dyn_coh_cc=0 \
+  -p dyn_coh_nc=0 \
+  -p dyn_mec_cc=0 \
+  -p dyn_mec_nc=0 \
+  > dial_m2_params.txt
+
+dumpParams -i params.txt.in \
+  -p number_of_events=${NEVS} \
+  -p ${DIALPARAMNAME}=${DIALVAL0} \
+  -p dyn_qel_cc=0 \
+  -p dyn_qel_nc=0 \
+  -p dyn_res_cc=1 \
+  -p dyn_res_nc=1 \
+  -p dyn_dis_cc=1 \
+  -p dyn_dis_nc=1 \
+  -p dyn_coh_cc=0 \
+  -p dyn_coh_nc=0 \
+  -p dyn_mec_cc=0 \
+  -p dyn_mec_nc=0 \
+  > dial_0_params.txt
+
+dumpParams -i params.txt.in \
+  -p number_of_events=${NEVS} \
+  -p ${DIALPARAMNAME}=${DIALVAL2} \
+  -p dyn_qel_cc=0 \
+  -p dyn_qel_nc=0 \
+  -p dyn_res_cc=1 \
+  -p dyn_res_nc=1 \
+  -p dyn_dis_cc=1 \
+  -p dyn_dis_nc=1 \
+  -p dyn_coh_cc=0 \
+  -p dyn_coh_nc=0 \
+  -p dyn_mec_cc=0 \
+  -p dyn_mec_nc=0 \
+  > dial_2_params.txt
+
+${NUWRO}/src/vali/reweight/scripts/generate_reweight_vali_data.sh ${DIALNAME}
 
 #################################################
 #  Add Plots
@@ -45,7 +91,7 @@ ${NUWRO_ROOT}/src/vali/reweight/scripts/generate_reweight_vali_data.sh ${DIALNAM
 
 echo "[INFO]: Building: Plot_${DIALNAME}_Vars.cc"
 
-cp ${NUWRO_ROOT}/src/vali/reweight/PlotDialVars.cc.in Plot_${DIALNAME}_Vars.cc
+cp ${NUWRO}/src/vali/reweight/PlotDialVars.cc.in Plot_${DIALNAME}_Vars.cc
 
 #pmu
 echo "VarToPlot1D FS_mu_p; FS_mu_p.XAxisTitle = \"#it{p}^{#mu} (GeV/#it{c})\"; FS_mu_p.XVariableName = \"pmu\"; FS_mu_p.XVariablePrettyName = \"#it{p}^{#mu}\";  FS_mu_p.DialName = \"${DIALNAME}\"; FS_mu_p.DialPrettyName = \"${DIALPRETTYNAME}\"; FS_mu_p.DialUnits = \"${DIALUNITS}\"; FS_mu_p.PlotString = \"HMFSLepton_4Mom.Vect().Mag()\"; FS_mu_p.SelectionString = \"(HMFSLepton_PDG==13)&&(NeutConventionReactionCode==11)\"; FS_mu_p.DialValm2 = \"${DIALVALM2}\"; FS_mu_p.DialVal0 = \"${DIALVAL0}\"; FS_mu_p.DialVal2 = \"${DIALVAL2}\"; FS_mu_p.NXBins = 50; FS_mu_p.XBinMin = 0; FS_mu_p.XBinMax = 2.5; FS_mu_p.LegX1 = 0.45; FS_mu_p.LegY1 = 0.6; FS_mu_p.LegX2 = 0.925; FS_mu_p.LegY2 = 0.925; FS_mu_p.LogHist = false; FS_mu_p.LegendTitle=\"NuWro C-target, ND280 Flux\"; PlotVar1D(FS_mu_p);" >> Plot_${DIALNAME}_Vars.cc
@@ -136,6 +182,6 @@ echo "VarToPlot2D FS_ct_p_p; FS_ct_p_p.YAxisTitle = \"cos#it{#theta}^{p,Highest}
 
 echo "}" >> Plot_${DIALNAME}_Vars.cc
 
-${NUWRO_ROOT}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh "Plot_${DIALNAME}_Vars.cc"
+${NUWRO}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh "Plot_${DIALNAME}_Vars.cc"
 
 ./Plot_Vars saf_dial_m2_eventsout.root saf_dial_0_eventsout.root saf_dial_2_eventsout.root ${DIALNAME}_weightsfile.root ${DIALNAME}_valid.pdf

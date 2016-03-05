@@ -97,7 +97,7 @@ int main(int argc, char const * argv[]){
     "NominalWeights." << std::endl;
   std::vector<Double_t> EvReWeights;
   EvReWeights.resize(SignalEvents.size());
-  SRW::ReWeightRESEvents(SignalEvents, 1.0, 1.0, EvReWeights, NominalWeights);
+  SRW::ReWeightRESEvents(SignalEvents, EvReWeights, NominalWeights, 1.0, 1.0);
 
   PlotTest(SignalSAFs,NominalWeights,EvReWeights);
 
