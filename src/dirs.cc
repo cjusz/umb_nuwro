@@ -17,13 +17,10 @@ void set_dirs(char *exename) {
   do {
     --n;
   } while (n >= 0 && exename[n] != '/');
-  if (exename[n] == '/')  // path was given
-  {
+  if (exename[n] == '/'){  // path was given
     exename[n] = 0;
     bin_dir = string(exename) + "/";
-    data_dir = bin_dir + "../data/";
     exename[n] = '/';
-    return;
   } else {  // no path given - exemine PATH try to find which exename was used
     char *p = getenv("PATH");
     if (p) {
@@ -41,8 +38,8 @@ void set_dirs(char *exename) {
   // try to use the environment variable "NUWRO"
   char *nuwro_dir = getenv("NUWRO");
   if (nuwro_dir) {
-    data_dir = bin_dir + "data/";
-    return;
+  	std::string ndir = nuwro_dir;
+    data_dir = ndir + (ndir[(ndir.length()-1)]=='/'?"":"/") + "data/";
   }
 }
 
