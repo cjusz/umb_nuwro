@@ -10,7 +10,7 @@ std::string NuwroSyst::AsString(NuwroSyst_t syst){
 
     case kNuwro_MaRES: { return "kNuwro_MaRES"; }
     case kNuwro_CA5: { return "kNuwro_CA5"; }
-    case kNuwro_SPPDISBkgScale: { return "kNuwro_SPPDISBkgScale"; }
+    case kNuwro_SPPBkgScale: { return "kNuwro_SPPBkgScale"; }
 
     case kNuwro_Ma_CCQE: { return "kNuwro_Ma_CCQE"; }
     case kNuwro_Ma_NCEL: { return "kNuwro_Ma_NCEL"; }

@@ -14,42 +14,46 @@
 #include "SimpleAnalysisFormat.h"
 #include "ValiPlotter.h"
 
-
-void PlotTest(std::vector<PODSimpleAnalysisFormat> &SignalSAFs,
-              std::vector<Double_t> &NominalWeights,
-              std::vector<Double_t> &EvReWeights){
-
+void PlotTest(std::vector<Double_t> &SignalLeptonMomentum,
+              std::vector<SRW::SRWEvent> &SignalSRWs,
+              std::vector<Double_t> &EvReWeights) {
   Vali::ValiStyle()->cd();
-  TH1D * Nominal =
-    new TH1D("PreReWeight","Nominal;#frac{d#sigma}{d#it{p}_{#mu}}"
-      " (nucleon^{-1} cm^{-2} MeV^{-1});#it{p}_{#mu} (MeV/#it{c})",100,0,2.0);
-  TH1D * ReWeight =
-    new TH1D("ReWeight","ReWeight;#frac{d#sigma}{d#it{p}_{#mu}}"
-      " (nucleon^{-1} cm^{-2} MeV^{-1});#it{p}_{#mu} (MeV/#it{c})",100,0,2.0);
+  TH1D *Nominal =
+      new TH1D("PreReWeight",
+               "Nominal;#it{p}_{#mu} (GeV/#it{c})"
+               "(MeV/#it{c});#frac{d#sigma}{d#it{p}_{#mu}}(nucleon^{-1} "
+               "cm^{-2} GeV^{-1})",
+               100, 0, 2.0);
+  TH1D *ReWeight =
+      new TH1D("ReWeight",
+               "ReWeight;#it{p}_{#mu} (GeV/#it{c})"
+               "(MeV/#it{c});#frac{d#sigma}{d#it{p}_{#mu}}(nucleon^{-1} "
+               "cm^{-2} GeV^{-1})",
+               100, 0, 2.0);
 
-  for(size_t i = 0; i < SignalSAFs.size(); ++i){
-    Nominal->Fill(SignalSAFs[i].HMFSLepton_4Mom.Vect().Mag(),SignalSAFs[i].EvtWght);
-    ReWeight->Fill(SignalSAFs[i].HMFSLepton_4Mom.Vect().Mag(),SignalSAFs[i].EvtWght *
-      EvReWeights[i]);
+  for (size_t i = 0; i < SignalSRWs.size(); ++i) {
+    Nominal->Fill(SignalLeptonMomentum[i], SignalSRWs[i].NominalWeight);
+    ReWeight->Fill(SignalLeptonMomentum[i],
+                   SignalSRWs[i].NominalWeight * EvReWeights[i]);
   }
 
   ReWeight->SetLineColor(kRed);
   ReWeight->SetLineStyle(2);
 
-  Nominal->Scale(1.0,"width");
-  ReWeight->Scale(1.0,"width");
+  Nominal->Scale(1.0, "width");
+  ReWeight->Scale(1.0, "width");
 
-  TCanvas *c1 = new TCanvas("test","test");
-  TLegend * leg = new TLegend(0.5,0.5,0.85,0.9);
+  TCanvas *c1 = new TCanvas("test", "test");
+  TLegend *leg = new TLegend(0.5, 0.5, 0.85, 0.9);
   leg->SetHeader("NuWro Test Load+Reweight");
-  leg->SetTextSize(leg->GetTextSize()*1.25);
+  leg->SetTextSize(leg->GetTextSize() * 1.25);
   leg->SetFillColor(kWhite);
   leg->SetFillStyle(-1);
   leg->SetBorderSize(-1);
   leg->AddEntry(Nominal, Nominal->GetTitle(), "l");
   leg->AddEntry(ReWeight, ReWeight->GetTitle(), "l");
 
-  if(ReWeight->GetMaximum() > Nominal->GetMaximum()){
+  if (ReWeight->GetMaximum() > Nominal->GetMaximum()) {
     ReWeight->Draw();
     Nominal->Draw("SAME");
   } else {
@@ -61,45 +65,63 @@ void PlotTest(std::vector<PODSimpleAnalysisFormat> &SignalSAFs,
   delete c1;
 }
 
-void PrintUsage(char const * rcmd){
+void PrintUsage(char const *rcmd) {
   std::cout << "[USAGE]: " << rcmd
-    << " <Input NuWro eventsout files>" << std::endl;
+            << "[#Events To Load] <Input NuWro eventsout files>" << std::endl;
+}
+std::vector<Double_t> SignalLeptonMomentum;
+params par;
+bool IsSignal(event const &ev) {
+  static bool first = true;
+  if (first) {
+    par = ev.par;
+    first = false;
+  }
+  if ((ev.dyn == 2) && (ev.flag.cc) && (!ev.flag.anty)) {
+    SignalLeptonMomentum.push_back(ev.out[0].momentum() / 1000.0);
+    return true;
+  }
+  return false;
 }
 
-bool IsSignal(PODSimpleAnalysisFormat const &ev){
-  return !((ev.NuWroDyn != 2) || (!ev.NuWroCC) || (!ev.NuWroAnty));
-}
-
-
-
-
-int main(int argc, char const * argv[]){
-  if(argc != 2){
-    std::cerr << "[ERROR]: Found " << (argc-1) << " cli args. Expected 1."
-      << std::endl;
+int main(int argc, char const *argv[]) {
+  if ((argc < 2) || (argc > 3)) {
+    std::cerr << "[ERROR]: Found " << (argc - 1)
+              << " cli args. Expected 1 or 2." << std::endl;
     PrintUsage(argv[0]);
     return 1;
   }
-  std::vector<event> SignalEvents;
-  std::vector<PODSimpleAnalysisFormat> SignalSAFs;
-  SRW::LoadSignalEventsIntoVector(argv[1],SignalEvents,SignalSAFs,&IsSignal);
+  int argo = 1;
+  size_t LoadNoMoreThan = std::numeric_limits<Long64_t>::max();
+  if (argc == 3) {
+    LoadNoMoreThan = atol(argv[1]);
+    LoadNoMoreThan =
+        LoadNoMoreThan ? LoadNoMoreThan : std::numeric_limits<Long64_t>::max();
+    argo++;
+  }
 
-  SRW::SetupSPP(SignalEvents.front().par);
+  std::vector<SRW::SRWEvent> SignalSRWs;
+  SRW::LoadSignalSRWEventsIntoVector(argv[argo], SignalSRWs, &IsSignal,
+                                     LoadNoMoreThan);
+
+  SRW::SetupSPP(par);
 
   std::vector<Double_t> NominalWeights;
-  NominalWeights.resize(SignalEvents.size());
-  SRW::GenerateNominalRESWeights(SignalEvents,NominalWeights);
-  for(size_t i = 0; i < SignalEvents.size(); ++i){
+  NominalWeights.resize(SignalSRWs.size());
+  SRW::GenerateNominalWeights(SignalSRWs, par, NominalWeights);
+  for (size_t i = 0; i < std::min(LoadNoMoreThan, SignalSRWs.size()); ++i) {
     assert(std::isfinite(NominalWeights[i]));
-    assert(NominalWeights[i]>0);
+    assert(NominalWeights[i] > 0);
   }
   std::cout << "[INFO]: Successfully loaded event vector and generated "
-    "NominalWeights." << std::endl;
+               "NominalWeights."
+            << std::endl;
   std::vector<Double_t> EvReWeights;
-  EvReWeights.resize(SignalEvents.size());
-  SRW::ReWeightRESEvents(SignalEvents, EvReWeights, NominalWeights, 1.0, 1.0);
+  EvReWeights.resize(SignalSRWs.size());
+  SRW::ReWeightRESEvents(SignalSRWs, par, EvReWeights, NominalWeights, 1.0,
+                         1.0);
 
-  PlotTest(SignalSAFs,NominalWeights,EvReWeights);
+  PlotTest(SignalLeptonMomentum, SignalSRWs, EvReWeights);
 
   return 0;
 }

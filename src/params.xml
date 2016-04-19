@@ -368,8 +368,8 @@
   <param name="pion_C5A" type="text" ctype="double" default="1.19">
     <description><![CDATA[]]></description>
   </param>
-  <param name="pion_SPPDISBkgScale" type="text" ctype="double" default="1.0">
-    <description><![CDATA[Factor used to scale DIS contribution to dyn = 2 &amp; 3 xsec]]></description>
+  <param name="SPPBkgScale" type="text" ctype="double" default="0.0">
+    <description>Factor used to scale DIS contribution to dyn = 2 &amp; 3 xsec. Applicable between -1.0, and 1.0</description>
   </param>
 
   <param name="delta_angular" type="select" ctype="int" default="0">

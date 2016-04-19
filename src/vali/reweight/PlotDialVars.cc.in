@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "TCanvas.h"
 #include "TFile.h"
 #include "TH1.h"
@@ -8,7 +10,7 @@ using namespace Vali;
 
 PlotData pd;
 
-void DoPlotting();
+void DoPlotting(Long64_t);
 void PlotVar1D(VarToPlot1D &v){
   Vali::PlotVar1D(v,pd);
 }
@@ -50,8 +52,13 @@ int main(int argc, char const * argv[]){
   TCanvas *c1 = new TCanvas("pdfdoc_dummy","");
   c1->SaveAs((pd.PDFOutName+"[").c_str());
 
+  Long64_t PlotNoMoreThan = std::min(pd.tree_dial0->GetEntries(),
+  dynamic_cast<TTree*>(_file3->Get("weights"))->GetEntries());
+
   //This gets specialized
-  DoPlotting();
+  std::cout << "[INFO]: Plotting no more than: " << PlotNoMoreThan
+    << " entries." << std::endl;
+  DoPlotting(PlotNoMoreThan);
 
   c1->SaveAs((pd.PDFOutName+"]").c_str());
 
@@ -63,4 +70,5 @@ int main(int argc, char const * argv[]){
   HistoFile->Close();
 }
 
-void DoPlotting(){
+void DoPlotting(Long64_t PlotNoMoreThan){
+  SetMaxToPlot(PlotNoMoreThan);

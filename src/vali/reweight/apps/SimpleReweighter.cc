@@ -48,7 +48,7 @@ int main(int argc, char const *argv[]){
   }
 
   std::vector<event> evs;
-  SRW::LoadSignalNuWroEventsIntoVector(argv[1], evs, &IsSignal);
+  SRW::LoadSignalNuWroEventsIntoVector(argv[1], evs, &IsSignal, 500000);
 
   params NomParams = evs[0].par; //Assume that all events in the file have the
   //same theory params.

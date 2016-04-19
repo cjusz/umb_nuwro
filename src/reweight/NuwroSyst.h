@@ -13,6 +13,11 @@ typedef enum ENuWroSyst {
   kNuwro_SMa_NCEL,
   kNuwro_DeltaS_NCEL,
 
+  // RES
+  kNuwro_MaRES,
+  kNuwro_CA5,
+  kNuwro_SPPBkgScale,
+
   // Flag Norm
   kNuwro_QELNorm,
   kNuwro_RESNorm,
@@ -34,11 +39,6 @@ typedef enum ENuWroSyst {
   kNuwro_DYNNorm_7,
   kNuwro_DYNNorm_8,
   kNuwro_DYNNorm_9,
-
-  // RES
-  kNuwro_MaRES,
-  kNuwro_CA5,
-  kNuwro_SPPDISBkgScale,
 
   // BBBA07 FF Pars
   kNuwro_BBBA07_AEp1,

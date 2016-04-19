@@ -1,5 +1,6 @@
 //c++
 #include <iostream>
+#include <algorithm>
 
 //POSIX
 #include <sys/time.h>
@@ -30,28 +31,30 @@ double get_wall_time(){
     return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
-using namespace RooTrackerUtils;
-
 #define DEBUG_MEM
 #define PROFILE
 
-static const size_t eSize = sizeof(event);
-static const size_t pSize = sizeof(particle);
-
-inline size_t NuwroEvSize(event const & ev){
-  return ev.in.size()*pSize + ev.temp.size()*pSize + ev.out.size()*pSize +
-  ev.post.size()*pSize + ev.all.size()*pSize + eSize;
-}
-
 void PrintUsage(char const * rcmd){
   std::cout << "[USAGE]: " << rcmd
-    << " <Nominal parameters file> <TChain::Add specifer of NuWro rootracker files> "
-    "<output ROOT file name>" << std::endl;
+    << " <Nominal parameters file> <NuWro eventsout.root>" << std::endl;
+}
+
+params par;
+bool IsSignal(event const &ev) {
+  static bool first = true;
+  if (first) {
+    par = ev.par;
+    first = false;
+  }
+  if (ev.dyn <= 3) {
+    return true;
+  }
+  return false;
 }
 
 int main(int argc, char const *argv[]){
 
-  if(argc != 4){
+  if((argc < 3) || (argc > 4)){
     std::cerr << "[ERROR]: Found " << (argc-1) << " cli args. Expected 2."
       << std::endl;
     PrintUsage(argv[0]);
@@ -61,63 +64,19 @@ int main(int argc, char const *argv[]){
   params NomParams;
   NomParams.read(argv[1]);
 
-  TFile *inputFile = TFile::Open(argv[2]);
-  if(!inputFile || ! inputFile->IsOpen()){
-    std::cerr << "[ERROR]: Couldn't open " << argv[2] << " for reading."
-      << std::endl;
-    PrintUsage(argv[0]);
-    return 2;
-  }
-  TTree *rootracker = dynamic_cast<TTree*>(inputFile->Get("nRooTracker"));
-  if(!rootracker){
-    std::cerr << "[ERROR]: Couldn't find TTree (\"nRooTracker\") in file "
-      << argv[1] << "." << std::endl;
-    PrintUsage(argv[0]);
-    return 4;
+  int argo = 2;
+  Long64_t LoadNoMoreThan = std::numeric_limits<Long64_t>::max();
+  if (argc == 4) {
+    LoadNoMoreThan = atol(argv[argo]);
+    LoadNoMoreThan = std::min(LoadNoMoreThan ,std::numeric_limits<Long64_t>::max());
+    argo++;
   }
 
-  RooTrackerEvent inpEv;
-  if(!inpEv.JackIn(rootracker)){
-    std::cerr << "[ERROR]: Couldn't Jack the RooTrackerEvent into the input"
-      " tree. Was it malformed?" << std::endl;
-    PrintUsage(argv[0]);
-    return 8;
-  } else {
-    std::cout << "[INFO]: StdHepEvent jacked in, here we go." << std::endl;
-  }
-
-  Long64_t nEntries = rootracker->GetEntries();
-  Long64_t Filled = 0;
-
-  std::vector<event> SignalEvents;
-  std::cout << "[INFO]: Loading the signal..." << std::endl;
-#ifdef DEBUG_MEM
-  size_t CacheSize = 0;
-#endif
-  for(Long64_t ent = 0; ent < nEntries; ++ent){
-    std::cout << "\r" << int((ent+1)*100/nEntries) << "\% loaded "
-#ifdef DEBUG_MEM
-      << "(" << (CacheSize/size_t(8E6)) << " Mb)"
-#endif
-      << std::flush;
-    rootracker->GetEntry(ent);
-    event nwev = GetNuWroEvent1(inpEv, 1000.0);
-    //Look for CCRes
-    if( (nwev.dyn != 2) || (!nwev.flag.cc) || (!nwev.flag.anty)){
-      continue;
-    }
-    SignalEvents.push_back(nwev);
-    SignalEvents.back().par = NomParams;
-#ifdef DEBUG_MEM
-    CacheSize += NuwroEvSize(nwev);
-#endif
-  }
-  std::cout << std::endl <<
-    "[INFO]: Loaded " << SignalEvents.size() << " signal events into memory."
-    << std::endl;
+  std::vector<SRW::SRWEvent> SignalSRWs;
+  SRW::LoadSignalSRWEventsIntoVector(argv[argo], SignalSRWs, &IsSignal, LoadNoMoreThan);
 
   std::vector<Double_t> Weights;
-  Weights.resize(SignalEvents.size());
+  Weights.resize(SignalSRWs.size());
 
   SRW::SetupSPP();
 
@@ -125,35 +84,37 @@ int main(int argc, char const *argv[]){
 
   size_t NReconfigures = 100;
 
+  SRW::SimpleReWeightParams rwParams;
+  rwParams.to_CA5 = 1.0;
+  rwParams.to_MaRES = 1.14;
+
   for(size_t i = 0; i < NReconfigures; i++){
-    SRW::ReWeightRESEvents(SignalEvents, Weights, std::vector<Double_t>(),
-      1.0,1.14);
+    SRW::ReWeightEvents(SignalSRWs, par, Weights, std::vector<Double_t>(),
+      rwParams);
     std::cout << "\r" << int((i+1)*100/NReconfigures) << "\% reconfigured."
       << std::flush;
   } std::cout << std::endl;
 
   double wt2 = get_wall_time();
 
-  std::cout << "[PROFILE]: " << NReconfigures << " reweights took "
+  std::cout << "[PROFILE]: " << NReconfigures << " RES reweights took "
     << (wt2-wt1) << " second, with no nominal weight information." << std::endl;
 
   std::vector<Double_t> NominalWeights;
-  NominalWeights.resize(SignalEvents.size());
-  SRW::GenerateNominalRESWeights(SignalEvents,NominalWeights);
+  NominalWeights.resize(SignalSRWs.size());
+  SRW::GenerateNominalWeights(SignalSRWs, par, NominalWeights);
 
   wt1 = get_wall_time();
 
   for(size_t i = 0; i < NReconfigures; i++){
-    SRW::ReWeightRESEvents(SignalEvents, Weights, NominalWeights, 1.0,1.14);
+    SRW::ReWeightEvents(SignalSRWs, par, Weights, NominalWeights, rwParams);
     std::cout << "\r" << int((i+1)*100/NReconfigures) << "\% reconfigured."
       << std::flush;
   } std::cout << std::endl;
 
   wt2 = get_wall_time();
 
-  std::cout << "[PROFILE]: " << NReconfigures << " reweights took "
+  std::cout << "[PROFILE]: " << NReconfigures << " RES reweights took "
     << (wt2-wt1) << " second, with nominal weight information." << std::endl;
-
-
 
 }

@@ -4,11 +4,15 @@
 #include "params.h"
 
 #include "NuwroWghtEngineI.h"
+#include "NuwroReWeightSimpleEvent.h"
 
 namespace nuwro {
 namespace rew  {
 
 //#define DEBUG_QE_REWEIGHT
+
+double GetWghtPropToQEXSec(event const &nuwro_event, params const &rwparams);
+double GetWghtPropToQEXSec(SRW::SRWEvent const &ev, params const &rwparams);
 
 class NuwroReWeight_QEL : public NuwroWghtEngineI {
 public:

@@ -206,11 +206,11 @@ struct PODSimpleAnalysisFormat {
   ///NEUT interaction code
   Int_t NeutConventionReactionCode;
   ///NuWro interaction code
-  /// 0/1: QEL
-  /// 2/3: RES
-  /// 4/5: DIS
-  /// 6/7: Coherent
-  /// 8/9: MEC
+  ///* 0/1: QEL
+  ///* 2/3: RES
+  ///* 4/5: DIS
+  ///* 6/7: Coherent
+  ///* 8/9: MEC
   ///Odd values correspond to NC
   Int_t NuWroDyn;
   ///Is CC or NC
@@ -238,47 +238,50 @@ struct PODSimpleAnalysisFormat {
 //******************************************************************************
 
 //Neutrino
-  ///PDG of initial state lepton
+  ///PDG of initial state lepton.
   Int_t ISLepton_PDG;
-  ///Four momentum of initial state lepton
+  ///Four momentum of initial state lepton.
   TLorentzVector ISLepton_4Mom;
 
 //Struck Nucleon
-  ///PDG of initial state lepton
+  ///PDG of struck nucleon.
+  /// 'First' nucleon for NuWroDyn = 8.
   Int_t StruckNucleonPDG;
-  ///Four momentum of initial state lepton
+  ///Four momentum of struck nucleon.
+  /// 'First' nucleon for NuWroDyn = 8.
   TLorentzVector StruckNucleon_4Mom;
 
 //HMFSLepton
-  ///PDG of initial state lepton
+  ///PDG of highest momentum final state lepton.
   Int_t HMFSLepton_PDG;
-  ///Four momentum of initial state lepton
+  ///Four momentum of the highest momentum final state lepton.
   TLorentzVector HMFSLepton_4Mom;
 
 //Highest Momentum Proton
-  ///PDG of initial state lepton
+  ///PDG of highest momentum final state Proton.
   Int_t HMProton_PDG;
-  ///Four momentum of initial state lepton
+  ///Four momentum of highest momentum final state Proton.
   TLorentzVector HMProton_4Mom;
+  ///Four momentum of highest momentum final state Proton before kaskada.
   TLorentzVector HMProton_PreFSI_4Mom;
 
 //Highest Momentum Pion
-  ///PDG of initial state lepton
+  ///PDG of highest momentum final state charged pion.
   Int_t HMChrgPion_PDG;
-  ///Four momentum of initial state lepton
+  ///Four momentum of highest momentum final state charged pion.
   TLorentzVector HMChrgPion_4Mom;
-  ///PDG of initial state lepton
+  ///PDG of highest momentum final state charged pion before kaskada.
   Int_t HMChrgPion_PreFSI_PDG;
-  ///Four momentum of initial state lepton
+  ///Four momentum of highest momentum final state charged pion before kaskada.
   TLorentzVector HMChrgPion_PreFSI_4Mom;
 
-  ///PDG of initial state lepton
+  ///PDG of highest momentum final state charged pion.
   Int_t HMPion_PDG;
-  ///Four momentum of initial state lepton
+  ///Four momentum of highest momentum final state charged pion.
   TLorentzVector HMPion_4Mom;
-  ///PDG of initial state lepton
+  ///PDG of highest momentum final state charged pion before kaskada.
   Int_t HMPion_PreFSI_PDG;
-  ///Four momentum of initial state lepton
+  ///Four momentum of highest momentum final state charged pion before kaskada.
   TLorentzVector HMPion_PreFSI_4Mom;
 
 //Reconstructed Delta 3Mom
@@ -294,7 +297,7 @@ struct PODSimpleAnalysisFormat {
   Int_t NPreFSIParticles;
   Int_t NFinalStateParticles;
 
-  ///The number of final state lepton
+  ///The number of final state leptons
   ///\note Pythia6 will sometimes produce electron-positron pairs, do not be too
   ///surprised if this is >1/
   Int_t NFinalStateLeptons;

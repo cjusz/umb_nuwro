@@ -34,7 +34,7 @@ inline nuwro::rew::NuwroWghtEngineI* GetWghtEngineFromDial(
     case nuwro::rew::kNuwro_CA5:{
       return new nuwro::rew::NuwroReWeight_SPP(param);
     }
-    case nuwro::rew::kNuwro_SPPDISBkgScale:{
+    case nuwro::rew::kNuwro_SPPBkgScale:{
       return new nuwro::rew::NuwroReWeight_SPP(param);
     }
     default:{

@@ -10,25 +10,24 @@
 
 using namespace nuwro::rew;
 
-
-void PrintUsage(char const * rcmd){
+void PrintUsage(char const *rcmd) {
   std::cout << "[USAGE]: " << rcmd
-    << " [params file for nominal] <dial to reweight>" << std::endl;
+            << " [params file for nominal] <dial to reweight>" << std::endl;
   PrintDialsImplemented();
 }
 
-std::string GetDialValStr(Double_t dialval){
+std::string GetDialValStr(Double_t dialval) {
   std::stringstream ss;
-  if(dialval < 0){
+  if (dialval < 0) {
     ss << "minus";
   }
   ss << fabs(dialval);
   return ss.str();
 }
 
-int main(int argc, char const *argv[]){
+int main(int argc, char const *argv[]) {
 
-  if( (argc < 2) || (argc > 3) ){
+  if ((argc < 2) || (argc > 3)) {
     std::cout << "[ERROR]: Expected 1 or 2 CLI arguments." << std::endl;
     PrintUsage(argv[0]);
     return 1;
@@ -36,7 +35,7 @@ int main(int argc, char const *argv[]){
 
   params NomParams;
   int argu = 1;
-  if(argc == 3){
+  if (argc == 3) {
     NomParams.read(argv[argu]);
     argu++;
   }
@@ -46,16 +45,15 @@ int main(int argc, char const *argv[]){
   NuwroReWeight WghtGen;
 
   std::vector<ENuWroSyst> Systs;
-  std::vector<NuwroSystInfo*> SystInstances;
+  std::vector<NuwroSystInfo *> SystInstances;
   std::vector<std::string> WghtEngineNames;
   std::string DialName(argv[argu]);
   ENuWroSyst syst = NuwroSyst::FromString(DialName);
 
-  NuwroWghtEngineI* wghtCalc =
-    GetWghtEngineFromDial(syst,NomParams);
-  if(!wghtCalc){
+  NuwroWghtEngineI *wghtCalc = GetWghtEngineFromDial(syst, NomParams);
+  if (!wghtCalc) {
     std::cout << "[ERROR]: Invalid Dial, " << syst << ", (from string: \""
-      << DialName << "\") specified." << std::endl;
+              << DialName << "\") specified." << std::endl;
     PrintDialsImplemented();
     return 2;
   }
@@ -63,7 +61,7 @@ int main(int argc, char const *argv[]){
   WghtGen.AdoptWghtCalc(DialName, wghtCalc);
 
   WghtGen.Systematics().Add(syst, 0, -4, 4, 2);
-  NuwroSystInfo & si = WghtGen.Systematics().GetSystInfo(syst);
+  NuwroSystInfo &si = WghtGen.Systematics().GetSystInfo(syst);
 
   std::stringstream ss;
   si.TurnDown();

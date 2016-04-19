@@ -4,16 +4,18 @@
 #include "params.h"
 
 #include "NuwroWghtEngineI.h"
+#include "NuwroReWeightSimpleEvent.h"
 
 namespace nuwro {
 namespace rew  {
 
-//#define DEBUG_RES_REWEIGHT
+#define DEBUG_RES_REWEIGHT
 
 void SetupSPP(void);
 void SetupSPP(params & param);
 
 double GetWghtPropToResXSec(event const &nuwro_event, params const & rwparams);
+double GetWghtPropToResXSec(SRW::SRWEvent const &ev, params const & rwparams);
 
 class NuwroReWeight_SPP : public NuwroWghtEngineI {
 public:
@@ -46,10 +48,10 @@ private:
   double fCurr_CA5;
   double fError_CA5;
 
-  double fTwkDial_SPPDISBkgScale;
-  double fDef_SPPDISBkgScale;
-  double fCurr_SPPDISBkgScale;
-  double fError_SPPDISBkgScale;
+  double fTwkDial_SPPBkgScale;
+  double fDef_SPPBkgScale;
+  double fCurr_SPPBkgScale;
+  double fError_SPPBkgScale;
 
 };
 

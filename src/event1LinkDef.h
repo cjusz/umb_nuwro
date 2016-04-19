@@ -3,7 +3,6 @@
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
-
 #pragma link C++ nestedclass;
 
 #pragma link C++ class flags+;
@@ -13,9 +12,7 @@
 #pragma link C++ class particle+;
 #pragma link C++ class line+;
 #pragma link C++ function qel_sigma;
-//#pragma link C++ class part+;
 #pragma link C++ class vector<particle>+;
-//#pragma link C++ class vector<part>+;
 #pragma link C++ class event+;
 #pragma link C++ global GeV;
 #pragma link C++ global GeV2;

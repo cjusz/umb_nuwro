@@ -30,7 +30,7 @@ DIAL2NAME="kNuwro_CA5"
 DIAL2PARAMNAME="pion_C5A"
 DIAL2PRETTYNAME="C_{A}^{5}"
 DIAL2UNITS=""
-NEVS="1000"
+NEVS="1000000"
 
 echo "[INFO]: Using ${PARAM_BASE}, specialised with ${FLUX_HIST}, and ${TARGET_PARAMS}, generating ${NEVS} events to test dials: ${DIAL1NAME} ${DIAL2NAME}"
 

@@ -61,7 +61,7 @@ flags GetFlagsFromNeutCode(int NeutCode, int nupdg){
   fl.mec = ((dyn/2)==4);
   fl.nc = (dyn&1);
   fl.cc = (!fl.nc);
-  fl.anty = (nupdg > 0);
+  fl.anty = (nupdg < 0);
   return fl;
 }
 

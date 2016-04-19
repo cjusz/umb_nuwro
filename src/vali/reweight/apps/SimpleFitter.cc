@@ -95,7 +95,7 @@ struct NPLLR_nwev {
     SRW::SetupSPP(Events.front().par);
     NominalWeights.resize(Events.size());
     Weights.resize(Events.size());
-    SRW::GenerateNominalRESWeights(Events, NominalWeights);
+    SRW::GenerateNominalWeights(Events, NominalWeights);
 
     Data = data;
     PlotHistos.resize(NumThreads);
@@ -240,7 +240,7 @@ int main(int argc, char const *argv[]){
   Double_t FitStart[3];
   FitStart[0] = NomParams.pion_C5A;
   FitStart[1] = NomParams.pion_axial_mass;
-  FitStart[2] = NomParams.pion_SPPDISBkgScale;
+  FitStart[2] = NomParams.SPPBkgScale;
 
   Eval(FitStart);
   TH1D* PreFit = static_cast<TH1D*>(Eval.PlotHistos[0]->Clone());
@@ -277,7 +277,7 @@ int main(int argc, char const *argv[]){
   std::cout << "[TRUE]: pion_axial_mass: " << TargetParams.pion_axial_mass
     << std::endl;
   DoMinosErrors(min,2);
-  std::cout << "[TRUE]: SPPDISBkgScale: " << TargetParams.pion_SPPDISBkgScale
+  std::cout << "[TRUE]: SPPBkgScale: " << TargetParams.SPPBkgScale
     << std::endl;
 #ifdef PROFILE
   wt2 = get_wall_time();
@@ -295,7 +295,7 @@ int main(int argc, char const *argv[]){
   Double_t ActualBF[3];
   ActualBF[0] = TargetParams.pion_C5A;
   ActualBF[1] = TargetParams.pion_axial_mass;
-  ActualBF[2] = TargetParams.pion_SPPDISBkgScale;
+  ActualBF[2] = TargetParams.SPPBkgScale;
   Double_t TestStat_ABF = Eval(ActualBF);
 
   std::cout << "BF: " << BestFit << ", Actual: " << ActualBF << std::endl;
@@ -308,7 +308,7 @@ int main(int argc, char const *argv[]){
     + ", BF: " + num2str(min->X()[0])
     + " || M_{A}^{RES} True: " + num2str(TargetParams.pion_axial_mass)
     + ", BF: " + num2str(min->X()[1])
-    + " || SPPDISBkgScale True: " + num2str(TargetParams.pion_SPPDISBkgScale)
+    + " || SPPBkgScale True: " + num2str(TargetParams.SPPBkgScale)
     + ", BF: " + num2str(min->X()[2]),
     argv[5]);
 

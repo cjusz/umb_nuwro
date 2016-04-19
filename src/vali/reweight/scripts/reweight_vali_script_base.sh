@@ -1,6 +1,6 @@
 #!/bin/sh
 if [ "${1}" == "clean" ]; then
-  rm -f *.root *.par *.cc *.txt Plot* random_seed
+  rm -f *.root *.par *.cc *.txt Plot* random_seed build.log
   exit 0
 fi
 

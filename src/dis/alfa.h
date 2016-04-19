@@ -7,5 +7,7 @@ double alfadis (int j, int k, int l, int t, double W);
 
 double  alfadelta (int j, int k, int l, int t, double W);
 
+double betadis (int j, int k, int l, int t, double W, double bkgr);
+
 #endif
 

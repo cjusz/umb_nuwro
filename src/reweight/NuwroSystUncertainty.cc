@@ -6,36 +6,43 @@ using namespace nuwro::rew;
 
 NuwroSystUncertainty *NuwroSystUncertainty::fInstance = NULL;
 
-NuwroSystUncertainty::NuwroSystUncertainty(){
+NuwroSystUncertainty::NuwroSystUncertainty() {
   std::cout << "[INFO]: NuwroSystUncertainty initialization" << std::endl;
   SetDefaults();
 }
-NuwroSystUncertainty::~NuwroSystUncertainty(){}
+NuwroSystUncertainty::~NuwroSystUncertainty() {}
 
-NuwroSystUncertainty * NuwroSystUncertainty::Instance(){
-  if(!fInstance) {
+NuwroSystUncertainty *NuwroSystUncertainty::Instance() {
+  if (!fInstance) {
     fInstance = new NuwroSystUncertainty;
   }
   return fInstance;
 }
 
-bool NuwroSystUncertainty::TearDown(void){
-  if(fInstance) { delete fInstance; fInstance = NULL; return true; }
+bool NuwroSystUncertainty::TearDown(void) {
+  if (fInstance) {
+    delete fInstance;
+    fInstance = NULL;
+    return true;
+  }
   return false;
 }
 
-double NuwroSystUncertainty::OneSigmaErr(NuwroSyst_t syst, int sign)
-  const {
+double NuwroSystUncertainty::OneSigmaErr(NuwroSyst_t syst, int sign) const {
 
-  if(sign > 0) {
-    std::map<nuwro::rew::NuwroSyst_t,double>::const_iterator it =
-      fOneSigPlusErrMap.find(syst);
-    if(it != fOneSigPlusErrMap.end()){ return it->second; }
+  if (sign > 0) {
+    std::map<nuwro::rew::NuwroSyst_t, double>::const_iterator it =
+        fOneSigPlusErrMap.find(syst);
+    if (it != fOneSigPlusErrMap.end()) {
+      return it->second;
+    }
     return 0;
-  } else if(sign < 0) {
-    std::map<nuwro::rew::NuwroSyst_t,double>::const_iterator it =
-      fOneSigMnusErrMap.find(syst);
-    if(it != fOneSigMnusErrMap.end()){ return it->second; }
+  } else if (sign < 0) {
+    std::map<nuwro::rew::NuwroSyst_t, double>::const_iterator it =
+        fOneSigMnusErrMap.find(syst);
+    if (it != fOneSigMnusErrMap.end()) {
+      return it->second;
+    }
     return 0;
   } else { // Assume symmetric error.
     double err = 0.5 * (OneSigmaErr(syst, +1) + OneSigmaErr(syst, -1));
@@ -43,18 +50,18 @@ double NuwroSystUncertainty::OneSigmaErr(NuwroSyst_t syst, int sign)
   }
 }
 
-void NuwroSystUncertainty::SetUncertainty(NuwroSyst_t syst,
-  double plus_err, double minus_err) {
+void NuwroSystUncertainty::SetUncertainty(NuwroSyst_t syst, double plus_err,
+                                          double minus_err) {
   fOneSigPlusErrMap[syst] = plus_err;
   fOneSigMnusErrMap[syst] = minus_err;
 }
 
-void NuwroSystUncertainty::SetDefaults(void){
+void NuwroSystUncertainty::SetDefaults(void) {
 
-  SetUncertainty(kNuwro_Ma_CCQE,  160, 160); //MeV
-  SetUncertainty(kNuwro_Ma_NCEL,  0.16, 0.16); //MeV
-  SetUncertainty(kNuwro_SMa_NCEL, 0.16, 0.16); //MeV
-  SetUncertainty(kNuwro_DeltaS_NCEL,   0.10, 0.10); //MeV
+  SetUncertainty(kNuwro_Ma_CCQE, 160, 160);       // MeV
+  SetUncertainty(kNuwro_Ma_NCEL, 0.16, 0.16);     // MeV
+  SetUncertainty(kNuwro_SMa_NCEL, 0.16, 0.16);    // MeV
+  SetUncertainty(kNuwro_DeltaS_NCEL, 0.10, 0.10); // MeV
 
   // FLAGS Norm
   SetUncertainty(kNuwro_QELNorm, 1.0, 1.0);
@@ -114,6 +121,5 @@ void NuwroSystUncertainty::SetDefaults(void){
   // RES
   SetUncertainty(kNuwro_MaRES, 0.1, 0.1); // GeV
   SetUncertainty(kNuwro_CA5, 0.1, 0.1);
-  SetUncertainty(kNuwro_SPPDISBkgScale, 0.25, 0.25);
+  SetUncertainty(kNuwro_SPPBkgScale, 0.25, 0.25);
 }
-
