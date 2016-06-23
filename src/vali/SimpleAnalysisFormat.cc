@@ -414,6 +414,7 @@ void SimpleAnalysisFormat::Reset(){
   NuWroAnty = false;
 
   EvtWght = 0;
+  RunAvgEvtWght = 0;
 
   FourMomentum_Transfer.SetXYZT(0,0,0,0);
 
@@ -525,6 +526,8 @@ void SimpleAnalysisFormat::AddBranches(TTree* tree){
 
   tree->Branch("EvtWght",&EvtWght,
     "EvtWght/D");
+  tree->Branch("RunAvgEvtWght",&RunAvgEvtWght,
+    "RunAvgEvtWght/D");
 
   tree->Branch("FourMomentum_Transfer",&_FourMomentum_Transfer);
 

@@ -1,14 +1,15 @@
-#include "NuwroReWeight_QEL.h"
-#include "NuwroSyst.h"
-#include "NuwroSystUncertainty.h"
-#include "ff.h"
-#include "qel_sigma.h"
-
+#include <cassert>
 #include <iostream>
 
 #include "TFile.h"
 #include "TMath.h"
 #include "TROOT.h"
+
+#include "NuwroReWeight_QEL.h"
+#include "NuwroSyst.h"
+#include "NuwroSystUncertainty.h"
+#include "ff.h"
+#include "qel_sigma.h"
 
 namespace nuwro {
 namespace rew {
@@ -129,17 +130,10 @@ void NuwroReWeight_QEL::Reset(void) {
 
 void NuwroReWeight_QEL::Reconfigure(void) {
   NuwroSystUncertainty *fracerr = NuwroSystUncertainty::Instance();
+
   fError_MaCCQE =
       fracerr->OneSigmaErr(kNuwro_Ma_CCQE, (fTwkDial_MaCCQE > 0) ? 1 : -1);
-  if (fabs(fTwkDial_MaCCQE) > 1E-8) {
-#ifdef DEBUG_QE_REWEIGHT
-    std::cout << "[INFO]: NuwroReWeight_QEL::Reconfigure: New MaQE value = "
-              << fDef_MaCCQE << " + (" << fError_MaCCQE << "  *  "
-              << fTwkDial_MaCCQE << ")" << std::endl;
-#endif
-  }
-  // fCurr_MaCCQE = fDef_MaCCQE * (1 + fError_MaCCQE * fTwkDial_MaCCQE);
-  fCurr_MaCCQE = fDef_MaCCQE + fError_MaCCQE * fTwkDial_MaCCQE;
+  fCurr_MaCCQE = fDef_MaCCQE * (1.0 + fError_MaCCQE * fTwkDial_MaCCQE);
 
   // Set NCEL Dials
   fError_MaNCEL =
@@ -153,20 +147,42 @@ void NuwroReWeight_QEL::Reconfigure(void) {
   fError_DeltaS =
       fracerr->OneSigmaErr(kNuwro_DeltaS_NCEL, (fTwkDial_DeltaS > 0) ? 1 : -1);
   fCurr_DeltaS = fDef_DeltaS * (1 + fError_DeltaS * fTwkDial_DeltaS);
+
+#ifdef DEBUG_QE_REWEIGHT
+  if ((fabs(fTwkDial_MaCCQE) > 1E-8) || (fabs(fTwkDial_MaNCEL) > 1E-8) ||
+      (fabs(fTwkDial_MaNCEL_s) > 1E-8) || (fabs(fTwkDial_DeltaS) > 1E-8)) {
+    std::cout << "[INFO]: NuwroReWeight_QEL::Reconfigure:"
+              << "\n\tNew MaCCQE value = " << fDef_MaCCQE << " * (1.0 + "
+              << fError_MaCCQE << "  *  " << fTwkDial_MaCCQE << ")"
+              << "\n\tNew MaNCEL value = " << fDef_MaNCEL << " * (1.0 + "
+              << fError_MaNCEL << "  *  " << fTwkDial_MaNCEL << ")"
+              << "\n\tNew MaNCEL_s value = " << fDef_MaNCEL_s << " * (1.0 + "
+              << fError_MaNCEL_s << "  *  " << fTwkDial_MaNCEL_s << ")"
+              << "\n\tNew Delta_s value = " << fDef_DeltaS << " * (1.0 + "
+              << fError_DeltaS << "  *  " << fTwkDial_DeltaS << ")"
+              << std::endl;
+  }
+#endif
 }
 
 double GetWghtPropToQEXSec(event const &nuwro_event, params const &rwparams) {
-  return GetWghtPropToQEXSec(SRW::SRWEvent(nuwro_event),rwparams);
+  return GetWghtPropToQEXSec(SRW::SRWEvent(nuwro_event), rwparams);
 }
 double GetWghtPropToQEXSec(SRW::SRWEvent const &ev, params const &rwparams) {
   ff_configure(rwparams);
   return qel_sigma(ev.NeutrinoEnergy, ev.DynProp.QE.FourMomentumTransfer,
-                   ev.DynProp.QE.QELKind, ev.NeutrinoPDG,
+                   ev.DynProp.QE.QELKind, (ev.NeutrinoPDG < 0),
                    ev.DynProp.QE.FSLeptonMass, ev.DynProp.QE.NucleonMass);
 }
 
 double NuwroReWeight_QEL::CalcWeight(event *nuwro_event) {
-  if ((fabs(fTwkDial_MaCCQE) < 1E-8)) {
+  return CalcWeight(SRW::SRWEvent(*nuwro_event), nuwro_event->par);
+}
+
+double NuwroReWeight_QEL::CalcWeight(SRW::SRWEvent const &srwev,
+                                     params const &par) {
+  if ((fabs(fTwkDial_MaCCQE) < 1E-8) && (fabs(fTwkDial_MaNCEL) < 1E-8) &&
+      (fabs(fTwkDial_MaNCEL_s) < 1E-8) && (fabs(fTwkDial_DeltaS) < 1E-8)) {
 #ifdef DEBUG_QE_REWEIGHT
     std::cout << "[WARN]: All Dials set very low, short circuiting."
               << std::endl;
@@ -175,32 +191,42 @@ double NuwroReWeight_QEL::CalcWeight(event *nuwro_event) {
     return 1.0;
   }
 
-  if ((!nuwro_event->flag.qel)) {
+  if (srwev.NuWroDynCode > 1) {
 #ifdef DEBUG_QE_REWEIGHT
-    std::cout << "[WARN]: This is not a QEL event. nwEv.flag.cc: "
-              << nuwro_event->flag.cc
-              << ", nwEv.flag.qel: " << nuwro_event->flag.qel << std::endl;
+    std::cout << "[WARN]: This is not a QEL event. srwev.NuWroDynCode: "
+              << srwev.NuWroDynCode << std::endl;
 #endif
     return 1.0;
   }
 
   double weight = 1;
-  params rwparams = (nuwro_event->par);
+  params rwparams = par;
 
   ff_configure(rwparams);
 
-  double oldweight = GetWghtPropToQEXSec((*nuwro_event), rwparams);
+  double oldweight = GetWghtPropToQEXSec(srwev, rwparams);
+
+#ifdef DEBUG_QE_REWEIGHT
+  std::cout << "[INFO]: QEL Param changes: "
+            << "qel_cc_axial_mass: " << rwparams.qel_cc_axial_mass << " -> "
+            << fCurr_MaCCQE
+            << ", qel_nc_axial_mass: " << rwparams.qel_nc_axial_mass << " -> "
+            << fCurr_MaNCEL
+            << ", qel_s_axial_mass: " << rwparams.qel_s_axial_mass << " -> "
+            << fCurr_MaNCEL_s << ", delta_s: " << rwparams.delta_s << " -> "
+            << fCurr_DeltaS << std::endl;
+#endif
 
   rwparams.qel_cc_axial_mass = fCurr_MaCCQE;
   rwparams.qel_nc_axial_mass = fCurr_MaNCEL;
   rwparams.qel_s_axial_mass = fCurr_MaNCEL_s;
   rwparams.delta_s = fCurr_DeltaS;
 
-  double newweight = GetWghtPropToQEXSec((*nuwro_event), rwparams);
+  double newweight = GetWghtPropToQEXSec(srwev, rwparams);
 
 #ifdef DEBUG_QE_REWEIGHT
-  std::assert(std::isfinite(oldweight));
-  std::assert(std::isfinite(newweight));
+  assert(std::isfinite(oldweight));
+  assert(std::isfinite(newweight));
 #endif
 
   weight *= newweight / oldweight;

@@ -6,12 +6,12 @@
 #include "beam.h"
 
 
-/// The beam shoots with identical particles (whose energy is defined by some 
+/// The beam shoots with identical particles (whose energy is defined by some
 /// energy profile but the direction of momentum is identical)
-/// beam: this class provides the input of the initial beam particle 
-/// into the generator.The beam particle is defined by providing 
+/// beam: this class provides the input of the initial beam particle
+/// into the generator.The beam particle is defined by providing
 /// its energy, direction and its PDG code to the constructor
-/// of the beam class 
+/// of the beam class
 
 class beam_uniform : public beam
 {
@@ -20,7 +20,7 @@ protected:
    vec dir;
    int pdg;
    double mass;
-public:   
+public:
    beam_uniform(params& p):g(p.beam_energy),dir(p.beam_direction.dir()),pdg(p.beam_particle), mass(PDG::mass(p.beam_particle))
    {
    }
@@ -36,11 +36,13 @@ public:
    {
 	   return g.disratio();
    }
-   
-  
+
+
    void check_energy()
    {
-	   if (g.minE() < mass) throw "energy can't be lower than particle mass!";	   
+	   if (g.minE() < mass) throw "energy can't be lower than particle mass!";
    }
+
+   EnergyProfile const & EProf() const { return g; }
 };
 #endif // _beam_uniform_h_

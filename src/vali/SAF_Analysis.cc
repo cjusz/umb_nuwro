@@ -110,6 +110,7 @@ int ReadNuWroEvent(char const * NuWroEvsFile, char const * OutputFileName){
   for(Long64_t ent = 0; ent < nEntries; ++ent){
     NuWroEvTree->GetEntry(ent);
     safEv = MakeSimpleAnalysisFormat(*nwEv);
+    safEv.RunAvgEvtWght = (safEv.EvtWght/Double_t(nEntries));
     outputters.second->Fill();
     safEv.Reset();
     std::cout << "\r" << int((ent+1)*100/nEntries) << "\% done."

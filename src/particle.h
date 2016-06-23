@@ -73,6 +73,7 @@ class particle : public vect {
       double E);       ///< set particle energy and adjust momentum
   inline vec p();      ///< the momentum as a 3-vector
   inline vect& p4();   ///< the four-momentum
+  inline vect const & p4() const;   ///< the four-momentum
   inline vec v();      ///< the velocity as a 3-vector
   inline double v2();  ///< the velocity squared
   inline void krok_czasowy(double dt);  ///< move the particle by v*dt
@@ -230,6 +231,7 @@ void particle::set_energy(double E) {
 vec particle::p() { return vec(x, y, z); }
 
 vect& particle::p4() { return *this; }
+vect const & particle::p4() const { return static_cast<vect const &>(*this); }
 
 vec particle::v() { return vec(x / t, y / t, z / t); }
 double particle::v2() { return (x * x + y * y + z * z) / t / t; }

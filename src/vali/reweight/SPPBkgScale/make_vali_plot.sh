@@ -28,7 +28,7 @@ DIALNAME="kNuwro_SPPBkgScale"
 DIALPARAMNAME="SPPBkgScale"
 DIALPRETTYNAME="1#pi DIS background scale"
 DIALUNITS=""
-NEVS="2000000"
+NEVS="5000000"
 
 echo "[INFO]: Using ${PARAM_BASE}, specialised with ${FLUX_HIST}, and ${TARGET_PARAMS}, generating ${NEVS} events to test dial: ${DIALNAME}"
 
@@ -124,7 +124,7 @@ echo "VarToPlot1D FS_mu_p; \
   FS_mu_p.LegX2 = 0.925;\
   FS_mu_p.LegY2 = 0.925;\
   FS_mu_p.LogHist = false;\
-  FS_mu_p.LegendTitle=\"NuWro C-target, ND280 Flux, RES\";\
+  FS_mu_p.LegendTitle=\"NuWro C-target, NuMi Flux, RES\";\
   PlotVar1D(FS_mu_p);" >> Plot_${DIALNAME}_Vars.cc
 #thetamu
 echo "VarToPlot1D FS_mu_ct;\
@@ -147,7 +147,7 @@ echo "VarToPlot1D FS_mu_ct;\
   FS_mu_ct.LegX2 = 0.675;\
   FS_mu_ct.LegY2 = 0.925;\
   FS_mu_ct.LogHist = true;\
-  FS_mu_ct.LegendTitle=\"NuWro C-target, ND280 Flux, RES\";\
+  FS_mu_ct.LegendTitle=\"NuWro C-target, NuMi Flux, CC RES\";\
   PlotVar1D(FS_mu_ct);" >> Plot_${DIALNAME}_Vars.cc
 
 #pq2
@@ -171,7 +171,7 @@ echo "VarToPlot1D FS_q2;\
   FS_q2.LegX2 = 0.675;\
   FS_q2.LegY2 = 0.925;\
   FS_q2.LogHist = false;\
-  FS_q2.LegendTitle=\"NuWro C-target, ND280 Flux, RES\";\
+  FS_q2.LegendTitle=\"NuWro C-target, NuMi Flux, CC+NC RES\";\
   PlotVar1D(FS_q2);" >> Plot_${DIALNAME}_Vars.cc
 
 
@@ -196,7 +196,7 @@ echo "VarToPlot1D FS_q2;\
     FS_mu_p_dis.LegX2 = 0.925;\
     FS_mu_p_dis.LegY2 = 0.925;\
     FS_mu_p_dis.LogHist = false;\
-    FS_mu_p_dis.LegendTitle=\"NuWro C-target, ND280 Flux, RES+DIS\";\
+    FS_mu_p_dis.LegendTitle=\"NuWro C-target, NuMi Flux, CC RES+DIS\";\
     PlotVar1D(FS_mu_p_dis);" >> Plot_${DIALNAME}_Vars.cc
   #thetamu
   echo "VarToPlot1D FS_mu_ct_dis;\
@@ -219,7 +219,7 @@ echo "VarToPlot1D FS_q2;\
     FS_mu_ct_dis.LegX2 = 0.675;\
     FS_mu_ct_dis.LegY2 = 0.925;\
     FS_mu_ct_dis.LogHist = true;\
-    FS_mu_ct_dis.LegendTitle=\"NuWro C-target, ND280 Flux, RES+DIS\";\
+    FS_mu_ct_dis.LegendTitle=\"NuWro C-target, NuMi Flux, CC RES+DIS\";\
     PlotVar1D(FS_mu_ct_dis);" >> Plot_${DIALNAME}_Vars.cc
 
   #pq2
@@ -243,7 +243,7 @@ echo "VarToPlot1D FS_q2;\
     FS_q2_dis.LegX2 = 0.675;\
     FS_q2_dis.LegY2 = 0.925;\
     FS_q2_dis.LogHist = false;\
-    FS_q2_dis.LegendTitle=\"NuWro C-target, ND280 Flux, RES+DIS\";\
+    FS_q2_dis.LegendTitle=\"NuWro C-target, NuMi Flux, CC+NC RES+DIS\";\
     PlotVar1D(FS_q2_dis);" >> Plot_${DIALNAME}_Vars.cc
 
 
@@ -268,7 +268,7 @@ echo "VarToPlot1D hadrmass;\
   hadrmass.LegX2 = 0.925;\
   hadrmass.LegY2 = 0.925;\
   hadrmass.LogHist = false;\
-  hadrmass.LegendTitle=\"NuWro C-target, ND280 Flux RES\";\
+  hadrmass.LegendTitle=\"NuWro C-target, NuMi Flux RES\";\
   PlotVar1D(hadrmass);" >> Plot_${DIALNAME}_Vars.cc
 
   echo "VarToPlot1D hadrmass_dis;\
@@ -291,7 +291,7 @@ echo "VarToPlot1D hadrmass;\
     hadrmass_dis.LegX2 = 0.925;\
     hadrmass_dis.LegY2 = 0.925;\
     hadrmass_dis.LogHist = false;\
-    hadrmass_dis.LegendTitle=\"NuWro C-target, ND280 Flux RES+DIS\";\
+    hadrmass_dis.LegendTitle=\"NuWro C-target, NuMi Flux RES+DIS\";\
     PlotVar1D(hadrmass_dis);" >> Plot_${DIALNAME}_Vars.cc
 
   echo "VarToPlot1D hadrmass_cc;\
@@ -314,7 +314,7 @@ echo "VarToPlot1D hadrmass;\
     hadrmass_cc.LegX2 = 0.925;\
     hadrmass_cc.LegY2 = 0.925;\
     hadrmass_cc.LogHist = false;\
-    hadrmass_cc.LegendTitle=\"NuWro C-target, ND280 Flux CC RES+DIS\";\
+    hadrmass_cc.LegendTitle=\"NuWro C-target, NuMi Flux CC RES+DIS\";\
     PlotVar1D(hadrmass_cc);" >> Plot_${DIALNAME}_Vars.cc
 
 #phmpi
@@ -338,7 +338,7 @@ echo "VarToPlot1D FS_hmpi_p;\
   FS_hmpi_p.LegX2 = 0.925;\
   FS_hmpi_p.LegY2 = 0.925;\
   FS_hmpi_p.LogHist = false;\
-  FS_hmpi_p.LegendTitle=\"NuWro C-target, ND280 Flux RES+DIS\";\
+  FS_hmpi_p.LegendTitle=\"NuWro C-target, NuMi Flux RES+DIS\";\
   PlotVar1D(FS_hmpi_p);" >> Plot_${DIALNAME}_Vars.cc
 #thetahmpi
 echo "VarToPlot1D FS_hmpi_ct;\
@@ -361,7 +361,7 @@ echo "VarToPlot1D FS_hmpi_ct;\
   FS_hmpi_ct.LegX2 = 0.675;\
   FS_hmpi_ct.LegY2 = 0.925;\
   FS_hmpi_ct.LogHist = true;\
-  FS_hmpi_ct.LegendTitle=\"NuWro C-target, ND280 Flux RES+DIS\";\
+  FS_hmpi_ct.LegendTitle=\"NuWro C-target, NuMi Flux RES+DIS\";\
   PlotVar1D(FS_hmpi_ct);" >> Plot_${DIALNAME}_Vars.cc
 
 #phmp
@@ -385,7 +385,7 @@ echo "VarToPlot1D FS_hmp_p;\
   FS_hmp_p.LegX2 = 0.925;\
   FS_hmp_p.LegY2 = 0.925;\
   FS_hmp_p.LogHist = false;\
-  FS_hmp_p.LegendTitle=\"NuWro C-target, ND280 Flux RES+DIS\";\
+  FS_hmp_p.LegendTitle=\"NuWro C-target, NuMi Flux RES+DIS\";\
   PlotVar1D(FS_hmp_p);" >> Plot_${DIALNAME}_Vars.cc
   #thetahmp
   echo "VarToPlot1D FS_hmp_ct;\
@@ -408,7 +408,7 @@ echo "VarToPlot1D FS_hmp_p;\
   FS_hmp_ct.LegX2 = 0.675;\
   FS_hmp_ct.LegY2 = 0.925;\
   FS_hmp_ct.LogHist = true;\
-  FS_hmp_ct.LegendTitle=\"NuWro C-target, ND280 Flux RES+DIS\";\
+  FS_hmp_ct.LegendTitle=\"NuWro C-target, NuMi Flux RES+DIS\";\
   PlotVar1D(FS_hmp_ct);" >> Plot_${DIALNAME}_Vars.cc
 
   ##############

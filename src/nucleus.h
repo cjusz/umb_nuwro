@@ -38,7 +38,7 @@ class nucleus
 	double _r;			  ///< nucleus radius
 	double _Eb;			  ///< binding energy per nucleon (from exp data)
 	double _kf;			  ///< global Fermi momentum
-	double LFGkfScale;
+	double LFGkfScale; /// Scaling factor to apply to the result of localkf_ in localkf
 	int kMomDist;   	  ///< Type of nucleon momentum distribution:
 						  /// 0 - free nucleon (forced for H1);
 						  /// 1 - Fermi gas (mean Fermi momentum);
@@ -92,11 +92,11 @@ inline double nucleus::Ef()
 }
 
 
-inline double kf_from_density (double dens, double LFGkfScale)
+inline double kf_from_density (double dens)
 {
 	static const double C= 3 * Pi * Pi * fermi3;
 	if(dens>0)
-		return cbrt( C*dens) * LFGkfScale; // 197.4 * MeV;
+		return cbrt( C*dens) * 197.4 * MeV;
 	else
 		return 0;
 }
@@ -105,7 +105,7 @@ inline double kf_from_density (double dens, double LFGkfScale)
 ////////////////////////////////////////////////////////////////////////
 inline double nucleus::localkf (particle & pa)   ///< local Fermi momentum for particle (pdg and position dependent)
 {
-	return localkf_ (pa.pdg, pa.r.length ());
+	return localkf_(pa.pdg, pa.r.length ()) * LFGkfScale;
 }
 
 
@@ -119,7 +119,7 @@ inline  double nucleus::localkf_ (int pdg, double r)
 	assert(p+n>0);
 	if(dens==0)
 		return 0;
-	return kf_from_density (dens*(pdg==pdg_proton?pr:nr)/(pr+nr),LFGkfScale);
+	return kf_from_density (dens*(pdg==pdg_proton?pr:nr)/(pr+nr));
 }
 
 ///////////////////////////////////////////////////////////////////////

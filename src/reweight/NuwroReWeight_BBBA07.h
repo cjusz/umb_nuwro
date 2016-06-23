@@ -31,7 +31,7 @@ private:
   double p_AMp[7];
   double p_AEn[7];
   double p_AMn[7];
-  
+
   double p_AEp_twk[7];
   double p_AMp_twk[7];
   double p_AEn_twk[7];
@@ -41,7 +41,7 @@ private:
   double p_AMp_def[7];
   double p_AEn_def[7];
   double p_AMn_def[7];
-  
+
 };
 
 } // rew namespace

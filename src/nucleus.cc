@@ -12,7 +12,7 @@ nucleus::nucleus(params &par):
 	n   (par.nucleus_n),
 	_Eb  (par.nucleus_E_b*MeV),
 	_kf  (par.nucleus_kf*MeV),
-	LFGkfScale(par.nucleus_LFGkfScale*MeV),
+	LFGkfScale(par.nucleus_LFGkfScale),
 	kMomDist(par.nucleus_target),
 	spectator(NULL),
 	d(NULL),

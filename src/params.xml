@@ -26,6 +26,9 @@
         <option key="2">2 - Make weighted events from non-zero test events</option>
       </options>
     </param>
+    <param name="OutputEvtHistogram" type="text" ctype="int" default="1">
+      <description>Outputs event and flux histograms to the output file</description>
+    </param>
     <param name="user_events" type="hidden" ctype="int" default="0">
       <description>Enable axial mass analysis</description>
       <conditions>
@@ -153,8 +156,8 @@
         <option key="1"><![CDATA[realistic density profile]]></option>
       </options>
     </param>
-    <param name="nucleus_LFGkfScale" type="text" ctype="double" default="197.4">
-      <description><![CDATA[Factor which enters into local KF determination, in MeV]]></description>
+    <param name="nucleus_LFGkfScale" type="text" ctype="double" default="1.0">
+      <description><![CDATA[Scale factor applied to the nominal local KF from nuclear density]]></description>
     </param>
     <param name="dyn_qel_cc" type="checkbox" ctype="bool" default="1">
       <description>Quasi elastic charged current</description>

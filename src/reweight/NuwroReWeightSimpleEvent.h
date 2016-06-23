@@ -6,6 +6,10 @@
 
 namespace SRW {
 
+struct SRWEvent;
+inline
+std::ostream &operator<<(std::ostream &os, SRWEvent const &ev);
+
 struct QEEventProperties {
   // Also Need:
   //  NeutrinoEnergy
@@ -15,11 +19,10 @@ struct QEEventProperties {
   double FSLeptonMass;
   double NucleonMass;  // This may be the same as RES effective mass, but RES
                        // code boosts the nucleon before calculating the mass.
-  char QELKind;        // process type: 0 - cc, 1 - nc proton, 2 - nc neutron
+  int QELKind;        // process type: 0 - cc, 1 - nc proton, 2 - nc neutron
 };
 
-inline
-void FillQEEventProperties(QEEventProperties &qev, event const &ev) {
+inline void FillQEEventProperties(QEEventProperties &qev, event const &ev) {
   qev.FourMomentumTransfer = ev.q2();
   qev.FSLeptonMass = ev.out[0].mass();
   qev.NucleonMass = ev.N0().mass();
@@ -33,15 +36,14 @@ struct RESEventProperties {
   //  IsCC
   double HadronicMass;
   int StruckNucleonPdg;
-  char NOutPart;
+  int NOutPart;
   int SecondOutPartPDG;
   int ThirdOutPartPDG;
   double EnergyTransfer;
   double NucleonEffectiveMass;
 };
 
-inline
-void FillRESEventProperties(RESEventProperties &rev, event const &ev) {
+inline void FillRESEventProperties(RESEventProperties &rev, event const &ev) {
   rev.HadronicMass = ev.W();
   rev.StruckNucleonPdg = ev.in[1].pdg;
   rev.NOutPart = ev.out.size();
@@ -65,6 +67,7 @@ union DynProperties {
 
 struct SRWEvent {
   double NominalWeight;
+  double mutable CacheWeight;
 
   double NeutrinoEnergy;
   double NeutrinoPDG;
@@ -80,6 +83,7 @@ struct SRWEvent {
   DynProperties DynProp;
   SRWEvent()
       : NominalWeight(0),
+        CacheWeight(0xdeadbeef),
         NeutrinoEnergy(0),
         NeutrinoPDG(0),
         IsAntiNeutrino(false),
@@ -89,6 +93,7 @@ struct SRWEvent {
   }
   SRWEvent(event const &ev)
       : NominalWeight(ev.weight),
+        CacheWeight(0xdeadbeef),
         NeutrinoEnergy(ev.E()),
         NeutrinoPDG(ev.nu().pdg),
         IsAntiNeutrino(ev.flag.anty),
@@ -123,11 +128,65 @@ struct SRWEvent {
   void SetRESEvent(event const &ev) {
     new (&DynProp.RES) RESEventProperties();
     FillRESEventProperties(DynProp.RES, ev);
+#ifdef DEBUG_SRWEv
+    std::cout << "[EVENTS] Loaded " << (*this) << std::endl;
+#endif
   }
   void SetQEEvent(event const &ev) {
     new (&DynProp.QE) QEEventProperties();
     FillQEEventProperties(DynProp.QE, ev);
+#ifdef DEBUG_SRWEv
+    std::cout << "[EVENTS] Loaded " << (*this) << std::endl;
+#endif
   }
 };
+
+inline
+std::ostream &operator<<(std::ostream &os, SRWEvent const &ev) {
+  switch (ev.NuWroDynCode) {
+    case 0:
+    case 1: {
+      os << "NuWro SRW QE Ev : {";
+      break;
+    }
+    case 2:
+    case 3: {
+      os << "NuWro SRW QE Ev : {";
+      break;
+    }
+    default: { os << "NuWro SRW Ev : {"; }
+  }
+
+  os << " NominalWeight: " << ev.NominalWeight
+     << ", CacheWeight: " << ev.CacheWeight
+     << ", NeutrinoEnergy: " << ev.NeutrinoEnergy
+     << ", NeutrinoPDG: " << ev.NeutrinoPDG
+     << ", IsAntiNeutrino: " << ev.IsAntiNeutrino << ", IsCC: " << ev.IsCC
+     << ", NuWroDynCode: " << ev.NuWroDynCode;
+
+  switch (ev.NuWroDynCode) {
+    case 0:
+    case 1: {
+      os << ", FourMomentumTransfer: " << ev.DynProp.QE.FourMomentumTransfer
+         << ", FSLeptonMass: " << ev.DynProp.QE.FSLeptonMass
+         << ", NucleonMass: " << ev.DynProp.QE.NucleonMass
+         << ", QELKind: " << ev.DynProp.QE.QELKind;
+      break;
+    }
+    case 2:
+    case 3: {
+      os << ", HadronicMass: " << ev.DynProp.RES.HadronicMass
+         << ", StruckNucleonPdg: " << ev.DynProp.RES.StruckNucleonPdg
+         << ", NOutPart: " << ev.DynProp.RES.NOutPart
+         << ", SecondOutPartPDG: " << ev.DynProp.RES.SecondOutPartPDG
+         << ", ThirdOutPartPDG: " << ev.DynProp.RES.ThirdOutPartPDG
+         << ", EnergyTransfer: " << ev.DynProp.RES.EnergyTransfer
+         << ", NucleonEffectiveMass: " << ev.DynProp.RES.NucleonEffectiveMass;
+      break;
+    }
+    default: {}
+  }
+  return os << " }";
+}
 }
 #endif

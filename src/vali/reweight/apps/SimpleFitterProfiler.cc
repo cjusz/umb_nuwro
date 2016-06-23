@@ -67,7 +67,7 @@ void PlotTest(std::vector<Double_t> &SignalLeptonMomentum,
 
 void PrintUsage(char const *rcmd) {
   std::cout << "[USAGE]: " << rcmd
-            << "[#Events To Load] <Input NuWro eventsout files>" << std::endl;
+            << " [#Events To Load] <Input NuWro eventsout files>" << std::endl;
 }
 std::vector<Double_t> SignalLeptonMomentum;
 params par;

@@ -53,7 +53,7 @@ void SetupSPP() {
 
 NuwroReWeight_SPP::NuwroReWeight_SPP() {
   fTwkDial_MaRES = 0;
-  fDef_MaRES = 940;
+  fDef_MaRES = 0.940;
   fCurr_MaRES = fDef_MaRES;
 
   fTwkDial_CA5 = 0;
@@ -86,6 +86,20 @@ NuwroReWeight_SPP::NuwroReWeight_SPP(params const &param) {
   if (DoSetupSPP) {
     SetupSPP(nc_param);
   }
+}
+
+void NuwroReWeight_SPP::SetDefaults(params const & param) {
+  fTwkDial_MaRES = 0;
+  fDef_MaRES = param.pion_axial_mass;
+  fCurr_MaRES = fDef_MaRES;
+
+  fTwkDial_CA5 = 0;
+  fDef_CA5 = param.pion_C5A;
+  fCurr_CA5 = fDef_CA5;
+
+  fTwkDial_SPPBkgScale = 0;
+  fDef_SPPBkgScale = param.SPPBkgScale;
+  fCurr_SPPBkgScale = fDef_SPPBkgScale;
 }
 
 NuwroReWeight_SPP::~NuwroReWeight_SPP() {}
@@ -159,17 +173,17 @@ void NuwroReWeight_SPP::Reconfigure(void) {
   fError_MaRES =
       fracerr->OneSigmaErr(kNuwro_MaRES, (fTwkDial_MaRES > 0) ? 1 : -1);
 
-  fCurr_MaRES = fDef_MaRES + fError_MaRES * fTwkDial_MaRES;
+  fCurr_MaRES = fDef_MaRES + fDef_MaRES * fError_MaRES * fTwkDial_MaRES;
 
   fError_CA5 = fracerr->OneSigmaErr(kNuwro_CA5, (fTwkDial_CA5 > 0) ? 1 : -1);
 
-  fCurr_CA5 = fDef_CA5 + fError_CA5 * fTwkDial_CA5;
+  fCurr_CA5 = fDef_CA5 + fDef_CA5 * fError_CA5 * fTwkDial_CA5;
 
   fError_SPPBkgScale = fracerr->OneSigmaErr(
       kNuwro_SPPBkgScale, (fTwkDial_SPPBkgScale > 0) ? 1 : -1);
 
   fCurr_SPPBkgScale =
-      fDef_SPPBkgScale + fError_SPPBkgScale * fTwkDial_SPPBkgScale;
+      fDef_SPPBkgScale + fDef_SPPBkgScale * fError_SPPBkgScale * fTwkDial_SPPBkgScale;
 }
 
 double GetEBind(event &nuwro_event, params const &rwparams) {
@@ -429,7 +443,7 @@ double GetWghtPropToResXSec(SRW::SRWEvent const &ev, params const &rwparams) {
       }
 #ifdef DEBUG_RES_REWEIGHT
       double test = (dis_spp + delta_spp);
-      if(test != test){
+      if (test != test) {
         std::cout << "[ERROR]: DIS contrib: " << dis_spp
                   << ", Delta contrib:" << delta_spp << std::endl;
       }
@@ -447,19 +461,34 @@ double GetWghtPropToResXSec(SRW::SRWEvent const &ev, params const &rwparams) {
 }
 
 double NuwroReWeight_SPP::CalcWeight(event *nuwro_event) {
+  return CalcWeight(SRW::SRWEvent(*nuwro_event), nuwro_event->par);
+}
+
+double NuwroReWeight_SPP::CalcWeight(SRW::SRWEvent const &srwev, params const &par) {
   if ((fabs(fTwkDial_MaRES) < 1E-8) && (fabs(fTwkDial_CA5) < 1E-8) &&
       (fabs(fTwkDial_SPPBkgScale) < 1E-8)) {
+#ifdef DEBUG_RES_REWEIGHT
+    std::cout << "[WARN]: All Dials set very low, short circuiting."
+              << std::endl;
+#endif
     return 1.0;
   }
 
-  if (!nuwro_event->flag.res) {
+  if ((srwev.NuWroDynCode != 2) && (srwev.NuWroDynCode != 3)) {
+#ifdef DEBUG_RES_REWEIGHT
+    std::cout << "[WARN]: This is not a SPP event. srwev.NuWroDynCode: "
+              << srwev.NuWroDynCode << std::endl;
+#endif
     return 1.0;
   }
 
   double weight = 1;
-  params rwparams = nuwro_event->par;
+  params rwparams = par;
 
-  double oldweight = GetWghtPropToResXSec(*nuwro_event, rwparams);
+  if(srwev.CacheWeight == 0xdeadbeef){
+    srwev.CacheWeight = GetWghtPropToResXSec(srwev, rwparams);
+  }
+
 #ifdef DEBUG_RES_REWEIGHT
   std::cout << "[INFO]: Reweighting nominal MaRES: { "
             << rwparams.pion_axial_mass << " -> " << fCurr_MaRES
@@ -471,12 +500,12 @@ double NuwroReWeight_SPP::CalcWeight(event *nuwro_event) {
   rwparams.pion_C5A = fCurr_CA5;
   rwparams.SPPBkgScale = fCurr_SPPBkgScale;
 
-  double newweight = GetWghtPropToResXSec(*nuwro_event, rwparams);
+  double newweight = GetWghtPropToResXSec(srwev, rwparams);
 
-  weight *= newweight / oldweight;
+  weight *= newweight / srwev.CacheWeight;
 #ifdef DEBUG_RES_REWEIGHT
   std::cout << "[INFO]: Returning event weight of " << weight << " = "
-            << newweight << "/" << oldweight << std::endl;
+            << newweight << "/" << srwev.CacheWeight << std::endl;
   assert(std::isfinite(weight));
 #endif
 

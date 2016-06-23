@@ -34,11 +34,11 @@ Int_t SetUserPalette(Int_t palette = 0, Int_t nCont=255, Float_t alpha =1){
     // * Covariance marticies or other [-1, +1] ranges
     // * Useless on B/W
     TColor::InitializeColors();
-    const Int_t NRGBs = 5;
-    Double_t stops[NRGBs] = { 0.00, 0.01, 0.02, 0.10, 1.00 };
-    Double_t red[NRGBs]   = { 0.00, 0.25, 1.00, 1.00, 0.50 };
-    Double_t green[NRGBs] = { 0.00, 0.25, 1.00, 0.25, 0.00 };
-    Double_t blue[NRGBs]  = { 0.50, 1.00, 1.00, 0.25, 0.00 };
+    const Int_t NRGBs = 6;
+    Double_t stops[NRGBs] = { 0.0000, 0.2400, 0.2500, 0.2600, 0.5000, 1.0000};
+    Double_t red[NRGBs]   = { 0.0000, 0.2500, 1.0000, 1.0000, 1.0000, 0.0000};
+    Double_t green[NRGBs] = { 0.0000, 0.2500, 1.0000, 0.2500, 0.5000, 0.0000};
+    Double_t blue[NRGBs]  = { 0.5000, 1.0000, 1.0000, 0.2500, 0.0000, 0.0000};
     start = TColor::CreateGradientColorTable(NRGBs, stops,
                                            red, green, blue,
                                            nCont, alpha);

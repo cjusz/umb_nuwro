@@ -9,7 +9,7 @@
 namespace nuwro {
 namespace rew  {
 
-#define DEBUG_RES_REWEIGHT
+//#define DEBUG_RES_REWEIGHT
 
 void SetupSPP(void);
 void SetupSPP(params & param);
@@ -30,7 +30,9 @@ public:
   double GetSystematicValue(NuwroSyst_t syst);
   void Reset(void);
   void Reconfigure(void);
+  void SetDefaults(params const &);
   double CalcWeight(event* nuwro_event);
+  double CalcWeight(SRW::SRWEvent const& nuwro_event, params const &par);
   double CalcChisq(void);
 
 static bool DoSetupSPP;

@@ -217,7 +217,7 @@ int event::f() const { return post.size(); }
 /// number of particles with given pdg after primary vertex
 int event::nof(int pdg)const  {
   int c = 0;
-  for (int i = 0; i < out.size(); i++)
+  for (size_t i = 0; i < out.size(); i++)
     if (out[i].pdg == pdg) c++;
   return c;
 }
@@ -225,7 +225,7 @@ int event::nof(int pdg)const  {
 /// number of particles with given pdg after primary vertex
 int event::nof(int pdg1, int pdg2) const {
   int c = 0;
-  for (int i = 0; i < out.size(); i++)
+  for (size_t i = 0; i < out.size(); i++)
     if (out[i].pdg == pdg1 || out[i].pdg == pdg2) c++;
   return c;
 }
@@ -233,7 +233,7 @@ int event::nof(int pdg1, int pdg2) const {
 /// number of particles with given pdg after primary vertex
 int event::nof(int pdg1, int pdg2, int pdg3) const {
   int c = 0;
-  for (int i = 0; i < out.size(); i++)
+  for (size_t i = 0; i < out.size(); i++)
     if (out[i].pdg == pdg1 || out[i].pdg == pdg2 || out[i].pdg == pdg3) c++;
   return c;
 }
@@ -241,7 +241,7 @@ int event::nof(int pdg1, int pdg2, int pdg3) const {
 /// number of particles with given pdg leaving nucleus
 int event::fof(int pdg) const {
   int c = 0;
-  for (int i = 0; i < post.size(); i++)
+  for (size_t i = 0; i < post.size(); i++)
     if (post[i].pdg == pdg) c++;
   return c;
 }
@@ -249,7 +249,7 @@ int event::fof(int pdg) const {
 /// number of particles with given pdg leaving nucleus
 int event::fof(int pdg1, int pdg2) const {
   int c = 0;
-  for (int i = 0; i < post.size(); i++)
+  for (size_t i = 0; i < post.size(); i++)
     if (post[i].pdg == pdg1 || post[i].pdg == pdg2) c++;
   return c;
 }
@@ -257,7 +257,7 @@ int event::fof(int pdg1, int pdg2) const {
 /// number of particles with given pdg leaving nucleus
 int event::fof(int pdg1, int pdg2, int pdg3) const {
   int c = 0;
-  for (int i = 0; i < post.size(); i++)
+  for (size_t i = 0; i < post.size(); i++)
     if (post[i].pdg == pdg1 || post[i].pdg == pdg2 || post[i].pdg == pdg3) c++;
   return c;
 }
@@ -279,14 +279,14 @@ int event::charge(int r) const {
       c = pr;
       break;
   }
-  for (int i = 0; i < set->size(); i++) c += (*set)[i].charge();
+  for (size_t i = 0; i < set->size(); i++) c += (*set)[i].charge();
   return c;
 }
 
 /// invaraint mass
 double event::W() const {
   vect h = out[1];
-  for (int a = 2; a < out.size(); a++) h = h + out[a];
+  for (size_t a = 2; a < out.size(); a++) h = h + out[a];
   return sqrt(h * h);
 }
 
@@ -294,12 +294,12 @@ double event::W() const {
 double event::przod() const {
   int licz = 0;
   vect h = out[1];
-  for (int a = 2; a < out.size(); a++) h = h + out[a];
+  for (size_t a = 2; a < out.size(); a++) h = h + out[a];
 
   vect tran = in[0] - out[0];
   vec ptr = vec(tran.x, tran.y, tran.z);
 
-  for (int b = 1; b < out.size(); b++) {
+  for (size_t b = 1; b < out.size(); b++) {
     if ((out[b].pdg != 111) && (out[b].pdg != 22) && (out[b].pdg != 130) &&
         (out[b].pdg != 2112) && (out[b].pdg != -2112))
 
@@ -319,12 +319,12 @@ double event::przod() const {
 double event::tyl() const {
   int licz = 0;
   vect h = out[1];
-  for (int a = 2; a < out.size(); a++) h = h + out[a];
+  for (size_t a = 2; a < out.size(); a++) h = h + out[a];
 
   vect tran = in[0] - out[0];
   vec ptr = vec(tran.x, tran.y, tran.z);
 
-  for (int b = 1; b < out.size(); b++) {
+  for (size_t b = 1; b < out.size(); b++) {
     if ((out[b].pdg != 111) && (out[b].pdg != 22) && (out[b].pdg != 130) &&
         (out[b].pdg != 2112) && (out[b].pdg != -2112))
 
@@ -366,7 +366,7 @@ int event::number_of_escape() const { return nod[10]; }
 
 int event::number_of_interactions() const {
   int noi = 0;
-  for (int i = 0; i < 11; i++) {
+  for (size_t i = 0; i < 11; i++) {
     noi = noi + nod[i];
   }
 
@@ -378,11 +378,11 @@ int event::number_of_particles(int pdg, bool fsi)const  {
   int number = 0;
 
   if (fsi) {
-    for (int k = 0; k < post.size(); k++) {
+    for (size_t k = 0; k < post.size(); k++) {
       if (post[k].pdg == pdg) number++;
     }
   } else if (!fsi) {
-    for (int k = 0; k < out.size(); k++) {
+    for (size_t k = 0; k < out.size(); k++) {
       if (out[k].pdg == pdg) number++;
     }
   }
@@ -393,7 +393,7 @@ int event::number_of_particles(int pdg, bool fsi)const  {
 /// total kinetic energy of nucleons that left the nucleus
 double event::nuc_kin_en() const {
   double sum = 0;
-  for (int k = 0; k < post.size(); k++) {
+  for (size_t k = 0; k < post.size(); k++) {
     if (post[k].pdg == 2212 || post[k].pdg == 2112) sum += post[k].Ek();
   }
   return sum;
@@ -405,11 +405,11 @@ int event::num_part_thr(int pdg, bool fsi, double threshold) const {
   int number = 0;
 
   if (fsi) {
-    for (int k = 0; k < post.size(); k++) {
+    for (size_t k = 0; k < post.size(); k++) {
       if ((post[k].pdg == pdg) && (post[k].momentum() > threshold)) number++;
     }
   } else if (!fsi) {
-    for (int k = 0; k < out.size(); k++) {
+    for (size_t k = 0; k < out.size(); k++) {
       if ((out[k].pdg == pdg) && (out[k].momentum() > threshold)) number++;
     }
   }
@@ -422,7 +422,7 @@ double event::proton_cosine(bool fsi, double thr)const  {
   int numer[2];
   int ile = 0;
   if (fsi) {
-    for (int k = 0; k < post.size(); k++) {
+    for (size_t k = 0; k < post.size(); k++) {
       if (post[k].pdg == 2212 && post[k].momentum() > thr) {
         numer[ile] = k;
         ile++;
@@ -434,7 +434,7 @@ double event::proton_cosine(bool fsi, double thr)const  {
     // )/post[numer[0]].momentum()/post[numer[1]].momentum();
 
   } else {
-    for (int k = 0; k < out.size(); k++) {
+    for (size_t k = 0; k < out.size(); k++) {
       if (out[k].pdg == 2212 && out[k].momentum() > thr) {
         numer[ile] = k;
         ile++;
@@ -450,9 +450,9 @@ double event::proton_cosine(bool fsi, double thr)const  {
 /// calculates momentum of proton which did not suffer from fsi (the first one,
 /// sometimes there are two,see below)
 double event::proton_transp_mom() const {
-  for (int k = 0; k < out.size(); k++)
+  for (size_t k = 0; k < out.size(); k++)
     if (out[k].pdg == 2212) {
-      for (int l = 0; l < post.size(); l++) {
+      for (size_t l = 0; l < post.size(); l++) {
         if (post[l].pdg == 2212) {
           //				double kos = ( out[k].x*post[l].x +
           //out[k].y*post[l].y + out[k].z*post[l].z
@@ -469,9 +469,9 @@ double event::proton_transp_mom() const {
 /// if it happens -- very rarely, but stil...)
 double event::proton_transp_mom2() const {
   int counter = 0;
-  for (int k = 0; k < out.size(); k++)
+  for (size_t k = 0; k < out.size(); k++)
     if (out[k].pdg == 2212) {
-      for (int l = 0; l < post.size(); l++) {
+      for (size_t l = 0; l < post.size(); l++) {
         if (post[l].pdg == 2212) {
           double kos = (out[k].x * post[l].x + out[k].y * post[l].y +
                         out[k].z * post[l].z) /
@@ -488,9 +488,9 @@ double event::proton_transp_mom2() const {
 /// calculates number of protons which did not suffer from fsi
 int event::proton_transp() const {
   int ile = 0;
-  for (int k = 0; k < out.size(); k++)
+  for (size_t k = 0; k < out.size(); k++)
     if (out[k].pdg == 2212) {
-      for (int l = 0; l < post.size(); l++) {
+      for (size_t l = 0; l < post.size(); l++) {
         if (post[l].pdg == 2212) {
           //					double kos = ( out[k].x*post[l].x +
           //out[k].y*post[l].y + out[k].z*post[l].z
@@ -507,7 +507,7 @@ int event::proton_pair_number1(bool fsi, double thr) const {
   int numer[2];
   int ile = 0;
   if (fsi) {
-    for (int k = 0; k < post.size(); k++) {
+    for (size_t k = 0; k < post.size(); k++) {
       if (post[k].pdg == 2212 && post[k].momentum() > thr) {
         numer[ile] = k;
         ile++;
@@ -515,7 +515,7 @@ int event::proton_pair_number1(bool fsi, double thr) const {
     }
     return numer[0];
   } else {
-    for (int k = 0; k < out.size(); k++) {
+    for (size_t k = 0; k < out.size(); k++) {
       if (out[k].pdg == 2212 && out[k].momentum() > thr) {
         numer[ile] = k;
         ile++;
@@ -529,7 +529,7 @@ int event::proton_pair_number2(bool fsi, double thr) const {
   int numer[2];
   int ile = 0;
   if (fsi) {
-    for (int k = 0; k < post.size(); k++) {
+    for (size_t k = 0; k < post.size(); k++) {
       if (post[k].pdg == 2212 && post[k].momentum() > thr) {
         numer[ile] = k;
         ile++;
@@ -537,7 +537,7 @@ int event::proton_pair_number2(bool fsi, double thr) const {
     }
     return numer[1];
   } else {
-    for (int k = 0; k < out.size(); k++) {
+    for (size_t k = 0; k < out.size(); k++) {
       if (out[k].pdg == 2212 && out[k].momentum() > thr) {
         numer[ile] = k;
         ile++;
@@ -553,12 +553,12 @@ double event::part_max_mom(int pdg, bool fsi) const {
   double mom = 0.0;
 
   if (fsi) {
-    for (int k = 0; k < post.size(); k++) {
+    for (size_t k = 0; k < post.size(); k++) {
       if ((post[k].pdg == pdg) && (post[k].momentum() > mom))
         mom = post[k].momentum();
     }
   } else if (!fsi) {
-    for (int k = 0; k < out.size(); k++) {
+    for (size_t k = 0; k < out.size(); k++) {
       if ((out[k].pdg == pdg) && (out[k].momentum() > mom))
         mom = out[k].momentum();
       // cout<<mom<<endl;
@@ -575,7 +575,7 @@ double event::part_sec_mom(int pdg, bool fsi) const {
   double memory;
 
   if (fsi) {
-    for (int k = 0; k < post.size(); k++) {
+    for (size_t k = 0; k < post.size(); k++) {
       if (post[k].pdg == pdg) {
         double ped = post[k].momentum();
         if (ped > mom[1]) {
@@ -589,7 +589,7 @@ double event::part_sec_mom(int pdg, bool fsi) const {
       }
     }
   } else if (!fsi) {
-    for (int k = 0; k < out.size(); k++) {
+    for (size_t k = 0; k < out.size(); k++) {
       if (out[k].pdg == pdg) {
         double ped = out[k].momentum();
         // cout<<ped<<endl;
@@ -613,7 +613,7 @@ double event::vert_act(double pion_threshold, bool fsi,
   double veract = 0.0;
 
   if (fsi) {
-    for (int k = 0; k < post.size(); k++) {
+    for (size_t k = 0; k < post.size(); k++) {
       if ((post[k].pdg == 211) && (post[k].momentum() < pion_threshold))
         veract += post[k].t - post[k].mass();
 
@@ -628,7 +628,7 @@ double event::vert_act(double pion_threshold, bool fsi,
     }
     return veract;
   } else {
-    for (int k = 0; k < out.size(); k++) {
+    for (size_t k = 0; k < out.size(); k++) {
       if ((out[k].pdg == 211) && (out[k].momentum() < pion_threshold))
         veract += out[k].t - out[k].mass();
 
@@ -657,7 +657,7 @@ double event::Erec(double Bin) const {
 /// stop program if event weight or momentum of any particle is NaN (not a
 /// number)
 void event::check() const {
-  for (int i = 0; i < out.size(); i++) {
+  for (size_t i = 0; i < out.size(); i++) {
     particle p = out[i];
     if (!(p.x == p.x && p.y == p.y && p.z == p.z and p.t == p.t)) {
       cerr << p << endl;

@@ -12,6 +12,7 @@
 #include "reweight/NuwroSystSet.h"
 #include "reweight/NuwroSystUncertainty.h"
 #include "reweight/NuwroWghtEngineI.h"
+#include "reweight/NuwroReWeightSimpleEvent.h"
 
 namespace nuwro {
 namespace rew   {
@@ -32,6 +33,9 @@ public:
   void Reconfigure(void);
   /// calculate weight for input event
   double CalcWeight(event * nuwro_event);
+  double CalcWeight(SRW::SRWEvent const &event, params const &par);
+
+  void SetDefaults(params const &);
 
   /// calculate penalty chisq for current values of tweaking dials
   double CalcChisq(void);

@@ -32,29 +32,33 @@ struct SimpleReWeightParams {
   Double_t to_MaRES;
   Double_t to_SPPBkgScale;
   Double_t to_MaQE;
+  Double_t to_2p2hNorm;
   SimpleReWeightParams(double CA5 = 0xDEADBEEF, double MaRES = 0xDEADBEEF,
                        double SPPBkgScale = 0xDEADBEEF,
-                       double MaQE = 0xDEADBEEF)
+                       double MaQE = 0xDEADBEEF, double Twop2hNorm = 1.0)
       : to_CA5(CA5),
         to_MaRES(MaRES),
         to_SPPBkgScale(SPPBkgScale),
-        to_MaQE(MaQE) {}
-  SimpleReWeightParams(double Params[4])
+        to_MaQE(MaQE),
+        to_2p2hNorm(Twop2hNorm) {}
+  SimpleReWeightParams(double Params[5])
       : to_CA5(Params[0]),
         to_MaRES(Params[1]),
         to_SPPBkgScale(Params[2]),
-        to_MaQE(Params[3]) {}
+        to_MaQE(Params[3]),
+        to_2p2hNorm(Params[4]) {}
   bool HasTweaks() const {
     return (to_CA5 != 0xDEADBEEF) || (to_MaRES != 0xDEADBEEF) ||
-           (to_SPPBkgScale != 0xDEADBEEF) || (to_MaQE != 0xDEADBEEF);
+           (to_SPPBkgScale != 0xDEADBEEF) || (to_MaQE != 0xDEADBEEF) ||
+           (to_2p2hNorm != 1.0);
   }
 };
 
 inline std::ostream &operator<<(std::ostream &o,
                                 SimpleReWeightParams const &p) {
   return o << "[ CA5: " << p.to_CA5 << ", MaRES: " << p.to_MaRES
-           << ", SPPBkgScale: " << p.to_SPPBkgScale << ", MaQE: " << p.to_MaQE << "]"
-           << std::flush;
+           << ", SPPBkgScale: " << p.to_SPPBkgScale << ", MaQE: " << p.to_MaQE
+           << ", 2p2hNorm: " << p.to_2p2hNorm << "]" << std::flush;
 }
 
 inline Double_t GetRESWeight(SRWEvent const &nwEv, params const &NominalParams,
@@ -170,10 +174,10 @@ inline Double_t GetQEWeight(SRWEvent const &nwEv, params const &NominalParams,
   return (NewWeight / NominalWeight);
 #else
   double NewWeight = nuwro::rew::GetWghtPropToQEXSec(nwEv, rwParams);
-  if((NewWeight-NominalWeight) > 1E-8){
+  if ((NewWeight - NominalWeight) > 1E-8) {
     throw 5;
   }
-  return ( NewWeight / NominalWeight);
+  return (NewWeight / NominalWeight);
 #endif
 }
 
@@ -251,7 +255,7 @@ inline void GenerateNominalWeights(std::vector<SRWEvent> const &nwEvs,
 #endif
 
   std::cout << "Generating Nominal Weights for: CA5: " << NominalParams.pion_C5A
-    << ", MaRES: " << NominalParams.pion_axial_mass << std::endl;
+            << ", MaRES: " << NominalParams.pion_axial_mass << std::endl;
 
 #pragma omp parallel for
   for (size_t i = 0; i < nwEvs.size(); ++i) {
@@ -305,6 +309,8 @@ inline void ReWeightEvents(
       OutWeights[i] = GetRESWeight(nwEvs[i], NominalParams, rwp.to_CA5,
                                    rwp.to_MaRES, rwp.to_SPPBkgScale,
                                    HaveNomWeights ? InWeights[i] : 0xDEADBEEF);
+    } else if (nwEvs[i].NuWroDynCode == 8) {
+      OutWeights[i] = rwp.to_2p2hNorm;
     } else {
       OutWeights[i] = 1.0;
     }

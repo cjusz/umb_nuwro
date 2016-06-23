@@ -28,6 +28,7 @@ public:
   void Reset(void);
   void Reconfigure(void);
   double CalcWeight(event* nuwro_event);
+  double CalcWeight(SRW::SRWEvent const& nuwro_event, params const &par);
   double CalcChisq(void);
 
 private:

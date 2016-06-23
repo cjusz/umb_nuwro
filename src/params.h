@@ -34,6 +34,7 @@ inline bool read (T & x, istream & s, char z){
 
 template < class T >
 inline void write (T x, std::ostream & s, char const * name=""){
+  (void)name;
   s << ' ' << x; // space looks nice ofter in "a = 1"
 }
 
@@ -47,11 +48,13 @@ bool read (vec & a, istream & s, char z){
 
 inline void
 write (vec a, std::ostream & s, char const * name=""){
+  (void)name;
   s << ' ' << a.x << ' ' << a.y << ' ' << a.z;
 }
 
 inline
 bool read (std::string & a, istream & s, char z){
+  (void)z;
   s >> a;
   if (!s)
     a = "";
@@ -99,12 +102,14 @@ void write (line a, std::ostream & s, char const * name=""){
 class params {
 public:
 
+  std::string path_to_data;
+
   /// parameter definitions
 #define PARAM(type, name, default_value) type name;
   PARAMS_ALL ()
 #undef PARAM
 public:
-  std::string path_to_data;
+
 
   /// constructor
   params () : path_to_data ("")
@@ -126,7 +131,6 @@ public:
   inline
   bool read (istream & dane, const char *filename){
     int line_number = 0;
-    double value;
     while (dane.good ()){ // while not end of file
       line_number++;      // increase line number
       //read next line to buffer "line"

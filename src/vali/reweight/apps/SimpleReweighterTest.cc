@@ -64,7 +64,7 @@ int main(int argc, char const *argv[]) {
   Var1.swap(PlotVar);
   params Params1 = par;
   SRW::SimpleReWeightParams srwp1(Params1.pion_C5A, Params1.pion_axial_mass,
-                                Params1.SPPBkgScale);
+                                Params1.SPPBkgScale, Params1.qel_cc_axial_mass);
 
   first = true;
   std::vector<SRW::SRWEvent> SignalSRWs2;
@@ -74,7 +74,7 @@ int main(int argc, char const *argv[]) {
   Var2.swap(PlotVar);
   params Params2 = par;
   SRW::SimpleReWeightParams srwp2(Params2.pion_C5A, Params2.pion_axial_mass,
-                                Params2.SPPBkgScale);
+                                Params2.SPPBkgScale, Params2.qel_cc_axial_mass);
 
   SRW::SetupSPP(Params1);
 

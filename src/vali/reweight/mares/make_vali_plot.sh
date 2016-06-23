@@ -1,26 +1,26 @@
 #!/bin/sh
 
-if [ ! "${NUWRO_ROOT}" ]; then
-  echo "[ERROR]: NUWRO_ROOT is not set."
+if [ ! "${NUWRO}" ]; then
+  echo "[ERROR]: NUWRO is not set."
   exit 1
 fi
 
-if [ ! -e ${NUWRO_ROOT}/src/vali/reweight/scripts/reweight_vali_script_base.sh ]; then
-  echo "[ERROR]: Expected ${NUWRO_ROOT}/src/vali/reweight/scripts/reweight_vali_script_base.sh to exist. Cannot continue."
+if [ ! -e ${NUWRO}/src/vali/reweight/scripts/reweight_vali_script_base.sh ]; then
+  echo "[ERROR]: Expected ${NUWRO}/src/vali/reweight/scripts/reweight_vali_script_base.sh to exist. Cannot continue."
   exit 1
 fi
 
-if [ ! -e ${NUWRO_ROOT}/src/vali/reweight/scripts/generate_reweight_vali_data.sh ]; then
-  echo "[ERROR]: Expected ${NUWRO_ROOT}/src/vali/reweight/scripts/generate_reweight_vali_data.sh to exist. Cannot continue."
+if [ ! -e ${NUWRO}/src/vali/reweight/scripts/generate_reweight_vali_data.sh ]; then
+  echo "[ERROR]: Expected ${NUWRO}/src/vali/reweight/scripts/generate_reweight_vali_data.sh to exist. Cannot continue."
   exit 1
 fi
 
-if [ ! -e ${NUWRO_ROOT}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh ]; then
-  echo "[ERROR]: Expected ${NUWRO_ROOT}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh to exist. Cannot continue."
+if [ ! -e ${NUWRO}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh ]; then
+  echo "[ERROR]: Expected ${NUWRO}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh to exist. Cannot continue."
   exit 1
 fi
 
-source ${NUWRO_ROOT}/src/vali/reweight/scripts/reweight_vali_script_base.sh
+source ${NUWRO}/src/vali/reweight/scripts/reweight_vali_script_base.sh
 
 DIALNAME="kNuwro_MaRES"
 DIALPRETTYNAME="M_{A}^{RES}"
@@ -28,7 +28,7 @@ DIALVALM2="0.74"
 DIALVAL0="0.94"
 DIALVAL2="1.14"
 DIALUNITS="GeV"
-NEVS="10000"
+NEVS="50000"
 
 echo "[INFO]: Using ${PARAM_BASE}, specialised with ${FLUX_HIST}, and ${TARGET_PARAMS}, generating ${NEVS} events to test dial: ${DIALNAME}"
 
@@ -36,7 +36,7 @@ cat ${PARAM_BASE} | sed "s/number_of_events   = 100000/number_of_events = ${NEVS
 cat ${PARAM_BASE} | sed "s/number_of_events   = 100000/number_of_events = ${NEVS}/g" | sed "s/pion_axial_mass =.*$/pion_axial_mass=${DIALVAL2}/g" | sed "s:#@beam/ND280.txt:@${FLUX_HIST}:g" | sed "s:@target/C.txt:@${TARGET_PARAMS}:g" | sed -e "s/dyn_\([^r].\+_[nc]c\) =1/dyn_\1=0/g" | sed -e "s/dyn_res_nc =1/dyn_res_nc=0/g" > dial_2_params.txt
 cat ${PARAM_BASE} | sed "s/number_of_events   = 100000/number_of_events = ${NEVS}/g" | sed "s/pion_axial_mass =.*$/pion_axial_mass=${DIALVALM2}/g" | sed "s:#@beam/ND280.txt:@${FLUX_HIST}:g" | sed "s:@target/C.txt:@${TARGET_PARAMS}:g" | sed -e "s/dyn_\([^r].\+_[nc]c\) =1/dyn_\1=0/g" | sed -e "s/dyn_res_nc =1/dyn_res_nc=0/g" > dial_m2_params.txt
 
-${NUWRO_ROOT}/src/vali/reweight/scripts/generate_reweight_vali_data.sh ${DIALNAME}
+${NUWRO}/src/vali/reweight/scripts/generate_reweight_vali_data.sh ${DIALNAME}
 
 #################################################
 #  Add Plots
@@ -44,7 +44,7 @@ ${NUWRO_ROOT}/src/vali/reweight/scripts/generate_reweight_vali_data.sh ${DIALNAM
 
 echo "[INFO]: Building: Plot_${DIALNAME}_Vars.cc"
 
-cp ${NUWRO_ROOT}/src/vali/reweight/PlotDialVars.cc.in Plot_${DIALNAME}_Vars.cc
+cp ${NUWRO}/src/vali/reweight/PlotDialVars.cc.in Plot_${DIALNAME}_Vars.cc
 
 #pmu
 echo "VarToPlot1D FS_mu_p; FS_mu_p.XAxisTitle = \"#it{p}^{#mu} (GeV/#it{c})\"; FS_mu_p.XVariableName = \"pmu\"; FS_mu_p.XVariablePrettyName = \"#it{p}^{#mu}\";  FS_mu_p.DialName = \"${DIALNAME}\"; FS_mu_p.DialPrettyName = \"${DIALPRETTYNAME}\"; FS_mu_p.DialUnits = \"${DIALUNITS}\"; FS_mu_p.PlotString = \"HMFSLepton_4Mom.Vect().Mag()\"; FS_mu_p.SelectionString = \"(HMFSLepton_PDG==13)&&(NeutConventionReactionCode==11)\"; FS_mu_p.DialValm2 = \"${DIALVALM2}\"; FS_mu_p.DialVal0 = \"${DIALVAL0}\"; FS_mu_p.DialVal2 = \"${DIALVAL2}\"; FS_mu_p.NXBins = 50; FS_mu_p.XBinMin = 0; FS_mu_p.XBinMax = 2.5; FS_mu_p.LegX1 = 0.45; FS_mu_p.LegY1 = 0.4; FS_mu_p.LegX2 = 0.925; FS_mu_p.LegY2 = 0.925; FS_mu_p.LogHist = false; FS_mu_p.LegendTitle=\"NuWro C-target, ND280 Flux\"; PlotVar1D(FS_mu_p);" >> Plot_${DIALNAME}_Vars.cc
@@ -134,6 +134,6 @@ echo "VarToPlot2D FS_ct_p_p; FS_ct_p_p.YAxisTitle = \"cos#it{#theta}^{p,Highest}
 
 echo "}" >> Plot_${DIALNAME}_Vars.cc
 
-if ! ${NUWRO_ROOT}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh "Plot_${DIALNAME}_Vars.cc"; then exit 1; fi
+if ! ${NUWRO}/src/vali/reweight/scripts/build_reweight_vali_plotscript.sh "Plot_${DIALNAME}_Vars.cc"; then exit 1; fi
 
 ./Plot_Vars saf_dial_m2_eventsout.root saf_dial_0_eventsout.root saf_dial_2_eventsout.root ${DIALNAME}_weightsfile.root ${DIALNAME}_valid.pdf
