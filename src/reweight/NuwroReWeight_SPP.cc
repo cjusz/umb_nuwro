@@ -88,7 +88,7 @@ NuwroReWeight_SPP::NuwroReWeight_SPP(params const &param) {
   }
 }
 
-void NuwroReWeight_SPP::SetDefaults(params const & param) {
+void NuwroReWeight_SPP::SetDefaults(params const &param) {
   fTwkDial_MaRES = 0;
   fDef_MaRES = param.pion_axial_mass;
   fCurr_MaRES = fDef_MaRES;
@@ -183,12 +183,17 @@ void NuwroReWeight_SPP::Reconfigure(void) {
       kNuwro_SPPBkgScale, (fTwkDial_SPPBkgScale > 0) ? 1 : -1);
 
   fCurr_SPPBkgScale =
-      fDef_SPPBkgScale + fDef_SPPBkgScale * fError_SPPBkgScale * fTwkDial_SPPBkgScale;
+      fDef_SPPBkgScale +
+      fDef_SPPBkgScale * fError_SPPBkgScale * fTwkDial_SPPBkgScale;
 
   std::cout << "[INFO]: "
-    <<"MaRES: " << fCurr_MaRES
-    <<", CA5: " << fCurr_CA5
-    <<", SPPBkgScale: " << fCurr_SPPBkgScale << std::endl;
+            << "MaRES: " << fCurr_MaRES << "{" << fDef_MaRES << "*(1+"
+            << fError_MaRES << " * [" << fTwkDial_MaRES << "]}"
+            << ", CA5: " << fCurr_CA5 << "{" << fDef_CA5 << "*(1+" << fError_CA5
+            << " * [" << fTwkDial_CA5 << "]}"
+            << ", SPPBkgScale: " << fCurr_SPPBkgScale << "{" << fDef_SPPBkgScale
+            << "*(1+" << fError_SPPBkgScale << " * [" << fTwkDial_SPPBkgScale
+            << "]}" << std::endl;
 }
 
 double GetEBind(event &nuwro_event, params const &rwparams) {
@@ -469,7 +474,8 @@ double NuwroReWeight_SPP::CalcWeight(event *nuwro_event) {
   return CalcWeight(SRW::SRWEvent(*nuwro_event), nuwro_event->par);
 }
 
-double NuwroReWeight_SPP::CalcWeight(SRW::SRWEvent const &srwev, params const &par) {
+double NuwroReWeight_SPP::CalcWeight(SRW::SRWEvent const &srwev,
+                                     params const &par) {
   if ((fabs(fTwkDial_MaRES) < 1E-8) && (fabs(fTwkDial_CA5) < 1E-8) &&
       (fabs(fTwkDial_SPPBkgScale) < 1E-8)) {
 #ifdef DEBUG_RES_REWEIGHT
@@ -490,7 +496,7 @@ double NuwroReWeight_SPP::CalcWeight(SRW::SRWEvent const &srwev, params const &p
   double weight = 1;
   params rwparams = par;
 
-  if(srwev.CacheWeight == 0xdeadbeef){
+  if (srwev.CacheWeight == 0xdeadbeef) {
     srwev.CacheWeight = GetWghtPropToResXSec(srwev, rwparams);
   }
 

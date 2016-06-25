@@ -56,8 +56,15 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
-  // std::vector<event> evs;
-  // SRW::LoadSignalNuWroEventsIntoVector(argv[1], evs, &IsSignal);
+  int argu = 3;
+  int Tweaks = 2;
+  if(std::string(argv[3]) == "-n"){
+    Tweaks = atoi(argv[4]);
+    if(!Tweaks){ Tweaks = 2; }
+    std::cout << "[INFO]: Tweaking by " << Tweaks << std::endl;
+    argu = 5;
+  }
+
 
   std::vector<SRW::SRWEvent> evs;
   SRW::LoadSignalSRWEventsIntoVector(argv[1], evs, &IsSignal);
@@ -68,7 +75,6 @@ int main(int argc, char const *argv[]) {
 
   NuwroReWeight WghtGen;
 
-  int argu = 3;
   std::vector<ENuWroSyst> Systs;
   std::vector<NuwroSystInfo *> SystInstances;
   std::vector<std::string> WghtEngineNames;
@@ -106,7 +112,7 @@ int main(int argc, char const *argv[]) {
       }
     }
 
-    WghtGen.Systematics().Add(syst, 0, -4, 4, 2);
+    WghtGen.Systematics().Add(syst, 0, -2*Tweaks, 2*Tweaks, Tweaks);
     SystInstances.push_back(&WghtGen.Systematics().GetSystInfo(syst));
     Systs.push_back(syst);
     std::cout << "[INFO]: Test reweighting " << syst << std::endl;
