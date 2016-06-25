@@ -187,13 +187,13 @@ void NuwroReWeight_SPP::Reconfigure(void) {
       fDef_SPPBkgScale * fError_SPPBkgScale * fTwkDial_SPPBkgScale;
 
   std::cout << "[INFO]: "
-            << "MaRES: " << fCurr_MaRES << "{" << fDef_MaRES << "*(1+"
+            << "MaRES: " << fCurr_MaRES << " {" << fDef_MaRES << "*(1+"
             << fError_MaRES << " * [" << fTwkDial_MaRES << "]}"
-            << ", CA5: " << fCurr_CA5 << "{" << fDef_CA5 << "*(1+" << fError_CA5
-            << " * [" << fTwkDial_CA5 << "]}"
-            << ", SPPBkgScale: " << fCurr_SPPBkgScale << "{" << fDef_SPPBkgScale
-            << "*(1+" << fError_SPPBkgScale << " * [" << fTwkDial_SPPBkgScale
-            << "]}" << std::endl;
+            << ", CA5: " << fCurr_CA5 << " {" << fDef_CA5 << "*(1+"
+            << fError_CA5 << " * [" << fTwkDial_CA5 << "]}"
+            << ", SPPBkgScale: " << (fCurr_SPPBkgScale - 1.0) << " {"
+            << fDef_SPPBkgScale << "*(1+" << fError_SPPBkgScale << " * ["
+            << fTwkDial_SPPBkgScale << "]}" << std::endl;
 }
 
 double GetEBind(event &nuwro_event, params const &rwparams) {
