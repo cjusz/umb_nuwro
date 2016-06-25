@@ -61,7 +61,7 @@ NuwroReWeight_SPP::NuwroReWeight_SPP() {
   fCurr_CA5 = fDef_CA5;
 
   fTwkDial_SPPBkgScale = 0;
-  fDef_SPPBkgScale = 0;
+  fDef_SPPBkgScale = 1.0;
   fCurr_SPPBkgScale = fDef_SPPBkgScale;
 
   if (DoSetupSPP) {
@@ -79,7 +79,7 @@ NuwroReWeight_SPP::NuwroReWeight_SPP(params const &param) {
   fCurr_CA5 = fDef_CA5;
 
   fTwkDial_SPPBkgScale = 0;
-  fDef_SPPBkgScale = param.SPPBkgScale;
+  fDef_SPPBkgScale = 1.0 + param.SPPBkgScale;
   fCurr_SPPBkgScale = fDef_SPPBkgScale;
 
   params nc_param(param);
@@ -98,7 +98,7 @@ void NuwroReWeight_SPP::SetDefaults(params const & param) {
   fCurr_CA5 = fDef_CA5;
 
   fTwkDial_SPPBkgScale = 0;
-  fDef_SPPBkgScale = param.SPPBkgScale;
+  fDef_SPPBkgScale = 1.0 + param.SPPBkgScale;
   fCurr_SPPBkgScale = fDef_SPPBkgScale;
 }
 
@@ -155,7 +155,7 @@ double NuwroReWeight_SPP::GetSystematicValue(NuwroSyst_t syst) {
       return fCurr_CA5;
     }
     case kNuwro_SPPBkgScale: {
-      return fCurr_SPPBkgScale;
+      return (fCurr_SPPBkgScale - 1.0);
     }
     default: { throw syst; }
   }
@@ -184,6 +184,11 @@ void NuwroReWeight_SPP::Reconfigure(void) {
 
   fCurr_SPPBkgScale =
       fDef_SPPBkgScale + fDef_SPPBkgScale * fError_SPPBkgScale * fTwkDial_SPPBkgScale;
+
+  std::cout << "[INFO]: "
+    <<"MaRES: " << fCurr_MaRES
+    <<", CA5: " << fCurr_CA5
+    <<", SPPBkgScale: " << fCurr_SPPBkgScale << std::endl;
 }
 
 double GetEBind(event &nuwro_event, params const &rwparams) {
@@ -498,7 +503,7 @@ double NuwroReWeight_SPP::CalcWeight(SRW::SRWEvent const &srwev, params const &p
 #endif
   rwparams.pion_axial_mass = fCurr_MaRES;
   rwparams.pion_C5A = fCurr_CA5;
-  rwparams.SPPBkgScale = fCurr_SPPBkgScale;
+  rwparams.SPPBkgScale = (fCurr_SPPBkgScale - 1.0);
 
   double newweight = GetWghtPropToResXSec(srwev, rwparams);
 
