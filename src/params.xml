@@ -64,6 +64,9 @@
           <param name="beam_folder" type="text" ctype="string" default="flux">
             <description></description>
           </param>
+	  <param name="beam_file" type="text" ctype="string" default="1">
+	    <description></description>
+	  </param>
           <param name="beam_file_first" type="text" ctype="int" default="1">
             <description></description>
           </param>
@@ -323,6 +326,9 @@
     <param name="delta_s" type="text" ctype="double" default="-0.15">
       <description><![CDATA[[Delta s parameter in the strange form factor]]></description>
     </param>
+    <param name="qel_cc_vector_mass" type="text" ctype="double" default="1000">
+      <description><![CDATA[[MeV] vector mass]]></description>
+    </param>
     <param name="qel_cc_axial_mass" type="text" ctype="double" default="1200">
       <description><![CDATA[[MeV] axial mass]]></description>
     </param>
@@ -427,6 +433,9 @@
   <param name="kaskada_writeall" type="checkbox" ctype="bool" default="0">
     <description><![CDATA[Store all intermediate FSI particles int the event::all vector]]></description>
   </param>
+  <param name="kaskada_newangle" type="text" ctype="double" default="0">
+    <description><![CDATA[New angle for Kaskada]]></description>
+  </param>
   <param name="formation_zone" type="select" ctype="string" default="fz">
     <description><![CDATA[Name of formation zone model]]></description>
     <options>
@@ -465,6 +474,12 @@
   </param>
   <param name="mixed_order" type="checkbox" ctype="bool" default="1">
     <description><![CDATA[random order of events in uotut file]]></description>
+  </param>
+  <param name="rmin" type="text" ctype="double" default="1.0">
+    <description><![CDATA[rmin]]></description>
+  </param>
+  <param name="rmax" type="text" ctype="double" default="1.0">
+    <description><![CDATA[rmax]]></description>
   </param>
 </params>
 
