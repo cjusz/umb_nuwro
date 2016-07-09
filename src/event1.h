@@ -4,10 +4,8 @@
 #include <iostream>
 #include <vector>
 #include "TObject.h"
-#include "dis/LeptonMass.h"
 #include "params.h"
 #include "particle.h"
-#include "qel_sigma.h"
 
 class flags {
  public:
@@ -68,11 +66,6 @@ class event : public TObject {
                 ///< 11 - pion tpp
   int pr;       ///< number of protons  in the residual nucleus
   int nr;       ///< number of neutrons in the residual nucleus
-
-  double GetLH() {
-    return qel_sigma(this->E(), this->q2(), 0, (this->nu().pdg < 0),
-                     this->post[0].m(), this->N0().m());
-  }
 
   event() : weight(0), norm(1) {}  ///< default constructor
   ~event() {}

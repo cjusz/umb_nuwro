@@ -43,6 +43,19 @@ message(STATUS "Include Paths: ${incdirs}")
 set(AINCDIRS ${incdirs} PARENT_SCOPE)
 
 set(EVENT_SOURCES)
+set(HEADERS_TO_INSTALL
+  params.h
+  vec.h
+  dirs.h
+  ${CMAKE_CURRENT_BINARY_DIR}/params_all.h
+  particle.h
+  generatormt.h
+  jednostki.h
+  pdg.h
+  vect.h
+  vecrand.h
+  event1.h
+  )
 
 foreach (dir ${SRC_SUBDIRS})
   message(STATUS "Adding subdirectory src/${dir}")
@@ -133,6 +146,8 @@ install(TARGETS
   nuwro2rootracker
   dumpParams
   DESTINATION bin)
+
+install(FILES ${HEADERS_TO_INSTALL} DESTINATION include/nuwro)
 
 if(ISROOT6)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/event1Dict_rdict.pcm DESTINATION lib)

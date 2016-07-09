@@ -15,6 +15,7 @@
 #include "dis/dis_cr_sec.h"
 #include "dis/resevent2.h"
 #include "dis/singlepion.h"
+#include "dis/LeptonMass.h"
 
 #include "reweight/NuwroSystUncertainty.h"
 

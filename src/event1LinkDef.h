@@ -11,7 +11,6 @@
 #pragma link C++ class params+;
 #pragma link C++ class particle+;
 #pragma link C++ class line+;
-#pragma link C++ function qel_sigma;
 #pragma link C++ class vector<particle>+;
 #pragma link C++ class event+;
 #pragma link C++ global GeV;
