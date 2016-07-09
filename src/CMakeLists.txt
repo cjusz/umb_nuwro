@@ -2,13 +2,23 @@
 # Libraries
 ########################
 
+add_custom_command(OUTPUT params_all.h
+  COMMAND echo '\#define PARAMS_ALL\(\)\\' > params_all.h
+  COMMAND sed -f ${CMAKE_CURRENT_SOURCE_DIR}/params.sed ${CMAKE_CURRENT_SOURCE_DIR}/params.xml >> params_all.h
+  COMMAND echo '' >> params_all.h
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/params.xml ${CMAKE_CURRENT_SOURCE_DIR}/params.sed)
+add_custom_target(params_header DEPENDS params_all.h)
+
 set(SRC_SUBDIRS
   dis
   sf
   reweight
-  vali
   #rpa -- Not included by default
   )
+
+if(NUWRO_BUILD_VALID)
+  set(SRC_SUBDIRS ${SRC_SUBDIRS};vali)
+endif()
 
 set(EVENT_LIBS event)
 if(NOT NUWRO_SINGLE_LIB)
@@ -16,7 +26,6 @@ if(NOT NUWRO_SINGLE_LIB)
 endif()
 
 set(AEVENT_LIBS ${EVENT_LIBS} PARENT_SCOPE)
-
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -80,13 +89,15 @@ set(EVENT_SOURCES ${EVENT_SOURCES}
   RooTrackerEvent.cc
   nuwro.cc)
 
-if("${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
+if(CMAKE_BUILD_TYPE MATCHES DEBUG)
   add_library(event STATIC ${EVENT_SOURCES})
 else()
   add_library(event SHARED ${EVENT_SOURCES})
   set_target_properties(event PROPERTIES VERSION
     "${NUWRO_VERSION_MAJOR}.${NUWRO_VERSION_MINOR}.${NUWRO_VERSION_REVISION}")
 endif()
+
+add_dependencies(event params_header)
 
 ROOT_GENERATE_DICTIONARY( ${CMAKE_CURRENT_BINARY_DIR}/event1Dict event1.h
   LINKDEF event1LinkDef.h)

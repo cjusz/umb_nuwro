@@ -29,8 +29,12 @@ if [ ! "${NUWRO_ROOT}" ] || [ ! -e "${NUWRO_ROOT}" ]; then
   exit 1
 fi
 
+if [ ! "${FLUX_HIST_NAME}" ]; then
+  FLUX_HIST_NAME="t2k.txt"
+fi
+
 PARAM_BASE=$(readlink -f ${NUWRO_ROOT}/data/params.txt)
-FLUX_HIST=$(readlink -f ${NUWRO_ROOT}/data/beam/t2k.txt)
+FLUX_HIST=$(readlink -f ${NUWRO_ROOT}/data/beam/${FLUX_HIST_NAME})
 TARGET_PARAMS=$(readlink -f ${NUWRO_ROOT}/data/target/C.txt)
 
 if [ ! -e "${PARAM_BASE}" ]; then

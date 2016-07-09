@@ -70,6 +70,9 @@ bool IsSignal(PODSimpleAnalysisFormat const &ev){
   return !((ev.NuWroDyn != 2) || (!ev.NuWroCC) || (!ev.NuWroAnty));
 }
 
+
+
+
 int main(int argc, char const * argv[]){
   if(argc != 2){
     std::cerr << "[ERROR]: Found " << (argc-1) << " cli args. Expected 1."

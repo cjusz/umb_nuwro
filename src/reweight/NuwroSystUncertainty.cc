@@ -114,5 +114,6 @@ void NuwroSystUncertainty::SetDefaults(void){
   // RES
   SetUncertainty(kNuwro_MaRES, 0.1, 0.1); // GeV
   SetUncertainty(kNuwro_CA5, 0.1, 0.1);
+  SetUncertainty(kNuwro_SPPDISBkgScale, 0.25, 0.25);
 }
 

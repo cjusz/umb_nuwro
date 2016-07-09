@@ -38,6 +38,7 @@ typedef enum ENuWroSyst {
   // RES
   kNuwro_MaRES,
   kNuwro_CA5,
+  kNuwro_SPPDISBkgScale,
 
   // BBBA07 FF Pars
   kNuwro_BBBA07_AEp1,

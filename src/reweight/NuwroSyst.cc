@@ -76,6 +76,9 @@ std::string NuwroSyst::AsString(NuwroSyst_t syst){
   case kNuwro_CA5: {
     return "kNuwro_CA5";
   }
+  case kNuwro_SPPDISBkgScale: {
+      return "kNuwro_SPPDISBkgScale";
+  }
   default: {
     return "-";
   }

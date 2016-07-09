@@ -1,6 +1,7 @@
 //c++
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 //POSIX
 #include <sys/time.h>
@@ -10,17 +11,8 @@
 #include "TTree.h"
 #include "TCanvas.h"
 
-#ifdef ROOT6
-
-#include "Minuit2/Minuit2Minimizer.h"
-#include "Math/Functor.h"
-
-#else
-
 #include "TFitterMinuit.h"
 #include "Minuit2/FCNBase.h"
-
-#endif
 
 #include "TH1D.h"
 
@@ -30,12 +22,14 @@
 //nuwro reweighting
 #include "NuwroReWeight.h"
 #include "NuwroReWeight_MaCCQE.h"
-#include "NuwroReWeight_MaRES_CA5.h"
+#include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
 #include "NuwroSystSet.h"
 #include "RooTrackerEvent.h"
-
 #include "NuwroReWeightSimple.h"
+
+//nuwro vali
+#include "ValiPlotter.h"
 
 double get_wall_time(){
     struct timeval time;
@@ -46,14 +40,21 @@ double get_wall_time(){
     return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
+std::string num2str(int i){
+  std::stringstream ss("");
+  ss << i;
+  return ss.str();
+}
+
+std::string num2str(double i){
+  std::stringstream ss("");
+  ss << i;
+  return ss.str();
+}
+
 using namespace RooTrackerUtils;
 
-#define DEBUG_SIMPFIT
-//#define LOUD_EVAL
-
-#ifdef _OPENMP
-#define DEBUG_MULTITHREADING
-#endif
+//#define DEBUG_SIMPFIT
 
 #define PROFILE
 
@@ -63,11 +64,9 @@ static size_t const NumThreads = 4;
 static size_t const NumThreads = 1;
 #endif
 
-#ifdef ROOT6
-struct NPLLR_nwev {
-#else
+
 struct NPLLR_nwev : public ROOT::Minuit2::FCNBase {
-#endif
+
   std::vector<event> const * Events;
   std::vector<Double_t> GenWeights;
   std::vector<Double_t> mutable NominalWeights;
@@ -87,22 +86,13 @@ struct NPLLR_nwev : public ROOT::Minuit2::FCNBase {
     PlotHistos.resize(NumThreads);
     for(size_t i = 0; i < NumThreads; i++){
       PlotHistos[i] = static_cast<TH1D*>(data->Clone());
+      PlotHistos[i]->Sumw2(false);
       PlotHistos[i]->Reset();
     }
     # pragma omp parallel for
     for(size_t i = 0; i < Events->size(); ++i){
       GenWeights[i] = Events->at(i).weight/double(NInTree)*1E40;
     }
-#ifdef DEBUG_MULTITHREADING
-    std::vector<Double_t> GenWeights_mtdb;
-    GenWeights_mtdb.resize(GenWeights.size());
-    for(size_t i = 0; i < Events->size(); ++i){
-      GenWeights_mtdb[i] = Events->at(i).weight/double(NInTree)*1E40;
-    }
-    for(size_t i = 0; i < Events->size(); ++i){
-      assert(GenWeights_mtdb[i] == GenWeights[i]);
-    }
-#endif
   }
 
   Double_t CalculateTestStat() const {
@@ -112,10 +102,6 @@ struct NPLLR_nwev : public ROOT::Minuit2::FCNBase {
       Double_t DataBin = Data->GetBinContent(i);
       Double_t MCBin = PlotHistos[0]->GetBinContent(i);
       Double_t LogEVal = ((DataBin>0)&&(MCBin>0))? DataBin*log(DataBin/MCBin) : 0;
-#ifdef LOUD_EVAL
-      std::cout << "[FIT]: data = " << DataBin << ", MCBin = " << MCBin
-        << ", LogEVal " << LogEVal << std::endl;
-#endif
       LLR +=  MCBin - DataBin + LogEVal;
     }
 #ifdef DEBUG_SIMPFIT
@@ -123,17 +109,16 @@ struct NPLLR_nwev : public ROOT::Minuit2::FCNBase {
 #endif
     return LLR;
   }
-#ifdef ROOT6
-  Double_t operator() (Double_t const *x) const {
-#else
+
   Double_t operator() (std::vector<Double_t> const &x) const {
-#endif
+
     SRW::ReWeightRESEvents((*Events),x[0],x[1], Weights, NominalWeights);
 
     PlotHistos[0]->Reset();
 
     # pragma omp parallel for
     for(size_t i = 0; i < Events->size(); ++i){
+
 #ifdef _OPENMP
       PlotHistos[omp_get_thread_num()]->Fill(
 #else
@@ -146,28 +131,6 @@ struct NPLLR_nwev : public ROOT::Minuit2::FCNBase {
       PlotHistos[0]->Add(PlotHistos[i]);
       PlotHistos[i]->Reset();
     }
-
-#ifdef DEBUG_MULTITHREADING
-    TH1D* PlotHisto_mtdb = static_cast<TH1D*>(PlotHistos[0]->Clone());
-    PlotHisto_mtdb->Reset();
-    for(size_t i = 0; i < Events->size(); ++i){
-      PlotHisto_mtdb->Fill(
-        Events->at(i).out[0].momentum(), Weights[i] * GenWeights[i]);
-    }
-
-    for(size_t i = 0; i < PlotHisto_mtdb->GetNbinsX()+1; ++i){
-      if(fabs(PlotHisto_mtdb->GetBinContent(i) -
-          PlotHistos[0]->GetBinContent(i)) > 1E-8){
-        std::cout << "[ERROR]: PlotHisto_mtdb->GetBinContent(" << i << ")"
-            << " ( = " << PlotHisto_mtdb->GetBinContent(i)
-            << ") != PlotHistos[0]->GetBinContent(" << i << ")"
-            << " ( = " << PlotHistos[0]->GetBinContent(i) << std::endl;
-      }
-      assert(fabs(PlotHisto_mtdb->GetBinContent(i) -
-          PlotHistos[0]->GetBinContent(i)) < 1E-8);
-    }
-    delete PlotHisto_mtdb;
-#endif
 
     Double_t LLR = CalculateTestStat();
 #ifdef DEBUG_SIMPFIT
@@ -223,7 +186,7 @@ inline size_t NuwroEvSize(event const & ev){
 void PrintUsage(char const * rcmd){
   std::cout << "[USAGE]: " << rcmd
     << " <Fake Data parameters file> <Fake Data Nuwro RooTracker File> "
-    "<Nominal parameters file> <MC Nuwro RooTracker File> <Output File>"
+    "<Nominal parameters file> <MC Nuwro RooTracker File> <Output PDF File>"
     << std::endl;
 }
 
@@ -263,8 +226,10 @@ int main(int argc, char const *argv[]){
     return 4;
   }
 
-  TH1D *FDDistrib = new TH1D("FakeDataDistribution","",15,0,3000);
+  TH1D *FDDistrib = new TH1D("FakeDataDistribution","FakeDataDistribution",
+    15,0,3000);
   FDDistrib->SetDirectory(NULL);
+  // FDDistrib->Sumw2(true);
   if(PlotFakeData(FDRootracker,(*FDDistrib))){
     PrintUsage(argv[0]);
     return 8;
@@ -329,11 +294,6 @@ int main(int argc, char const *argv[]){
     "[INFO]: Loaded " << SignalEvents.size() << " signal events into memory."
     << std::endl;
 
-  TFile* OutFile = TFile::Open(argv[5],"RECREATE");
-  FDDistrib->SetDirectory(OutFile);
-  TCanvas * c1 = new TCanvas("FitRes","");
-  FDDistrib->Draw("");
-
   std::vector<Double_t> Weights;
   Weights.resize(SignalEvents.size());
 
@@ -341,55 +301,28 @@ int main(int argc, char const *argv[]){
 
   std::cout << "[INFO]: Attempting the fittening. " << std::endl;
   NPLLR_nwev Eval(&SignalEvents, FDDistrib, nEntries);
-#ifdef ROOT6
-  Double_t FitStart[] = {NomParams.pion_C5A, NomParams.pion_axial_mass};
-#else
+
   std::vector<Double_t> FitStart;
   FitStart.push_back(NomParams.pion_C5A);
   FitStart.push_back(NomParams.pion_axial_mass);
-#endif
+
+  // Eval.PlotHistos[0]->Sumw2(true);
   Eval(FitStart);
-  TH1D* PreFit = (TH1D*)Eval.PlotHistos[0]->Clone();
+  TH1D* PreFit = static_cast<TH1D*>(Eval.PlotHistos[0]->Clone());
+  Eval.PlotHistos[0]->Sumw2(false);
 
-  PreFit->SetDirectory(OutFile);
-  PreFit->SetLineColor(kBlue);
-  PreFit->SetNameTitle("MCPreFit","MCPreFit");
-  PreFit->Write("MCPreFit");
-  PreFit->SetDirectory(NULL);
-  PreFit->Draw("SAME");
-
-#ifdef ROOT6
-  ROOT::Minuit2::Minuit2Minimizer min ( ROOT::Minuit2::kMigrad );
-  min.SetMaxFunctionCalls(1000000);
-  min.SetMaxIterations(100000);
-  min.SetTolerance(0.001);
-
-  ROOT::Math::Functor f(Eval,2);
-
-  min.SetFunction(f);
-
-  // Set the free variables to be minimized!
-  min.SetLimitedVariable(0,"CA5",NomParams.pion_C5A,0.1,0,3.0);
-  min.SetLimitedVariable(1,"MaRES",NomParams.pion_axial_mass,0.1,0,3.0);
-#else
   TFitterMinuit * minuit = new TFitterMinuit();
   minuit->SetMinuitFCN(&Eval);
   minuit->SetPrintLevel(4);
   minuit->SetParameter(0,"CA5",FitStart[0],0.01,0,3.0);
   minuit->SetParameter(1,"MaRES",FitStart[1],0.01,0,3.0);
   minuit->CreateMinimizer();
-#endif
-
 
 #ifdef PROFILE
   Double_t wt1 = get_wall_time();
 #endif
 
-#ifdef ROOT6
-  min.Minimize();
-#else
   int iret = minuit->Minimize();
-#endif
 
 #ifdef PROFILE
   Double_t wt2 = get_wall_time();
@@ -397,40 +330,28 @@ int main(int argc, char const *argv[]){
     << (wt2-wt1) << " seconds." << std::endl;
 #endif
 
-#ifdef ROOT6
-  std::cout << "[INFO]: Nominal parameters: CA5 == " << NomParams.pion_C5A
-    << ", MaRES == " << NomParams.pion_axial_mass << std::endl;
-  min.PrintResults();
-  Eval.PlotHistos[0]->SetDirectory(OutFile);
-  OutFile->Write();
-  OutFile->Close();
-  for(size_t i = 1; i < Eval.PlotHistos.size(); ++i){
-    delete Eval.PlotHistos[i];
-  }
-#else
+  // Eval.PlotHistos[0]->Sumw2(true);
   std::vector<Double_t> BestFit;
   BestFit.push_back(minuit->GetParameter(0));
   BestFit.push_back(minuit->GetParameter(1));
   Double_t TestStat_BF = Eval(BestFit);
-  Eval.PlotHistos[0]->SetLineColor(kRed);
-  Eval.PlotHistos[0]->SetLineWidth(2);
-  Eval.PlotHistos[0]->SetLineStyle(2);
-  Eval.PlotHistos[0]->SetNameTitle("BestFitMC","BestFitMC");
-  Eval.PlotHistos[0]->Write("BestFitMC");
-  Eval.PlotHistos[0]->Draw("SAME");
+
+  TH1D* MCBestFitH = static_cast<TH1D*>(Eval.PlotHistos[0]->Clone());
   std::vector<Double_t> ActualBF;
   ActualBF.push_back(TargetParams.pion_C5A);
   ActualBF.push_back(TargetParams.pion_axial_mass);
   Double_t TestStat_ABF = Eval(ActualBF);
-  Eval.PlotHistos[0]->SetLineColor(kMagenta);
-  Eval.PlotHistos[0]->SetLineWidth(2);
-  Eval.PlotHistos[0]->SetLineStyle(2);
-  Eval.PlotHistos[0]->SetNameTitle("TrueReweightedMC","TrueReweightedMC");
-  Eval.PlotHistos[0]->Write("TrueReweightedMC");
-  Eval.PlotHistos[0]->Draw("SAME");
-  Eval.PlotHistos[0]->SetDirectory(NULL);
-  c1->BuildLegend();
-  c1->SaveAs("FitResults.pdf");
+
+  TH1D* MCTrueReWeightH = static_cast<TH1D*>(Eval.PlotHistos[0]->Clone());
+
+  Vali::PlotValiFitResults(FDDistrib, PreFit, MCBestFitH, MCTrueReWeightH,
+    "#it{p}_{#mu} (MeV/#it{c})", "#frac{d#sigma}{d#it{p}_{#mu}} (x10^{-40})",
+    std::string("C_{A}^{5} True: ") + num2str(TargetParams.pion_C5A)
+    + ", BF: " + num2str(minuit->GetParameter(0))
+    + " || M_{A}^{RES} True: " + num2str(TargetParams.pion_axial_mass)
+    + ", BF: " + num2str(minuit->GetParameter(1)),
+    argv[5]);
+
   std::cout << "[FIT RESULTS]: MC Nom: CA5 = " << NomParams.pion_C5A
     << ", FD True = " << TargetParams.pion_C5A
     << ", Fit Result = " << minuit->GetParameter(0) << std::endl;
@@ -439,17 +360,10 @@ int main(int argc, char const *argv[]){
     << ", Fit Result = " << minuit->GetParameter(1) << std::endl;
   std::cout << "[FIT RESULTS]: LLR at best fit: " << TestStat_BF
     << ", at true: " << TestStat_ABF << std::endl;
-  delete c1;
-  OutFile->Write();
-  OutFile->Close();
-  // for(size_t i = 1; i < Eval.PlotHistos.size(); ++i){
-  //   delete Eval.PlotHistos[i];
-  // }
+
   if (iret != 0) {
     std::cout << "Minimization failed - exit " ;
     return iret;
   }
-#endif
-
 
 }

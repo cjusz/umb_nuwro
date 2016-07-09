@@ -63,7 +63,7 @@ resevent2 (params & p, event & e, bool cc)
 ///////////////////////////////////////////////////////////////////
 {
   double M2 = M12 * M12;
-  bool current = cc;		//cc==true for charge current 
+  bool current = cc;		//cc==true for charge current
   int nukleon = e.in[1].pdg;
   int lepton = e.in[0].pdg;
 
@@ -71,7 +71,7 @@ resevent2 (params & p, event & e, bool cc)
   double m2 = m * m;
 
   vect nu0 = e.in[0];
-  
+
   e.weight=0;  // in case of error it is not changed
 
 
@@ -98,11 +98,11 @@ int numneu=p.nucleus_n;
 	break;
 	case 4: _E_bind = binen (ped, numpro, numneu);//effective SF
 	break;
-	case 5: _E_bind= deuter_binen (ped);//deuterium 
+	case 5: _E_bind= deuter_binen (ped);//deuterium
 	break;
 	case 6: _E_bind= p.nucleus_E_b; //deuterium like Fermi gas
 	break;
-	
+
 //in the future it is possible to add SF for other nuclei as well
 	default: _E_bind=0;
 	}
@@ -184,8 +184,12 @@ double Meff2=Meff*Meff;
 ///////////////////////////////////////////////////////////////
 //      End of selection of points in W, nu plane
 /////////////////////////////////////////////////////////////
-
+#ifdef USE_SPP_BKGSCALE
+      double fromdis = cr_sec_dis (E, W, nu, lepton, nukleon, current)*p.pion_SPPDISBkgScale;
+#else
       double fromdis = cr_sec_dis (E, W, nu, lepton, nukleon, current);
+#endif
+
 //cout<<"fromdis"<<fromdis<<endl;
       if (fromdis < 0)
 	fromdis = 0;
@@ -195,9 +199,9 @@ double Meff2=Meff*Meff;
       double cth = (E2 + kprim * kprim - q * q) / 2 / E / kprim;//final lepton
 
       vec kkprim;		//the unit vector in the direction of scattered lepton
-      if(abs(cth)>1) 
+      if(abs(cth)>1)
 		return; // e.weight=0 already
-      kinfinder (numom, kkprim, cth);	//produces kkprim 
+      kinfinder (numom, kkprim, cth);	//produces kkprim
 
       kkprim = kprim * kkprim;	//multiplied by its length
 
@@ -349,7 +353,7 @@ double Meff2=Meff*Meff;
 	  vect finnuk, finpion;
 
 	  kin2part (W, nukleon2, pion, finnuk, finpion);	//produces 4-momenta of final pair: nucleon + pion
-	  
+
 	  finnuk = finnuk.boost (hadrspeed);
 	  finnuk = finnuk.boost (nuc0.v ());
 
@@ -381,22 +385,22 @@ double Meff2=Meff*Meff;
 
 	  pythia71->SetMSTU (20, 1);	//advirsory warning for unphysical flavour switch off
 	  pythia71->SetMSTU (23, 1);	//It sets counter of errors at 0
-	  pythia71->SetMSTU (26, 0);	//no warnings printed 
+	  pythia71->SetMSTU (26, 0);	//no warnings printed
 
 	  // PARJ(32)(D=1GeV) is, with quark masses added, used to define the minimum allowable enrgy of a colour singlet parton system
 	  pythia71->SetPARJ (33, 0.1);
 
-	  // PARJ(33)-PARJ(34)(D=0.8GeV, 1.5GeV) are, with quark masses added, used to define the remaining energy below which 
+	  // PARJ(33)-PARJ(34)(D=0.8GeV, 1.5GeV) are, with quark masses added, used to define the remaining energy below which
 	  //the fragmentation of a parton system is stopped and two final hadrons formed.
 	  pythia71->SetPARJ (34, 0.5);
 	  pythia71->SetPARJ (35, 1.0);
 
-	  //PARJ(36) (D=2.0GeV) represents the dependence of the mass of final quark pair for defining the stopping point of the 
+	  //PARJ(36) (D=2.0GeV) represents the dependence of the mass of final quark pair for defining the stopping point of the
 	  //fragmentation. Strongly corlated with PARJ(33-35)
 
 	  pythia71->SetPARJ (37, 1.);	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
-	  //MSTJ(17) (D=2) number of attemps made to find two hadrons that have a combined mass below the cluster mass and thus allow 
+	  //MSTJ(17) (D=2) number of attemps made to find two hadrons that have a combined mass below the cluster mass and thus allow
 	  // a cluster to decay rather than collaps
 	  pythia71->SetMSTJ (18, 3);	//do not change
 
@@ -482,8 +486,8 @@ double Meff2=Meff*Meff;
 	  delta_spp*=pdd_red(e.in[0].t );
 	  //cout<<ennergy<<"  "<<rescale<<"  "<<delta_spp<<endl;
 	}
-//approximate implementation of pionless delta decays	
-	  
+//approximate implementation of pionless delta decays
+
 	      double spp_strength = dis_spp + delta_spp;
 //cout<<"spp "<<W<<" "<<nu<<" "<<spp_strength<<endl;
 	      e.weight = spp_strength * 1e-38 * przedzial;
@@ -523,17 +527,17 @@ double Meff2=Meff*Meff;
 		{
 		  vect finnuk, finpion;
 
-		  
+
 		  nu0.boost (-hadrspeed);//a boost from nu-N CMS to the hadronic CMS
 		  lepton_out.boost (-hadrspeed);//a boost from nu-N CMS to the hadronic CMS
 		  kin4part (nu0, lepton_out, W, nukleon2, pion, finnuk, finpion,p.delta_angular); //produces 4-momenta of final pair: nucleon + pion with density matrix information
 		  e.weight*= angrew;//reweight according to angular correlation
-		 
+
 		  //kin2part (W, nukleon2, pion, finnuk, finpion);	//produces 4-momenta of the final pair: nucleon + pion
-		  
+
 			nu0.boost (hadrspeed);//a boost back to the nu-N CMS frame
 			nu0.boost (nuc0.v ());//a boost back to tha LAB frame
-			
+
 		  lepton_out.boost (hadrspeed);//a boost back to the nu-N CMS frame
 		  lepton_out.boost (nuc0.v ());//a boost back to tha LAB frame
 
@@ -589,7 +593,7 @@ double Meff2=Meff*Meff;
 	    }
 //end of more inelastic part or single kaon production
 
-	
+
 }//end of W>1210 &&  !fromdis==0
 
  }

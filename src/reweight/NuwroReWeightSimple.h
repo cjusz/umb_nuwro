@@ -10,7 +10,7 @@
 #include "TFile.h"
 #include "TTree.h"
 
-#include "NuwroReWeight_MaRES_CA5.h"
+#include "NuwroReWeight_SPP.h"
 
 #include "SimpleAnalysisFormat.h"
 
@@ -124,7 +124,7 @@ inline void GenerateNominalRESWeights(std::vector<event> const &nwEvs,
   # pragma omp parallel for
   for(size_t i = 0; i < nwEvs.size(); ++i){
     NominalWeights[i] =
-      nuwro::rew::GetWghtPropToResXSec(nwEvs[i],nwEvs[i].par, false);
+      nuwro::rew::GetWghtPropToResXSec(nwEvs[i],nwEvs[i].par);
   }
 
 }

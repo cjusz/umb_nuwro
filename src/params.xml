@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<params> 
+<params>
   <param name="random_seed" type="text" ctype="int" default="0">
     <description>Control the random seed persistence
     0 - use time(NULL) as a seed for random number generator
@@ -87,7 +87,7 @@
   <param name="beam_test_only" type="hidden" ctype="int" default="0">
     <description></description>
   </param>
-  
+
   <param name="target_type" type="radio" ctype="int" default="0">
     <description></description>
     <conditions>
@@ -279,6 +279,10 @@
   <param name="pion_C5A" type="text" ctype="double" default="1.19">
     <description><![CDATA[]]></description>
   </param>
+  <param name="pion_SPPDISBkgScale" type="text" ctype="double" default="1.0">
+    <description><![CDATA[Factor used to scale DIS contribution to dyn = 2 &amp; 3 xsec]]></description>
+  </param>
+
   <param name="delta_angular" type="select" ctype="int" default="0">
     <description><![CDATA[Delta decay anisotropy]]></description>
     <options>
@@ -330,19 +334,19 @@
   </param>
   <param name="kaskada_writeall" type="checkbox" ctype="bool" default="0">
     <description><![CDATA[Store all intermediate FSI particles int the event::all vector]]></description>
-  </param> 
+  </param>
   <param name="formation_zone" type="select" ctype="string" default="fz">
     <description><![CDATA[Name of formation zone model]]></description>
     <options>
       <option key="fz"><![CDATA[fz - ]]></option>
-      <option key="trans"><![CDATA[trans - ]]></option>		
-      <option key="skat8"><![CDATA[skat8 - ]]></option>		
-      <option key="cohl"><![CDATA[cohl - ]]></option>		
-      <option key="cosyn"><![CDATA[cosyn - ]]></option>		
-      <option key="ranft"><![CDATA[tranft - ]]></option>		
-      <option key="rl"><![CDATA[rl - ]]></option>		
-      <option key="delta"><![CDATA[delta - ]]></option>		
-      <option key="nofz"><![CDATA[nofz - ]]></option>		
+      <option key="trans"><![CDATA[trans - ]]></option>
+      <option key="skat8"><![CDATA[skat8 - ]]></option>
+      <option key="cohl"><![CDATA[cohl - ]]></option>
+      <option key="cosyn"><![CDATA[cosyn - ]]></option>
+      <option key="ranft"><![CDATA[tranft - ]]></option>
+      <option key="rl"><![CDATA[rl - ]]></option>
+      <option key="delta"><![CDATA[delta - ]]></option>
+      <option key="nofz"><![CDATA[nofz - ]]></option>
     </options>
   </param>
   <param name="tau" type="text" ctype="double" default="8">
@@ -369,7 +373,7 @@
   </param>
   <param name="mixed_order" type="checkbox" ctype="bool" default="1">
     <description><![CDATA[random order of events in uotut file]]></description>
-  </param>  
+  </param>
 </params>
 
 <!--

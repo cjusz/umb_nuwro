@@ -5,7 +5,7 @@ set(VALI_SOURCES
   SimpleAnalysisFormat.cc
   ValiPlotter.cc)
 
-if("${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
+if(CMAKE_BUILD_TYPE MATCHES DEBUG)
   add_library(vali STATIC ${VALI_SOURCES})
 else()
   add_library(vali SHARED ${VALI_SOURCES})

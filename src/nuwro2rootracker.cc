@@ -204,9 +204,9 @@ int main (int argc, char *argv[]){
           }else{
             if(extended_mode){
               rtEv.fStdHepPdg[rtEv.fStdHepN] = NucleusPdg;
-              rtEv.fStdHepPdg[rtEv.fStdHepN] = 0;
-
+              rtEv.fStdHepStatus[rtEv.fStdHepN] = 0;
               rtEv.fStdHepN++; // fill out the rest of this entry as usual
+
               rtEv.fStdHepPdg[rtEv.fStdHepN] = in_part.pdg;
             } else { // Merge the struck nucleon and nuclear target entries
               rtEv.fStdHepPdg[rtEv.fStdHepN] = NucleusPdg; //nucleus code

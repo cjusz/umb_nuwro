@@ -7,13 +7,12 @@
 
 #include "NuwroReWeight.h"
 #include "NuwroReWeight_QEL.h"
-#include "NuwroReWeight_MaRES_CA5.h"
+#include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
 #include "NuwroSystSet.h"
 #include "RooTrackerEvent.h"
 
-
-#define TW_DEBUG
+//#define TW_DEBUG
 
 using namespace nuwro::rew;
 using namespace RooTrackerUtils;
@@ -30,10 +29,13 @@ NuwroWghtEngineI* GetWghtEngineFromDial(ENuWroSyst sys, params const &param){
       return new NuwroReWeight_QEL(param);
   
     case kNuwro_MaRES:{
-      return new NuwroReWeight_MaRES_CA5(param);
+      return new NuwroReWeight_SPP(param);
     }
     case kNuwro_CA5:{
-      return new NuwroReWeight_MaRES_CA5(param);
+      return new NuwroReWeight_SPP(param);
+    }
+    case kNuwro_SPPDISBkgScale:{
+      return new NuwroReWeight_SPP(param);
     }
     default:{
       return NULL;
@@ -48,7 +50,7 @@ NuwroWghtEngineI* GetWghtEngineFromDialString(std::string DialName,
 }
 
 void PrintDialsImplemented(){
-  NuwroReWeight_MaRES_CA5::DoSetupSPP = false;
+  NuwroReWeight_SPP::DoSetupSPP = false;
   params dummy;
   std::cout << "[INFO]: Currently implemented dials." << std::endl;
   for(ENuWroSyst sys = kNullSystematic; sys != kNNuWroSystematics;

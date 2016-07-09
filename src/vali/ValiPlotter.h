@@ -82,6 +82,17 @@ struct VarToPlot1D_2Dial : VarToPlot_2Dial  {
   VarToPlot1D_2Dial();
 };
 
+struct VarToPlot2D_2Dial : VarToPlot_2Dial  {
+  // std::string LegendTitle;
+  // double LegTextScale;
+  // double LegX1;
+  // double LegY1;
+  // double LegX2;
+  // double LegY2;
+  // VarToPlot1D_2Dial();
+};
+
+
 struct PlotData {
 
   std::string PDFOutName;

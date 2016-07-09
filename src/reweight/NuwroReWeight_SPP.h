@@ -13,15 +13,14 @@ namespace rew  {
 void SetupSPP(void);
 void SetupSPP(params & param);
 
-double GetWghtPropToResXSec(event const &nuwro_event, params const & rwparams,
-  bool RTDebug=false);
+double GetWghtPropToResXSec(event const &nuwro_event, params const & rwparams);
 
-class NuwroReWeight_MaRES_CA5 : public NuwroWghtEngineI {
+class NuwroReWeight_SPP : public NuwroWghtEngineI {
 public:
 
-  NuwroReWeight_MaRES_CA5();
-  NuwroReWeight_MaRES_CA5(params const & param);
-  ~NuwroReWeight_MaRES_CA5();
+  NuwroReWeight_SPP();
+  NuwroReWeight_SPP(params const & param);
+  ~NuwroReWeight_SPP();
 
   bool SystIsHandled(NuwroSyst_t syst);
   void SetSystematic(NuwroSyst_t syst, double val);
@@ -44,6 +43,11 @@ private:
   double fDef_CA5;
   double fCurr_CA5;
   double fError_CA5;
+
+  double fTwkDial_SPPDISBkgScale;
+  double fDef_SPPDISBkgScale;
+  double fCurr_SPPDISBkgScale;
+  double fError_SPPDISBkgScale;
 
 };
 
