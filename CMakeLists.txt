@@ -132,5 +132,3 @@ if(DEFINED ENV{PYTHIA6})
 endif()
 file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:\${LD_LIBRARY_PATH}")
 
-add_subdirectory(EunicesAnalysis)
-add_subdirectory(AzeemsAnalysis)
