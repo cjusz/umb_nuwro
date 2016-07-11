@@ -32,14 +32,14 @@ class event : public TObject {
   ///< from event to event (e.g. in case of the detector simulation)
   vector<particle> in;    ///< vector of incoming particles
   vector<particle> temp;  ///< vector of temporary particles (daughters of
-                          ///primary vertex in DIS)
+                          /// primary vertex in DIS)
   vector<particle> out;   ///< vector of outgoing particles (before fsi)
   vector<particle> post;  ///< vector of particles leaving the nucleus
   vector<particle>
       all;  ///< vector of all particles (inclluding temporary fsi particles)
 
   double weight;  ///< cross section of current event in cm^2 (set to total
-                  ///cross section on saving to file)
+                  /// cross section on saving to file)
   double norm;  ///< norm of the initial neutrino (for weighted beams; not used)
   vec r;        ///< position of the event inside the detector
   double
@@ -51,96 +51,114 @@ class event : public TObject {
             ///< 6,7 - coh  cc/nc - coherent
             ///< 8,9 - mec  cc/nc - meson exhchange current
 
-  int nod[12];  ///< number of rescattering interactions of given type:
-                ///< 0 - nucleon elastic,
-                ///< 1 - nucleon ce,
-                ///< 2 - nucleon spp,
-                ///< 3 - nucleon dpp,
-                ///< 4 - pion elastic,
-                ///< 5 - pion ce,
-                ///< 6 - pion spp,
-                ///< 7 - pion dpp,
-                ///< 8 - pion abs,
-                ///< 9 - jailed,
-                ///< 10 - escape
-                ///< 11 - pion tpp
-  int pr;       ///< number of protons  in the residual nucleus
-  int nr;       ///< number of neutrons in the residual nucleus
+  int nod[14];        ///< number of rescattering interactions of given type:
+                      ///< 0 - nucleon elastic,
+                      ///< 1 - nucleon ce,
+                      ///< 2 - nucleon spp,
+                      ///< 3 - nucleon dpp,
+                      ///< 4 - pion elastic,
+                      ///< 5 - pion ce,
+                      ///< 6 - pion spp,
+                      ///< 7 - pion dpp,
+                      ///< 8 - pion abs,
+                      ///< 9 - jailed,
+                      ///< 10 - escape
+                      ///< 11 - pion tpp
+                      ///< 12 - no pion interactions
+                      ///< 13 - no nucleon interactions
+  int pr;             ///< number of protons  in the residual nucleus
+  int nr;             ///< number of neutrons in the residual nucleus
+  double r_distance;  //< distance from nucleus center of absorption point (if
+                      //happened)
 
   event() : weight(0), norm(1) {}  ///< default constructor
   ~event() {}
-  inline void check() const;      ///< stop program if event weight or momentum of any
-                            ///particle is NaN (not a number)
+  inline void check()
+      const;                ///< stop program if event weight or momentum of any
+                            /// particle is NaN (not a number)
   inline void clear_fsi();  ///< clear the fsi intermediate particles tracks
-  inline particle nu() const;     ///< initial neutrino
-  inline particle N0() const;     ///< initial nucleon
-  inline vect q() const;          ///< fourmomentum transfer
-  inline double q0() const;       ///< energy transfer
-  inline double qv() const;       ///< momentum transfer
-  inline double q2() const;       ///< momentum transfer squared
-  inline double s() const;        ///< s - variable
+  inline particle nu() const;      ///< initial neutrino
+  inline particle N0() const;      ///< initial nucleon
+  inline vect q() const;           ///< fourmomentum transfer
+  inline double q0() const;        ///< energy transfer
+  inline double qv() const;        ///< momentum transfer
+  inline double q2() const;        ///< momentum transfer squared
+  inline double s() const;         ///< s - variable
   inline double costheta() const;  ///< cos theta lab
   inline double E() const;         ///< initial neutrino energy
-  inline int charge(
-      int r) const;  ///< total charge: 0 - initial, 1 - before fsi, 2 - after fsi
+  inline int charge(int r)
+      const;  ///< total charge: 0 - initial, 1 - before fsi, 2 - after fsi
   inline double W() const;  ///< invariant mass (before fsi, all particles
-                            ///except the rescattered lepton)
-  inline int n() const;  ///< number of particles after primery vertex (before fsi)
-  inline int f() const;  ///< number of particles leaving nucleous
+                            /// except the rescattered lepton)
+  inline int n()
+      const;  ///< number of particles after primery vertex (before fsi)
+  inline int f() const;           ///< number of particles leaving nucleous
   inline int nof(int pdg) const;  ///< number of particles after primery vertex
   inline int nof(int pdg1,
                  int pdg2) const;  ///< number of particles after primery vertex
   inline int nof(int pdg1, int pdg2,
                  int pdg3) const;  ///< number of particles after primery vertex
   inline int fof(int pdg) const;   ///< number of particles leaving nucleus
-  inline int fof(int pdg1, int pdg2) const;  ///< number of particles leaving nucleus
+  inline int fof(int pdg1,
+                 int pdg2) const;  ///< number of particles leaving nucleus
   inline int fof(int pdg1, int pdg2,
                  int pdg3) const;  ///< number of particles leaving nucleus
   inline double przod() const;
   inline double tyl() const;
   inline int number_of_nucleon_elastic() const;  ///< number of nucleon elastic
-                                           ///interactions during fsi
-  inline int
-  number_of_nucleon_ce() const;  ///< number of nucleon ce interactions during fsi
-  inline int
-  number_of_nucleon_spp() const;  ///< number of nucleon spp interactions during fsi
-  inline int
-  number_of_nucleon_dpp() const;  ///< number of nucleon dpp interactions during fsi
-  inline int
-  number_of_pion_elastic() const;  ///< number of pion elastic interactions during fsi
-  inline int
-  number_of_pion_ce() const;  ///< number of pion ce interactions during fsi
-  inline int
-  number_of_pion_spp() const;  ///< number of pion spp interactions during fsi
-  inline int
-  number_of_pion_dpp() const;  ///< number of pion dpp interactions during fsi
-  inline int
-  number_of_pion_tpp() const;  ///< number of pion tpp interactions during fsi
-  inline int number_of_pion_abs() const;  ///< number of pions absorbed during fsi
-  inline int
-  number_of_jailed() const;  ///< number of nucleons jailed in nucleous during fsi
-  inline int number_of_escape() const;  ///< number of particles that escaped from
-                                  ///nucleus during fsi
-  inline int
-  number_of_interactions() const;  ///< total number of interactions during fsi
+                                                 /// interactions during fsi
+  inline int number_of_nucleon_ce()
+      const;  ///< number of nucleon ce interactions during fsi
+  inline int number_of_nucleon_spp()
+      const;  ///< number of nucleon spp interactions during fsi
+  inline int number_of_nucleon_dpp()
+      const;  ///< number of nucleon dpp interactions during fsi
+  inline int number_of_pion_elastic()
+      const;  ///< number of pion elastic interactions during fsi
+  inline int number_of_pion_ce()
+      const;  ///< number of pion ce interactions during fsi
+  inline int number_of_pion_spp()
+      const;  ///< number of pion spp interactions during fsi
+  inline int number_of_pion_dpp()
+      const;  ///< number of pion dpp interactions during fsi
+  inline int number_of_pion_tpp()
+      const;  ///< number of pion tpp interactions during fsi
+  inline int number_of_pion_abs()
+      const;  ///< number of pions absorbed during fsi
+  inline int number_of_pion_no_interactions()
+      const;  ///< number of pion steps with no interactions
+  inline int number_of_nucleon_no_interactions()
+      const;  ///< number of nucleon steps with no interactions
+  inline double absorption_position()
+      const;  ///< positions where absorption occured
+  inline int number_of_jailed()
+      const;  ///< number of nucleons jailed in nucleous during fsi
+  inline int number_of_escape()
+      const;  ///< number of particles that escaped from
+              /// nucleus during fsi
+  inline int number_of_interactions()
+      const;  ///< total number of interactions during fsi
   inline int number_of_particles(
       int pdg, bool fsi) const;  ///< number of particles before/after fsi
-  inline double
-  nuc_kin_en() const;  ///< total kinetic energy of nucleons that left the nucleus
-  inline int num_part_thr(int pdg, bool fsi,
-                          double threshold) const;  ///< number of particles with
-                                              ///momentum above threshold
-                                              ///before/after fsi
-  inline double proton_cosine(bool fsi, double thr) const;  ///< cosine of the angle
-                                                      ///between two protons
-                                                      ///with momenta above thr
+  inline double nuc_kin_en()
+      const;  ///< total kinetic energy of nucleons that left the nucleus
+  inline int num_part_thr(
+      int pdg, bool fsi,
+      double threshold) const;  ///< number of particles with
+                                /// momentum above threshold
+  /// before/after fsi
+  inline double proton_cosine(bool fsi,
+                              double thr) const;  ///< cosine of the angle
+                                                  /// between two protons
+  /// with momenta above thr
   inline double proton_transp_mom() const;
   inline double proton_transp_mom2() const;
   inline int proton_transp() const;
   inline int proton_pair_number1(bool fsi, double thr) const;
   inline int proton_pair_number2(bool fsi, double thr) const;
-  inline double part_max_mom(int pdg,
-                             bool fsi) const;  ///< maximal momentum of particle pdg
+  inline double part_max_mom(
+      int pdg,
+      bool fsi) const;  ///< maximal momentum of particle pdg
   inline double part_sec_mom(
       int pdg, bool fsi) const;  ///< second largest momentum of particle pdg
   inline double vert_act(double pion_threshold, bool fsi,
@@ -169,7 +187,7 @@ particle event::nu() const { return in[0]; }
 particle event::N0() const { return in[1]; }
 
 /// fourmomentum transfer
-vect event::q()const  {
+vect event::q() const {
   vect q = in[0] - out[0];
   return q;
 }
@@ -208,7 +226,7 @@ int event::n() const { return out.size(); }
 int event::f() const { return post.size(); }
 
 /// number of particles with given pdg after primary vertex
-int event::nof(int pdg)const  {
+int event::nof(int pdg) const {
   int c = 0;
   for (size_t i = 0; i < out.size(); i++)
     if (out[i].pdg == pdg) c++;
@@ -335,17 +353,17 @@ double event::tyl() const {
 
 int event::number_of_nucleon_elastic() const { return nod[0]; }
 
-int event::number_of_nucleon_ce()const  { return nod[1]; }
+int event::number_of_nucleon_ce() const { return nod[1]; }
 
 int event::number_of_nucleon_spp() const { return nod[2]; }
 
 int event::number_of_nucleon_dpp() const { return nod[3]; }
 
-int event::number_of_pion_elastic()const  { return nod[4]; }
+int event::number_of_pion_elastic() const { return nod[4]; }
 
 int event::number_of_pion_ce() const { return nod[5]; }
 
-int event::number_of_pion_spp()const  { return nod[6]; }
+int event::number_of_pion_spp() const { return nod[6]; }
 
 int event::number_of_pion_dpp() const { return nod[7]; }
 
@@ -366,8 +384,14 @@ int event::number_of_interactions() const {
   return noi;
 }
 
+int event::number_of_pion_no_interactions() const { return nod[12]; }
+
+int event::number_of_nucleon_no_interactions() const { return nod[13]; }
+
+double event::absorption_position() const { return r_distance; }
+
 /// number of particles of given pdg code ( 0 - before FSI, 1 - after FSI )
-int event::number_of_particles(int pdg, bool fsi)const  {
+int event::number_of_particles(int pdg, bool fsi) const {
   int number = 0;
 
   if (fsi) {
@@ -411,7 +435,7 @@ int event::num_part_thr(int pdg, bool fsi, double threshold) const {
 }
 
 /// cosine if the angle between the two outgoing protons
-double event::proton_cosine(bool fsi, double thr)const  {
+double event::proton_cosine(bool fsi, double thr) const {
   int numer[2];
   int ile = 0;
   if (fsi) {
@@ -447,8 +471,8 @@ double event::proton_transp_mom() const {
     if (out[k].pdg == 2212) {
       for (size_t l = 0; l < post.size(); l++) {
         if (post[l].pdg == 2212) {
-          //				double kos = ( out[k].x*post[l].x +
-          //out[k].y*post[l].y + out[k].z*post[l].z
+          //        double kos = ( out[k].x*post[l].x +
+          // out[k].y*post[l].y + out[k].z*post[l].z
           //)/out[k].momentum()/post[l].momentum();
           double kos = cos(out[k], post[l]);
           if (kos > 0.999) return out[k].momentum();
@@ -485,8 +509,9 @@ int event::proton_transp() const {
     if (out[k].pdg == 2212) {
       for (size_t l = 0; l < post.size(); l++) {
         if (post[l].pdg == 2212) {
-          //					double kos = ( out[k].x*post[l].x +
-          //out[k].y*post[l].y + out[k].z*post[l].z
+          //          double kos = ( out[k].x*post[l].x
+          //+
+          // out[k].y*post[l].y + out[k].z*post[l].z
           //)/out[k].momentum()/post[l].momentum();
           double kos = cos(out[k], post[l]);
           if (kos > 0.999) ile++;

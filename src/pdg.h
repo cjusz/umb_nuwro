@@ -523,6 +523,10 @@ inline bool nucleon_or_pion(int pdg) {
   return pdg == pdg_proton or pdg == pdg_neutron or pdg == pdg_pi or
          pdg == pdg_piP or pdg == -pdg_piP;
 }
+
+inline bool pion(int pdg) {
+  return pdg == pdg_pi or pdg == pdg_piP or pdg == -pdg_piP;
+}
 };
 
 #endif

@@ -395,6 +395,9 @@
   <param name="res_dis_cut" type="text" ctype="double" default="1600">
     <description><![CDATA[res dis boundary in MeV, should be 1600]]></description>
   </param>
+  <param name="bkgrscaling" type="text" ctype="double" default="0.0">
+    <description><![CDATA[scaling of non resonant backgroung; should be in the range -1.3...+1.3]]></description>
+  </param>
   <param name="coh_mass_correction" type="checkbox" ctype="bool" default="1">
     <description><![CDATA[Rein Sehgal correction to CC coherent single pion production]]></description>
   </param>
@@ -418,8 +421,20 @@
   <param name="mec_ratio_ppp" type="text" ctype="double" default="0.8">
     <description><![CDATA[]]></description>
   </param>
+  <param name="mec_central_motion" type="text" ctype="double" default="0.0">
+    <description><![CDATA[motion of correlated pairs, sigma in gaussian distribution]]></description>
+  </param>
+   <param name="mec_back_to_back_smearing" type="text" ctype="double" default="0.0">
+    <description><![CDATA[smearing of originally back-to-back correlated pair nucleons momenta]]></description>
+  </param>
+  <param name="mec_pb_trials" type="text" ctype="int" default="25">
+    <description><![CDATA[how many times configuration satisfying Pauli blocking is searched for]]></description>
+  </param>
   <param name="MEC_pauli_blocking" type="checkbox" ctype="bool" default="1">
     <description><![CDATA[enable (1) or not (0) Pauli blocking of final nucleons in Nieves model]]></description>
+  </param>
+   <param name="MEC_cm_direction" type="checkbox" ctype="double" default="0.0">
+     <description><![CDATA[ in CM frame prefered directions along (>0.0) or perpendicular (<0.0) wrt momentum transfer; | | cannot be larger than 1]]></description>
   </param>
   <param name="kaskada_on" type="checkbox" ctype="bool" default="1">
     <description><![CDATA[use (1) or not (0) the cascade]]></description>

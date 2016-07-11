@@ -14,6 +14,11 @@ inline vec spectral_choice (int p, int n);
 inline vec deuterium ();
 inline vec rand3(vec A,double b,double c);
 inline vec rand_ort (vec a);
+inline vec rand_gauss (double sigma);
+inline double rand_gauss (double sigma, double average);
+inline vec rand_direc (vec a, double alpha);
+inline double fff (double kos, double par);
+
 //inline vec rand_ort2 (vec a);
 
 
@@ -120,12 +125,108 @@ vec rand_dir ()
   d=sqrt(d);
   return vec (xx/d, yy/d, zz/d);
 }
+
+////////////////////////////////////////////////////////////////
+/// direction of vec R such that |R|=1 with extra information
+////////////////////////////////
+/// Direction information
+double fff (double kos, double par)
+{
+  if (par>0)
+    return 1 - (1-fabs(kos))*par;
+  else
+  { //cout<<"redukcja = "<<1 + par*fabs(kos)<<endl;
+    return 1 + par*fabs(kos);
+  }
+}
+
+vec rand_direc (vec aa, double alpha)
+{
+  double spr, los;
+  vec ran;
+  double xx, yy, zz, d;
+  //int licznik=0;
+    
+  do
+  {
+    
+    do
+    {
+      xx = 2 * frandom () - 1;
+      yy = 2 * frandom () - 1;
+      zz = 2 * frandom () - 1;
+    }
+  while ((d = xx * xx + yy * yy + zz * zz) > 1 || (d<0.25));
+  
+  d=sqrt(d);
+  ran= vec (xx/d, yy/d, zz/d);
+
+    
+  double kos = ran*aa/aa.length();
+  spr = fff (kos, alpha);
+  los = frandom();
+  //cout<<"licznik ="<<licznik<<endl;
+  //licznik++;
+  }
+  while(spr<los);
+  
+  return ran;
+}
+
 ////////////////////////////////////////////////////////////////
 /// random unit vec B orthogonal to A ( |B|=1 and B*A=0 )
 vec rand_ort (vec A) 
 {				
   double phi=2*Pi*frandom();
   return vec(cos(phi),sin(phi),0).fromZto(A);
+}
+
+/// random vector from gaussian distribution; 
+vec rand_gauss (double sigma)
+{
+  double a1, a2, w, x, y, z;
+  
+  do {
+                 a1 = 2.0 * frandom() - 1.0;
+                 a2 = 2.0 * frandom() - 1.0;
+                 w = a1 * a1 + a2 * a2;
+      } while ( w >= 1.0 );
+	 
+	 w = sqrt( (-2.0 * log( w ) ) / w );
+         x = a1 * w * sigma;
+	 y = a2 * w * sigma;
+
+	 
+do {
+                 a1 = 2.0 * frandom() - 1.0;
+                 a2 = 2.0 * frandom() - 1.0;
+                 w = a1 * a1 + a2 * a2;
+      } while ( w >= 1.0 );
+	 
+	 w = sqrt( (-2.0 * log( w ) ) / w );
+         z = a1 * w * sigma;
+	 
+vec odp(x,y,z);	 
+	 
+         //y2 = x2 * w*sigma;
+	 return odp;
+}
+
+/// random number from gaussian distribution; 
+double rand_gauss (double sigma, double average)
+{
+  double x1, x2, w, y1, y2;
+  
+  do {
+                 x1 = 2.0 * frandom() - 1.0;
+                 x2 = 2.0 * frandom() - 1.0;
+                 w = x1 * x1 + x2 * x2;
+      } while ( w >= 1.0 );
+	 
+	 w = sqrt( (-2.0 * log( w ) ) / w );
+         y1 = x1 * w * sigma;
+         //y2 = x2 * w*sigma;
+	 return y1 + average;
 }
 
 ////////////////////////////////////////////////////////////////

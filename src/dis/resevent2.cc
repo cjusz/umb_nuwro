@@ -123,8 +123,6 @@ void resevent2(params &p, event &e, bool cc)
     }
   }
 
-  //_E_bind=N0.bin();
-
   // if (p.target_FG)
   //_E_bind= p.target_E_b;
   vect nuc0 = e.in[1];
