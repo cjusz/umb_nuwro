@@ -115,6 +115,9 @@ add_dependencies(event params_header)
 ROOT_GENERATE_DICTIONARY(${CMAKE_CURRENT_BINARY_DIR}/event1Dict event1.h
   LINKDEF event1LinkDef.h)
 
+set_target_properties(event PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${XTRA_CFLAGS}" )
+set_target_properties(event PROPERTIES COMPILE_FLAGS "${XTRA_LDFLAGS} ")
+
 install(TARGETS event DESTINATION lib)
 
 ########################
