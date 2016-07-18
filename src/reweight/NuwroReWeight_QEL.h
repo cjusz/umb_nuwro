@@ -31,6 +31,7 @@ public:
   double CalcWeight(SRW::SRWEvent const& nuwro_event, params const &par);
   double CalcChisq(void);
 
+  void ResetBBBA07(void);
 private:
   void Init(void);
 
@@ -53,6 +54,46 @@ private:
   double fDef_DeltaS;
   double fCurr_DeltaS;
   double fError_DeltaS;
+
+  // BBBA07 Parameters
+  double p_AEp[7];
+  double p_AMp[7];
+  double p_AEn[7];
+  double p_AMn[7];
+  double p_AAx[7];
+
+  double p_AEp_twk[7];
+  double p_AMp_twk[7];
+  double p_AEn_twk[7];
+  double p_AMn_twk[7];
+  double p_AAx_twk[7];
+
+  double p_AEp_def[7];
+  double p_AMp_def[7];
+  double p_AEn_def[7];
+  double p_AMn_def[7];
+  double p_AAx_def[7];
+
+  // 2 Comp Parameters
+  double fTwkDial_axial_2comp_alpha;
+  double fDef_axial_2comp_alpha;
+  double fCurr_axial_2comp_alpha;
+  double fError_axial_2comp_alpha;
+  
+  double fTwkDial_axial_2comp_gamma;
+  double fDef_axial_2comp_gamma;
+  double fCurr_axial_2comp_gamma;
+  double fError_axial_2comp_gamma;
+
+  double fTwkDial_axial_3comp_theta;
+  double fDef_axial_3comp_theta;
+  double fCurr_axial_3comp_theta;
+  double fError_axial_3comp_theta;
+
+  double fTwkDial_axial_3comp_beta;
+  double fDef_axial_3comp_beta;
+  double fCurr_axial_3comp_beta;
+  double fError_axial_3comp_beta;
 
 };
 

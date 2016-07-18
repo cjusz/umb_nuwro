@@ -2,7 +2,6 @@ set(REWEIGHT_SOURCES
   NuwroReWeight.cc
   NuwroReWeight_QEL.cc
   NuwroReWeight_FlagNorm.cc
-  NuwroReWeight_BBBA07.cc
   NuwroReWeight_SPP.cc
   NuwroSyst.cc
   NuwroSystSet.cc

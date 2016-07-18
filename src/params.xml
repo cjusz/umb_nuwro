@@ -298,7 +298,27 @@
     <param name="bba07_AMn7" type="text" ctype="double" default="0.7300">
       <description><![CDATA[]]></description>
     </param>
-
+    <param name="bba07_AAx1" type="text" ctype="double" default="1.0">
+      <description><![CDATA[]]></description>
+    </param>
+    <param name="bba07_AAx2" type="text" ctype="double" default="0.9958">
+      <description><![CDATA[]]></description>
+    </param>
+    <param name="bba07_AAx3" type="text" ctype="double" default="0.9877">
+      <description><![CDATA[]]></description>
+    </param>
+    <param name="bba07_AAx4" type="text" ctype="double" default="1.0193">
+      <description><![CDATA[]]></description>
+    </param>
+    <param name="bba07_AAx5" type="text" ctype="double" default="1.0350">
+      <description><![CDATA[]]></description>
+    </param>
+    <param name="bba07_AAx6" type="text" ctype="double" default="0.9164">
+      <description><![CDATA[]]></description>
+    </param>
+    <param name="bba07_AAx7" type="text" ctype="double" default="0.7300">
+      <description><![CDATA[]]></description>
+    </param>
     <param name="qel_axial_ff_set" type="select" ctype="int" default="1">
       <description></description>
       <options>
@@ -306,6 +326,8 @@
         <option key="2"><![CDATA[2-fold parabolic modification of axial FF]]></option>
         <option key="3"><![CDATA[3-fold parabolic modification of axial FF]]></option>
         <option key="4"><![CDATA[4-fold parabolic modification of axial FF]]></option>
+	<option key="5"><![CDATA[2-component axial model]]></option>
+	<option key="6"><![CDATA[3-component axial model]]></option>
       </options>
     </param>
     <param name="qel_rpa" type="select" ctype="int" default="0">
@@ -337,6 +359,18 @@
     </param>
     <param name="qel_s_axial_mass" type="text" ctype="double" default="1200">
       <description><![CDATA[[MeV] axial mass used in the strange dipole ff]]></description>
+    </param>
+    <param name="qel_axial_2comp_gamma" type="text" ctype="double" default="0.15">
+      <description><![CDATA[Gamma value in 2 component model]]></description>
+    </param>
+    <param name="qel_axial_2comp_alpha" type="text" ctype="double" default="2.0">
+      <description><![CDATA[Alpha value in 2 component model]]></description>
+    </param>
+    <param name="qel_axial_3comp_theta" type="text" ctype="double" default="0.15">
+      <description><![CDATA[Theta value in 3 component model]]></description>
+    </param>
+    <param name="qel_axial_3comp_beta" type="text" ctype="double" default="2.0">
+      <description><![CDATA[Beta value in 3 component model]]></description>
     </param>
     <param name="flux_correction" type="checkbox" ctype="bool" default="1">
       <description><![CDATA[no flux correction]]></description>

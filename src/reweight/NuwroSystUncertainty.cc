@@ -122,4 +122,10 @@ void NuwroSystUncertainty::SetDefaults(void) {
   SetUncertainty(kNuwro_MaRES, 0.1, 0.1);
   SetUncertainty(kNuwro_CA5, 0.1, 0.1);
   SetUncertainty(kNuwro_SPPBkgScale, 0.26, 0.26);
+
+  SetUncertainty(kNuwro_Axl2comp_gamma, 1.0, 1.0);
+  SetUncertainty(kNuwro_Axl2comp_alpha, 1.0, 1.0);
+  SetUncertainty(kNuwro_Axl3comp_beta, 1.0, 1.0);
+  SetUncertainty(kNuwro_Axl3comp_theta, 1.0, 1.0);
+
 }

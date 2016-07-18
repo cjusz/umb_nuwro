@@ -72,7 +72,20 @@ typedef enum ENuWroSyst {
   kNuwro_BBBA07_AMn5,
   kNuwro_BBBA07_AMn6,
   kNuwro_BBBA07_AMn7,
-  
+
+  kNuwro_BBBA07_AAx1,
+  kNuwro_BBBA07_AAx2,
+  kNuwro_BBBA07_AAx3,
+  kNuwro_BBBA07_AAx4,
+  kNuwro_BBBA07_AAx5,
+  kNuwro_BBBA07_AAx6,
+  kNuwro_BBBA07_AAx7,
+
+  kNuwro_Axl2comp_gamma,
+  kNuwro_Axl2comp_alpha,
+  kNuwro_Axl3comp_beta,
+  kNuwro_Axl3comp_theta,
+
   kNNuWroSystematics
 } NuwroSyst_t;
 

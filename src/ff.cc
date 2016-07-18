@@ -34,6 +34,13 @@ static double p_AEp[7] = {1., 0.9927, 0.9898, 0.9975, 0.9812, 0.9340, 1.};
 static double p_AMp[7] = {1., 1.0011, 0.9992, 0.9974, 1.0010, 1.0003, 1.};
 static double p_AEn[7] = {1., 1.1011, 1.1392, 1.0203, 1.1093, 1.5429, 0.9706};
 static double p_AMn[7] = {1., 0.9958, 0.9877, 1.0193, 1.0350, 0.9164, 0.7300};
+static double p_AAx[7] = {1., 0.9958, 0.9877, 1.0193, 1.0350, 0.9164, 0.7300};
+
+// 2 and 3 Component Form Factor parameters
+static double axial_ff_beta = 0.0;
+static double axial_ff_theta = 0.0;
+static double axial_ff_gamma = 0.0;
+static double axial_ff_alpha = 0.0;
 
 // strange =0 nie strange FF
 // strange =1 old implementation (recover old bahaviour)
@@ -54,6 +61,12 @@ struct FF {
 //_________________________________________________________
 /// Pointer to current vector form factors model
 static FF (*FFfromq2)(const double) = 0;
+
+
+//_________________________________________________________
+/// Pointer to current axial form factors model
+static double (*Axialfromq2)(const double, const double) = 0;
+
 
 // _________________________________________________________
 double axialcorr(int axialFF, double q2);
@@ -98,6 +111,13 @@ FF JLab_FF(const double q2);  // 4. PHYSICAL REVIEW C, VOLUME 65, 051001(R)
                               // PHYSICAL REVIEW C, VOLUME 51, 409 (1995)
 FF kg_FF(const double q2);    // 5. K. Graczyk ...
 FF npar_FF(const double q2);  // 6. nowa (1990:) parametryzacja JS z qelcc
+
+/// FA Functions
+double dipole_FA(const double q2, const double ma); // Standard dipole
+double bbba07_FA(const double q2, const double ma); // BBBA07 Form Factors
+double comp2_FA(const double q2, const double ma); // 2 Component Model
+double comp3_FA(const double q2, const double ma); // 3 Component Model
+
 
 // double axialcorr(int axialFF,double q2);
 ////////////////////////////////////////////////////////////////////////
@@ -452,6 +472,54 @@ pair<double, double> f12(double q2, int kind) {
   return ff.f12(kind);
 }
 
+
+///////////////////////////////////////////////////////////////
+// AXIAL FORM FACTOR FUNCTIONS
+
+//____________________________________
+/// Standard Dipole
+double dipole_FA(double q2, double ma){
+  return -1.267 / pow2(1 - q2 / ma / ma);
+}
+
+//____________________________________
+/// BBBA07 Dipole
+double bbba07_FA(double q2, double ma){
+  
+  double FA = dipole_FA(q2, ma);
+  double AAx = GetA(q2, p_AAx);
+  return FA* AAx;
+  
+}
+
+
+//____________________________________
+/// 2 Component Model
+double comp2_FA(double q2, double ma){
+  (void) ma; // MA Ignored for this function
+
+  double ma_axl = 1.230;
+  double gterm = 1.0 / pow2(1.0 + axial_ff_gamma * q2);
+  double aterm = (1.0 - axial_ff_alpha + \
+		  (axial_ff_alpha * (ma_axl * ma_axl) / (ma_axl*ma_axl + q2)));
+  
+  return -1.267 * gterm * aterm;
+}
+
+
+//____________________________________
+/// 3 Component model
+double comp3_FA(double q2, double ma){
+  (void) ma; // MA Ignored for this functoin
+
+  double comp2_term = comp2_FA(q2, ma);
+  double exp_term = - 1.267 * sqrt( axial_ff_theta) * axial_ff_beta * \
+    exp(axial_ff_theta + axial_ff_beta * q2);
+  
+  return comp2_term + exp_term;
+}
+
+
 ///////////////////////////////////////////////////////////////
 // Calculate the axial form factors
 pair<double, double> fap(double q2, int kind) {
@@ -461,44 +529,43 @@ pair<double, double> fap(double q2, int kind) {
   static const double MM = M12 * M12;
 
   double Ga, Fpa, Gas, Fpas;
-  double Fa = 0, Fp = 0;
+  double Fp = 0, Fa = 0;
 
-  //  std::cout<<"MA FAP FUNC "<<MA_cc<<std::endl;
-  //  std::cout<<"Factor "<<pow2 (1 - q2 / MA_cc / MA_cc)<<std::endl;
   switch (kind) {
     case 0:  // cc
 
-      Fa = -1.267 / pow2(1 - q2 / MA_cc / MA_cc);
+      Fa = Axialfromq2(q2, MA_cc); 
 
       Fa *= axialcorr(axialFFset, q2);
       Fp = 2 * MM * Fa / (piMass2 - q2);
 
       break;
     case 1:  // nc proton
-      Fa = 0.5 * -1.267 / pow2(1 - q2 / MA_nc / MA_nc);
+      Fa = 0.5 * Axialfromq2(q2, MA_nc); 
       // Fp=2.0*M2*Fa/(piMass2 - q2) ;
       break;
     case 2:  // nc neutron
-      Fa = 0.5 * 1.267 / pow2(1 - q2 / MA_nc / MA_nc);
+      Fa = -0.5 * Axialfromq2(q2, MA_nc);
       // Fp=2.0*M2*Fa/(piMass2 - q2) ;
       break;
     case 3:
     case 6:  // mec cc
-      Fa = -1.267 / pow2(1 - q2 / MA_cc_mec / MA_cc_mec);
+      Fa = Axialfromq2(q2, MA_cc_mec);
       Fa *= axialcorr(axialFFset, q2);
       Fp = 2 * MM * Fa / (piMass2 - q2);
       break;
     case 4:
     case 7:  // mec nc proton
-      Fa = 0.5 * -1.267 / pow2(1 - q2 / MA_nc_mec / MA_nc_mec);
+      Fa = 0.5 * Axialfromq2(q2, MA_nc_mec);
       // Fp=2.0*M2*Fa/(piMass2 - q2) ;
       break;
     case 5:
     case 8:  // mec nc neutron
-      Fa = 0.5 * 1.267 / pow2(1 - q2 / MA_nc_mec / MA_nc_mec);
+      Fa = -0.5 * Axialfromq2(q2, MA_nc_mec);
       // Fp=2.0*M2*Fa/(piMass2 - q2) ;
       break;
   }
+
   if ((kind == 1 or kind == 2) and strange) {
     switch (strange) {
       case 1: {
@@ -581,11 +648,8 @@ void ff_configure(params const& p) {
     default:
       throw("bad ffset");
   };
-  axialFFset = p.qel_axial_ff_set;
-  strange = p.qel_strange;
-  strangeEM = p.qel_strangeEM;
-  delta_s = p.delta_s;
 
+  // Set BBBA07 Vector Pars
   if (p.qel_vector_ff_set == 7) {
     p_AEp[0] = p.bba07_AEp1;
     p_AEp[1] = p.bba07_AEp2;
@@ -619,6 +683,45 @@ void ff_configure(params const& p) {
     p_AMn[5] = p.bba07_AMn6;
     p_AMn[6] = p.bba07_AMn7;
   }
+
+  // AXIAL FF SET
+  axialFFset = p.qel_axial_ff_set;
+  switch(axialFFset){
+  case 1:
+  case 2:
+  case 3:
+    Axialfromq2 = dipole_FA;
+    break;
+  case 4:
+    Axialfromq2 = bbba07_FA;
+    p_AAx[0] = p.bba07_AAx1;
+    p_AAx[1] = p.bba07_AAx2;
+    p_AAx[2] = p.bba07_AAx3;
+    p_AAx[3] = p.bba07_AAx4;
+    p_AAx[4] = p.bba07_AAx5;
+    p_AAx[5] = p.bba07_AAx6;
+    p_AAx[6] = p.bba07_AAx7;
+    break;
+  case 5:
+    Axialfromq2 = comp2_FA;
+    axial_ff_gamma = p.qel_axial_2comp_gamma;
+    axial_ff_alpha = p.qel_axial_2comp_alpha;
+    break;
+  case 6:
+    Axialfromq2 = comp3_FA;
+    axial_ff_gamma = p.qel_axial_2comp_gamma;
+    axial_ff_alpha = p.qel_axial_2comp_alpha;
+    axial_ff_beta = p.qel_axial_3comp_beta;
+    axial_ff_theta = p.qel_axial_3comp_theta;
+    break;
+  default:
+    throw("bad axial ffset");
+    break;
+  }
+
+  strange = p.qel_strange;
+  strangeEM = p.qel_strangeEM;
+  delta_s = p.delta_s;
 
   MA_cc = p.qel_cc_axial_mass;
   MA_nc = p.qel_nc_axial_mass;

@@ -73,7 +73,21 @@ std::string NuwroSyst::AsString(NuwroSyst_t syst){
     case kNuwro_BBBA07_AMn6: { return "kNuwro_BBBA07_AMn6"; }
     case kNuwro_BBBA07_AMn7: { return "kNuwro_BBBA07_AMn7"; }
 
+    case kNuwro_BBBA07_AAx1: { return "kNuwro_BBBA07_AAx1"; }
+    case kNuwro_BBBA07_AAx2: { return "kNuwro_BBBA07_AAx2"; }
+    case kNuwro_BBBA07_AAx3: { return "kNuwro_BBBA07_AAx3"; }
+    case kNuwro_BBBA07_AAx4: { return "kNuwro_BBBA07_AAx4"; }
+    case kNuwro_BBBA07_AAx5: { return "kNuwro_BBBA07_AAx5"; }
+    case kNuwro_BBBA07_AAx6: { return "kNuwro_BBBA07_AAx6"; }
+    case kNuwro_BBBA07_AAx7: { return "kNuwro_BBBA07_AAx7"; }
+
+    case kNuwro_Axl2comp_gamma: { return "kNuwro_Axl2comp_gamma"; }
+    case kNuwro_Axl2comp_alpha: { return "kNuwro_Axl2comp_alpha"; }
+    case kNuwro_Axl3comp_beta: { return "kNuwro_Axl3comp_beta"; }
+    case kNuwro_Axl3comp_theta: { return "kNuwro_Axl3comp_theta"; }
+
     default: { return "-"; }
+
   }
 }
 
