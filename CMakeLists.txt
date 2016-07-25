@@ -56,24 +56,41 @@ endif()
 ################################################################################
 
 ##################################  ROOT  ######################################
-if ( NOT DEFINED ENV{ROOTSYS} )
+if (NOT DEFINED ENV{ROOTSYS})
   message (FATAL_ERROR "$ROOTSYS is not defined, please set up root first.")
 endif()
 
-include ($ENV{ROOTSYS}/etc/cmake/FindROOT.cmake)
+function(GenROOTDictionary OutputDictName Header LinkDef)
 
-if ( NOT ROOT_FOUND )
-  message (FATAL_ERROR "[ROOT]: FindROOT.cmake could not be found, or did not execute as expected is ROOT installed in $ROOTSYS = $ENV{ROOTSYS}?")
-else()
-  execute_process (COMMAND root-config --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-  execute_process (COMMAND root-config --libs OUTPUT_VARIABLE ROOT_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-  execute_process (COMMAND root-config --version OUTPUT_VARIABLE ROOT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-  message ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
-  message ( STATUS "[ROOT]: root-config --cflags: " ${ROOT_CXX_FLAGS} )
-  message ( STATUS "[ROOT]: root-config --libs: " ${ROOT_LD_FLAGS} )
-endif()
+  get_directory_property(incdirs INCLUDE_DIRECTORIES)
+  string(REPLACE ";" ";-I" LISTDIRINCLUDES "-I${incdirs}")
+  string(REPLACE " " ";" LISTCPPFLAGS "${CMAKE_CXX_FLAGS}")
 
-if(${ROOT_VERSION} MATCHES "6.*")
+  #ROOT5 CINT cannot handle it.
+  list(REMOVE_ITEM LISTCPPFLAGS "-std=c++11")
+
+  message(STATUS "LISTCPPFLAGS: ${LISTCPPFLAGS}")
+  message(STATUS "LISTINCLUDES: ${LISTDIRINCLUDES}")
+  #Learn how to generate the Dict.cxx and Dict.hxx
+  add_custom_command(
+    OUTPUT "${OutputDictName}.cxx" "${OutputDictName}.h"
+    COMMAND rootcint
+    ARGS -f ${OutputDictName}.cxx -c
+    -p ${LISTDIRINCLUDES} ${LISTCPPFLAGS} ${Header} ${LinkDef}
+    )
+endfunction()
+
+message(STATUS "Added GenROOTDictionary command.")
+
+execute_process (COMMAND root-config --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND root-config --libs OUTPUT_VARIABLE ROOT_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND root-config --version OUTPUT_VARIABLE ROOT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+message ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
+message ( STATUS "[ROOT]: root-config --cflags: " ${ROOT_CXX_FLAGS} )
+message ( STATUS "[ROOT]: root-config --libs: " ${ROOT_LD_FLAGS} )
+
+
+if("${ROOT_VERSION}" MATCHES "6.*")
   set(ISROOT6 TRUE)
   message( STATUS "[ROOT]: Using ROOT 6.")
 else()
