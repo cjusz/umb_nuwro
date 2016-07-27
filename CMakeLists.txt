@@ -91,7 +91,7 @@ message ( STATUS "[ROOT]: root-config --libdir: " ${ROOT_LD_FLAGS} )
 
 set(ROOT_LD_FLAGS "-L${ROOT_LIBDIR}")
 
-if("${ROOT_VERSION}" MATCHES "6\..*")
+if("${ROOT_VERSION}" MATCHES "6\\..*")
   set(ISROOT6 TRUE)
   message( STATUS "[ROOT]: Using ROOT 6.")
 else()
