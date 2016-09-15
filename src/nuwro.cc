@@ -31,6 +31,9 @@
 #include "sfevent.h"
 #include "stdlib.h"
 #include "target_mixer.h"
+#include "beam_mixed.h"
+#include "beam_singleroothist.h"
+#include "beam_mixedroothist.h"
 
 extern double SPP[2][2][2][3][40];
 // extern double sppweight;
@@ -749,54 +752,214 @@ void NuWro::real_events(params &p) {
       }
   }
 
-  if (p.OutputEvtHistogram && dynamic_cast<beam_uniform const *>(_beam)) {
-    beam_uniform const &bh = dynamic_cast<beam_uniform const &>(*_beam);
-    if (bh.EProf().GetN()) {
-      std::cout << "[INFO]: Writing Flux and Event histograms..." << std::endl;
-      std::cout << "[INFO]: Found energy profile with " << bh.EProf().GetN()
-                << " bins between " << bh.EProf().GetEmin() << " and "
-                << bh.EProf().GetEmax() << std::endl;
+  // Save Flux and XSec Histograms
+  if (p.OutputEvtHistogram || p.beam_type == 4 || p.beam_type == 5){
+    cout << "Saving histogram" << endl;
+    ff->cd();
+    
+    int nFlux = 0;
+    vector<TH1D> FluxHist;
+    vector<int> PDGList;
 
-      TH1D *FluxHist = new TH1D("FluxHist", "FluxHist;E_{#nu} (GeV);P.D.F.",
-                                bh.EProf().GetN(), bh.EProf().GetEmin() / 1.E3,
-                                bh.EProf().GetEmax() / 1.E3);
+    // Get Flux Histograms depending on Beam Type
 
-      FluxHist->SetDirectory(ff);
+    // Uniform Flux ________________
+    if (p.beam_type == 0){
+      
+      if (dynamic_cast<beam_uniform const *>(_beam)){
+	beam_uniform const &bh = dynamic_cast<beam_uniform const &>(*_beam);
+	
+	TH1D temp_flux = bh.EProf().GetHist();
+	temp_flux.SetName( Form("FluxHist_PDG_%i",bh.GetPDG()) );
+	temp_flux.SetDirectory(ff);
+	
+	// Save Flux
+	FluxHist.push_back((TH1D)temp_flux);
+	PDGList.push_back( bh.GetPDG() );
+	
+      } else {
+	cout << "[ERROR ] : Uniform flux cast failed!" << endl;
+	throw;
+      }
+    }
+    // MIXED Flux ______________________
+    else if (p.beam_type == 1){
+      
+      // Now have a list of histograms to save
+      if (dynamic_cast<beam_mixed const *>(_beam)){
+	beam_mixed const &bh = dynamic_cast<beam_mixed const &>(*_beam);
+	
+	if (!bh.GetN()){
+	  cout << " ERROR No Beams in Mixed Hist" << endl;
+	  exit(30);
+	}
+	
+	for (int i = 0; i < bh.GetN(); i++){
+	  TH1D temp_flux = bh.GetBeam(i)->EProf().GetHist();
+	  temp_flux.SetName( Form("FluxHist_PDG_%i",bh.GetBeam(i)->GetPDG()) );
+	  
+	  // Save Flux
+	  FluxHist.push_back((TH1D)temp_flux);
+	  PDGList.push_back( bh.GetBeam(i)->GetPDG() );
+	  
+	}
+      } else {
+	cout << "[ERROR ] : Mixed flux cast failed!" << endl;
+	throw;
+      }
+    // Single ROOT HIST ____________________
+    } else if (p.beam_type == 5){
 
-      for (size_t bin = 1; bin < FluxHist->GetXaxis()->GetNbins() + 1; ++bin) {
-        FluxHist->SetBinContent(bin, bh.EProf().GetBinProb(bin - 1, false));
+      if (dynamic_cast<beam_singleroothist const *>(_beam)){
+	beam_singleroothist const &bh = dynamic_cast<beam_singleroothist const &>(*_beam);
+
+	TH1D temp_flux = bh.EProf().GetHist();
+	temp_flux.SetName( Form("FluxHist_PDG_%i",bh.GetPDG()) );
+	temp_flux.SetDirectory(ff);
+
+	// Save Flux
+	FluxHist.push_back((TH1D)temp_flux);
+	PDGList.push_back( bh.GetPDG() );
+
+      } else {
+	cout << "[ERROR ] : Singleroothist flux cast failed!" << endl;
+	throw;
+      }
+    // MIXED ROOT HIST __________
+    } else if (p.beam_type == 6){
+
+      if (!dynamic_cast<beam_mixedroothist const *>(_beam)){
+	cout << "[ERROR ] : Mixed root hist flux cast failed!" << endl;
+	throw;
+      }
+      beam_mixedroothist const &bh = dynamic_cast<beam_mixedroothist const &>(*_beam);
+
+      if (!bh.GetN()){
+	cout << " ERROR No Beams in Mixed Hist" << endl;
+	exit(30);
       }
 
-      FluxHist->Scale(1.0 / FluxHist->Integral(), "width");
+      for (int i = 0; i < bh.GetN(); i++){
 
-      TH1D *XSecHist =
-          new TH1D("XSecHist",
-                   "XSecHist;E_{#nu} (GeV);#frac{d#sigma}{dE_{#nu}} "
-                   "(cm^{2} GeV^{-1} nucleon^{-1})",
-                   bh.EProf().GetN(), bh.EProf().GetEmin() / 1.E3,
-                   bh.EProf().GetEmax() / 1.E3);
+	TH1D temp_flux = bh.GetBeam(i)->EProf().GetHist();
+	temp_flux.SetName( Form("FluxHist_PDG_%i",bh.GetBeam(i)->GetPDG()) );
 
-      TH1D *EvtHist =
-          new TH1D("EvtHist", "EvtHist;E_{#nu} (GeV);Number of Events",
-                   bh.EProf().GetN(), bh.EProf().GetEmin() / 1.E3,
-                   bh.EProf().GetEmax() / 1.E3);
-      XSecHist->SetDirectory(ff);
-      EvtHist->SetDirectory(ff);
+	// Save Flux
+	FluxHist.push_back((TH1D)temp_flux);
+	PDGList.push_back( bh.GetBeam(i)->GetPDG() );
 
-      e = new event();
-      size_t nentrs = tf->GetEntries();
-      for (size_t evt_it = 0; evt_it < nentrs; ++evt_it) {
-        tf->GetEntry(evt_it);
-        XSecHist->Fill(e->nu().t / 1.E3, e->weight / double(nentrs));
-        EvtHist->Fill(e->nu().t / 1.E3);
       }
     } else {
-      std::cout
-          << "[INFO]: Monoenergetic beam profile, no need to flux histograms."
-          << std::endl;
+      cout << "Not saving flux histograms" << endl;
     }
-  }
 
+    // Get Total Flux Integral
+    nFlux = FluxHist.size();
+    double TotalFluxIntegral = 0.0;
+    for (int i = 0; i < nFlux; i++){
+      TotalFluxIntegral += FluxHist[i].Integral("width");
+    }
+
+    // Setup Other Hists
+    vector<TH1D> XSecHist;
+    vector<TH1D> EvtHist;
+
+    for (int i = 0; i < nFlux; i++){
+
+      // Make Flux Spectrum
+      FluxHist[i].Scale(1.0 / TotalFluxIntegral );
+      FluxHist[i].SetName(Form("FluxHist_PDG_%i",PDGList[i]));
+
+      // Make XSec Container
+      XSecHist.push_back( (TH1D) FluxHist[i] );
+      XSecHist[i].SetNameTitle(Form("XSecHist_PDG_%i",PDGList[i]),
+			       "XSecHist;E_{#nu} (GeV);#frac{d#sigma}{dE_{#nu}}"
+			       "(cm^{2} GeV^{-1} nucleon^{-1})");
+      XSecHist[i].Reset();
+      XSecHist[i].SetDirectory(ff);
+
+      // Make Event Container
+      EvtHist.push_back( (TH1D) FluxHist[i] );
+      EvtHist[i].SetNameTitle(Form("EvtHist_PDG_%i",PDGList[i]),
+			      "EvtHist;E_{#nu} (GeV);Number of Events");
+      EvtHist[i].Reset();
+      EvtHist[i].SetDirectory(ff);
+
+    }
+
+    // Event Loop
+    e = new event();
+    size_t nentrs = tf->GetEntries();
+    for (size_t evt_it = 0; evt_it < nentrs; ++evt_it) {
+      tf->GetEntry(evt_it);
+      
+      // Determine PDG
+      for (int i = 0; i < nFlux; i++){
+	if (e->nu().pdg == PDGList[i]){
+
+	  XSecHist[i].Fill(e->nu().t / 1.E3, e->weight);
+	  EvtHist[i].Fill(e->nu().t / 1.E3);
+	  break;
+	}
+      }
+    }
+
+    // Apply Scaling to XSec/Event rates
+    for (int i = 0; i < FluxHist.size(); i++){
+      double AvgXSec = (XSecHist[i].Integral() * 1E38 / EvtHist[i].Integral());
+      EvtHist[i].Scale(1.0 / EvtHist[i].Integral());
+      EvtHist[i].Scale( FluxHist[i].Integral("width") * AvgXSec, "width" );
+
+      XSecHist[i].Reset();
+      XSecHist[i].Add(&EvtHist[i]);
+      XSecHist[i].Divide(&FluxHist[i]);
+    }
+
+    // Make Totals
+    TH1D FluxTotal = FluxHist[0];
+    TH1D EvtTotal  = EvtHist[0];
+    TH1D XSecTotal = EvtHist[0];
+    XSecTotal.GetYaxis()->SetTitle("XSecTotal;E_{#nu} (GeV);#frac{d#sigma}{dE_{#nu}}"
+				   "(cm^{2} GeV^{-1} nucleon^{-1})");
+    
+    // Save
+    for (int i = 0 ; i < FluxHist.size(); i++){
+      ff->cd();
+      FluxHist[i].Write();
+      EvtHist[i].Write();
+      XSecHist[i].Write();
+
+      if (i > 0){
+	FluxTotal.Add(&FluxHist[i]);
+	EvtTotal.Add(&EvtHist[i]);
+	XSecTotal.Add(&EvtHist[i]); // Add Up Events
+      }
+    }
+
+    // Make XSec Total
+    XSecTotal.Divide(&FluxTotal);
+    
+    FluxTotal.SetName("FluxHist");
+    EvtTotal.SetName("EvtHist");
+    XSecTotal.SetName("XSecHist");
+
+    ff->cd();
+    FluxTotal.Write();
+    EvtTotal.Write();
+    XSecTotal.Write();
+
+    // Clean Up
+    XSecHist.clear();
+    EvtHist.clear();
+    PDGList.clear();
+    FluxHist.clear();
+
+    cout << " Done Handling Flux " << endl;
+  } else {
+    cout << "Not saving flux histograms." << endl;
+  }
+  
+      
   ff->Write();
   ff->Close();
   _progress.close();

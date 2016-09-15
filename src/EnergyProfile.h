@@ -6,6 +6,9 @@
 #include <string>
 #include "generatormt.h"
 #include "jednostki.h"
+#include "TFile.h"
+#include "TH1.h"
+#include "dirs.h"
 
 using namespace std;
 
@@ -21,6 +24,12 @@ class EnergyProfile {
   double Emax;
   double *prob;
   double *prob2;  // for dis
+
+  TH1D* spectrum;
+  double *Elow;
+  double *Ehigh;
+  bool roothist;
+  
  public:
   ~EnergyProfile() {
     delete[] prob;
@@ -28,24 +37,32 @@ class EnergyProfile {
   }
 
   /// Beam of Zero Energy
-  EnergyProfile() : n(0), Emin(0), Emax(0), prob(NULL), prob2(NULL) {}
+ EnergyProfile() : n(0), Emin(0), Emax(0), prob(NULL), prob2(NULL), roothist(false)  {}
 
   /// Monoenergetic beam
-  EnergyProfile(double E) : n(0), Emin(E), Emax(E), prob(NULL), prob2(NULL) {}
+ EnergyProfile(double E) : n(0), Emin(E), Emax(E), prob(NULL), prob2(NULL), roothist(false) {}
 
   /// uniform probability density betweeen E1 and E2
   EnergyProfile(double E1, double E2)
-      : n(1), Emin(E1), Emax(E2), prob(NULL), prob2(NULL) {}
+    : n(1), Emin(E1), Emax(E2), prob(NULL), prob2(NULL), roothist(false) {}
 
   /// energy profile given by a histogram encoded in a string
   /// the string contains space separated values:
   /// Emin Emax b1 b2 ... bn
   /// where b1 b2 ... bn are the heightsof the bars of the histogram
   /// the widths are assumed equal to (Emax-Emin)/n
-  EnergyProfile(string s) : n(0), Emin(0), Emax(0), prob(NULL), prob2(NULL) {
+ EnergyProfile(string s) : n(0), Emin(0), Emax(0), prob(NULL), prob2(NULL), roothist(false) {
     read(s);
   }
 
+  // Energy Profile From File and histogram name
+ EnergyProfile(string f, string h) : n(0), Emin(0), Emax(0), prob(NULL), prob2(NULL), roothist(true) {
+    readHistRoot(f, h, false);
+  }
+
+  // Set the Energy Profile from a ROOT hist
+  void readHistRoot(string f, string h, bool inMEV);
+  
   /// the auxiliary helper function for parsing the string paramater to
   /// the EnergyProfile constructor
   void read(string s);
@@ -82,6 +99,8 @@ class EnergyProfile {
       return prob2[n - 1] / prob[n - 1];
   }
 
+  TH1D GetHist(bool inMEV=false) const;
+
 };  // Energy Profile class
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,17 +125,100 @@ inline void EnergyProfile::read(string s) {
   while (in >> bufor[i]) i++;
   if (i > 1) {
     n = i;
+
     prob = new double[n];
     prob2 = new double[n];
+    Elow  = new double[n];
+    Ehigh = new double[n];
+    
     double prev1 = 0, prev2 = 0;
     for (int i = 0; i < n; i++) {
+
+      Elow[i] = Emin + (i) * (Emax - Emin)/n;
+      Ehigh[i] = Emin + (i+1) * (Emax - Emin)/n;
+      double E = (Elow[i] + Ehigh[i]) / 2.0;
+	  
       prob[i] = prev1 += bufor[i];
-      prob2[i] = prev2 += bufor[i] * (Emin + (0.5 + i) * (Emax - Emin) / n);
+      prob2[i] = prev2 += bufor[i] * E;
     }
   }
   delete[] bufor;
 }
 
+// Read in a flux histogram for the spectrum
+inline void EnergyProfile::readHistRoot(string f, string h, bool inMEV){
+
+  // Initial Setup
+  if (prob) delete[] prob;
+  if (prob2) delete[] prob2;
+  prob2 = prob = NULL;
+  Emin = Emax = n = 0;
+
+  // Read in histogram
+  cout << "Opening TFile = " << f << endl;
+  TFile* infile = new TFile(f.c_str(),"READ");
+  if (infile->IsZombie()){
+    cout << "Can't find flux file in: " << f << endl;
+    cout << "Checking: " << get_data_dir() + "/beam/" + f << endl;
+
+    infile = new TFile( (get_data_dir() + "/beam/" + f).c_str(), "READ" );
+  }
+
+  // Exit if no version of file found
+  if (infile->IsZombie()){
+    cerr << "[ERROR ] : Cannot find flux input file: " << f << endl;
+    exit(30);
+  } else {
+    cout << "Opened flux succesfully!" << endl;
+  }
+
+  spectrum = (TH1D*) infile->Get(h.c_str());
+
+  // Check histogram okay
+  if (!spectrum){
+    cerr << "Cannot find histogram : " << h << endl;
+    cerr << "File Contents : " << endl;
+    infile->ls();
+    exit(30);
+  }
+
+  // Get Histogram
+  spectrum->SetDirectory(0);
+
+  double scaleF = 1.0;
+  if (inMEV) scaleF = MeV;
+  else scaleF = GeV;
+
+  Emin = spectrum->GetXaxis()->GetXmin() * scaleF;
+  Emax = spectrum->GetXaxis()->GetXmax() * scaleF;
+
+  n = spectrum->GetNbinsX();
+
+  prob  = new double[n];
+  prob2 = new double[n];
+  Elow  = new double[n];
+  Ehigh = new double[n];
+
+  double prev1 = 0;
+  double prev2 = 0;
+
+  for (int i = 0; i < n; i++){
+
+    double E = spectrum->GetXaxis()->GetBinCenter(i+1) * scaleF;
+    Elow[i]  = spectrum->GetXaxis()->GetBinLowEdge(i+1) * scaleF;
+    Ehigh[i] = spectrum->GetXaxis()->GetBinLowEdge(i+2) * scaleF;
+
+    prob[i]  = prev1 += spectrum->GetBinContent(i+1);
+    prob2[i] = prev2 += spectrum->GetBinContent(i+1) * E;
+
+  }
+
+  // Close Shop
+  infile->Close();
+}
+
+
+  
 /// yield a random number with the probability profile
 /// specified by the constructor parameters
 inline double EnergyProfile::shoot(bool dis) {
@@ -132,13 +234,14 @@ inline double EnergyProfile::shoot(bool dis) {
     else
       i = s + 1;
   }
+
   double z = frandom();
   if (dis) {
-    double a = Emin + i * (Emax - Emin) / n;
-    double b = a + (Emax - Emin) / n;
+    double a = Elow[i];
+    double b = Ehigh[i];      
     return sqrt(a * a + z * (b * b - a * a));
   }
-  return Emin + (i + z) * (Emax - Emin) / n;
+  return Elow[i] + z * (Ehigh[i] - Elow[i]);
 }
 
 /// diagnostic function for verifying if the beam
@@ -153,6 +256,42 @@ inline void EnergyProfile::print() {
 }
 
 inline double EnergyProfile::minE() { return Emin; }
+
+inline TH1D EnergyProfile::GetHist(bool inMEV) const{
+
+  // If not using root
+  if (!roothist){
+    TH1D temp_flux;
+
+    // Make Histogram
+    if (inMEV){
+      temp_flux =  TH1D("FluxHist", "FluxHist;E_{#nu} (MeV);Flux",
+			n,
+			Emin ,
+			Emax);
+    } else {
+      temp_flux=  TH1D("FluxHist", "FluxHist;E_{#nu} (GeV);Flux",
+		       n,
+		       Emin / 1.E3 ,
+		       Emax / 1.E3);
+    }
+
+    // Fill Hist
+    for (size_t bin = 1; bin < temp_flux.GetXaxis()->GetNbins() + 1; ++bin) {
+      temp_flux.SetBinContent(bin, GetBinProb(bin - 1, false));
+    }
+
+    return temp_flux;
+
+  } else {
+
+    // Assumes GeV
+    TH1D temp_flux = *spectrum;
+    temp_flux.SetNameTitle("FluxHist", "FluxHist;E_{#nu} (GeV);Flux");
+
+    return temp_flux;
+  }
+}
 ////////////////////////////////////////////////////////////////////////////////
 ///        END OF  I M P L E M E N T A I O N
 ////////////////////////////////////////////////////////////////////////////////

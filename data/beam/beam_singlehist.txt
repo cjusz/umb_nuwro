@@ -1,0 +1,4 @@
+beam_type = 5
+beam_particle = 14
+beam_inputroot = /path/to/root/file.root
+beam_inputroot_flux = hist_name

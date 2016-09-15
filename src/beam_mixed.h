@@ -69,6 +69,15 @@ public:
        i++;
      return beams[i]->shoot(dis);
    }
+
+   // Get N Beams
+   int GetN() const {return n;};
+
+   // Get Beam i
+   beam_uniform* GetBeam(int i) const {return beams[i];};
+   
+   // Get Beam Weight
+   double GetRatio(int i) const {return w1[i];};
    
 };
 #endif // _beam_mixed_h_

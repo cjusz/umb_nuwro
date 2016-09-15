@@ -1,0 +1,12 @@
+# List multiple histograms from a single file
+# Leave given pdg entries blank if you don't want that part.
+# Relative composition is judged from the histogram integrals
+# so they can't just be the shape spectrum
+beam_type = 6
+beam_inputroot = miniboone_flux_rhc.root
+beam_inputroot_nue   = 
+beam_inputroot_nueb  = 
+beam_inputroot_numu  = mb_rhc_numu
+beam_inputroot_numub = mb_rhc_numub
+beam_inputroot_nutau   = 
+beam_inputroot_nutaub  = 

@@ -1,5 +1,5 @@
-#ifndef _beam_uniform_h_
-#define _beam_uniform_h_
+#ifndef _beam_singleroothist_h_
+#define _beam_singleroothist_h_
 #include "EnergyProfile.h"
 #include "params.h"
 #include "particle.h"
@@ -13,7 +13,7 @@
 /// its energy, direction and its PDG code to the constructor
 /// of the beam class
 
-class beam_uniform : public beam
+class beam_singleroothist : public beam
 {
 protected:
    EnergyProfile g;
@@ -21,14 +21,8 @@ protected:
    int pdg;
    double mass;
 public:
-   beam_uniform(params& p):g(p.beam_energy),dir(p.beam_direction.dir()),pdg(p.beam_particle), mass(PDG::mass(p.beam_particle))
+ beam_singleroothist(params& p):g(p.beam_inputroot,p.beam_inputroot_flux),dir(p.beam_direction.dir()),pdg(p.beam_particle), mass(PDG::mass(p.beam_particle))
    {
-     if (p.beam_type == 0){
-       g = EnergyProfile(p.beam_energy);
-     } else if (p.beam_type == 5){
-       g = EnergyProfile(p.beam_inputroot,p.beam_inputroot_flux);
-     }
-     
    }
    /// get next particle form the beam
    virtual particle shoot(bool dis=0)
@@ -49,8 +43,8 @@ public:
 	   if (g.minE() < mass) throw "energy can't be lower than particle mass!";
    }
 
-   EnergyProfile const & EProf() const { return g; }
-
    int GetPDG() const { return pdg; }
+   
+   EnergyProfile const & EProf() const { return g; }
 };
-#endif // _beam_uniform_h_
+#endif // _beam_singleroothist_h_
