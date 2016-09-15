@@ -1,0 +1,4 @@
+beam_type = 5
+beam_particle = 14
+beam_inputroot = miniboone_flux_fhc.root
+beam_inputroot_flux = mb_fhc_numu
