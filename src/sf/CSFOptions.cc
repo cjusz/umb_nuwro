@@ -133,7 +133,10 @@ double CSFOptions::evalLH(const double q4til2,
 	if (true) // neutrino scattering 
 	{
 		double f1,f2,fa,fp;
+		f1 = f2 = fa = fp = 0.0;
 		double f1x,f2x,fax,fpx;
+		f1x = f2x = fax = fpx= 0.0;
+		
 		if(m_qel_new!=1)
 		{
 		const double ge=FFGE(q4til2);
@@ -245,7 +248,9 @@ double CSFOptions::evalLHnc(const double q4til2,
     //cout<<ge<< '\t'<<gm<<endl;
     //cout<<gex<< '\t'<<gmx<<endl<<endl;
     double f1,f2,fa,fp;
+    f1 = f2 = fa = fp = 0.0;
     double f1x,f2x,fax,fpx;
+    f1x = f2x = fax = fpx = 0.0;
 	if(m_qel_new!=1)
 	{
 		const double ge=0.5*sign*FFGE(q4til2)-2*sin2thetaW*(m_proton?FFGEp(q4til2):FFGEn(q4til2));/// - 0.5*GEs(q4til2);
