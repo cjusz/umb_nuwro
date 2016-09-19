@@ -352,6 +352,49 @@
     <param name="bba07_AAx7" type="text" ctype="double" default="0.7300">
       <description><![CDATA[]]></description>
     </param>
+    <!-- ZEXPANSION PARAMETERS -->
+    <param name="zexp_nterms" type="text" ctype="int" default="4">
+      <description><![CDATA[N Coefficients in z-expansion]]></description>
+    </param>
+    <param name="zexp_tc" type="text" ctype="double" default="0.1764">
+      <description><![CDATA[tcut in z-expansion]]></description>
+    </param>
+    <param name="zexp_t0" type="text" ctype="double" default="-0.280">
+      <description><![CDATA[t0 in z-expansion]]></description>
+    </param>
+    <param name="zexp_a0" type="text" ctype="double" default="0.00">
+      <description><![CDATA[A co-efficient 0 in z-expansion, do not change!]]></description>
+    </param>
+    <param name="zexp_a1" type="text" ctype="double" default="2.30">
+      <description><![CDATA[A co-efficient 1 in z-expansion]]></description>
+    </param>
+    <param name="zexp_a2" type="text" ctype="double" default="-0.6">
+      <description><![CDATA[A co-efficient 2 in z-expansion]]></description>
+    </param>
+    <param name="zexp_a3" type="text" ctype="double" default="-3.8">
+      <description><![CDATA[A co-efficient 3 in z-expansion]]></description>
+    </param>
+    <param name="zexp_a4" type="text" ctype="double" default="2.3">
+      <description><![CDATA[A co-efficient 4 in z-expansion]]></description>
+    </param>
+    <param name="zexp_a5" type="text" ctype="double" default="0.00">
+      <description><![CDATA[A co-efficient 5 in z-expansion]]></description>
+    </param>
+    <param name="zexp_a6" type="text" ctype="double" default="0.00">
+      <description><![CDATA[A co-efficient 6 in z-expansion]]></description>
+    </param>
+    <param name="zexp_a7" type="text" ctype="double" default="0.00">
+      <description><![CDATA[A co-efficient 7 in z-expansion]]></description>
+    </param>
+    <param name="zexp_a8" type="text" ctype="double" default="0.00">
+      <description><![CDATA[A co-efficient 8 in z-expansion]]></description>
+    </param>
+    <param name="zexp_a9" type="text" ctype="double" default="0.00">
+      <description><![CDATA[A co-efficient 9 in z-expansion]]></description>
+    </param>
+    <param name="zexp_q4limit" type="text" ctype="int" default="1">
+      <description><![CDATA[Apply Q4 Limit in z-expansion]]></description>
+    </param>
     <param name="qel_axial_ff_set" type="select" ctype="int" default="1">
       <description></description>
       <options>
@@ -361,6 +404,7 @@
         <option key="4"><![CDATA[4-fold parabolic modification of axial FF]]></option>
 	<option key="5"><![CDATA[2-component axial model]]></option>
 	<option key="6"><![CDATA[3-component axial model]]></option>
+	<option key="7"><![CDATA[Z-expanion model]]></option>
       </options>
     </param>
     <param name="qel_rpa" type="select" ctype="int" default="0">

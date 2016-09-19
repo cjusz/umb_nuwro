@@ -117,7 +117,7 @@ double dipole_FA(const double q2, const double ma); // Standard dipole
 double bbba07_FA(const double q2, const double ma); // BBBA07 Form Factors
 double comp2_FA(const double q2, const double ma); // 2 Component Model
 double comp3_FA(const double q2, const double ma); // 3 Component Model
-
+double zexp_FA(const double q2, const double ma); // Z-expansion Model   
 
 // double axialcorr(int axialFF,double q2);
 ////////////////////////////////////////////////////////////////////////
@@ -510,7 +510,7 @@ double comp2_FA(double q2, double ma){
 //____________________________________
 /// 3 Component model
 double comp3_FA(double q2, double ma){
-  (void) ma; // MA Ignored for this functoin
+  (void) ma; // MA Ignored for this function
 
   double comp2_term = comp2_FA(q2, ma);
   double exp_term = - 1.267 * sqrt( axial_ff_theta) * axial_ff_beta * \
@@ -519,6 +519,184 @@ double comp3_FA(double q2, double ma){
   return comp2_term + exp_term;
 }
 
+
+
+//____________________________________
+/// Z Expansion Model
+
+static const int kmax = 15;
+static double zexp_aterms[15];
+static int zexp_nterms;
+static bool zexp_q4limit;
+static double zexp_tc;
+static double zexp_t0;
+
+double zexp_GetZ(double q2){
+
+  // T Cut
+  double num = sqrt(zexp_tc - q2) - sqrt(zexp_tc - zexp_t0);
+  double den = sqrt(zexp_tc - q2) + sqrt(zexp_tc - zexp_t0);
+
+  return num/den;
+}
+
+void PrintZExpTerms(bool showFA){
+
+  cout << " ZEXP State! " << endl;
+  cout << " ------------------" << endl;
+  cout << " T0 = " << zexp_t0 << endl;
+  cout << " TC = " << zexp_tc << endl;
+
+  int ncount = zexp_nterms;
+  if (zexp_q4limit > 0) ncount += 4;
+  for (int i = 0; i <= ncount; i++){
+    cout << "ZEXP A" << i << " = " << zexp_aterms[i] << endl;
+  }
+
+  if (showFA){
+    cout << " FA Values " << endl;
+    cout << " FAZ(0.00) = " << zexp_FA(0.00,0.0) << endl;
+    cout << " FAZ(0.25) = " << zexp_FA(0.25,0.0) << endl;
+    cout << " FAZ(0.50) = " << zexp_FA(0.50,0.0) << endl;
+    cout << " FAZ(0.75) = " << zexp_FA(0.75,0.0) << endl;
+    cout << " FAZ(1.00) = " << zexp_FA(1.00,0.0) << endl;
+    cout << " FAZ(1.50) = " << zexp_FA(1.50,0.0) << endl;
+    cout << " FAZ(2.00) = " << zexp_FA(2.00,0.0) << endl;
+    cout << " FAZ(3.00) = " << zexp_FA(3.00,0.0) << endl;
+  }
+}
+
+double zexp_FA(double q2, double ma){
+  (void) ma; // MA Ignored for this function
+  
+  // Read Params
+  q2 = -fabs(q2);
+
+  // Calculate z
+  double z = zexp_GetZ(q2);
+  double FA = 0.0;
+
+  int ncount = zexp_nterms;
+  if (zexp_q4limit > 0) ncount += 4;
+
+  for (int i = 0; i <= ncount; i++){
+    FA += pow(z,i) * zexp_aterms[i];
+  }
+
+  return FA;
+}
+
+
+void zexp_applysumrules(){
+  //  cout << " ZEXP: Applying Sum Rules" << endl;
+  //  PrintZExpTerms(false);
+
+  // The Code below is from private correspondence
+  // with Aaron Meyer on the calculation of sum Rules.
+  // - P. Stowell
+
+  // Gives the Q^-4 format at high Q^2
+  double k0 = (double)zexp_nterms;
+  double z0 = zexp_GetZ(0.0);
+
+  double k1 = (double)zexp_nterms+1;
+  double z1 = pow(z0, (int)k1);
+
+  double k2 = (double)zexp_nterms+2;
+  double z2 = pow(z0, (int)k2);
+
+  double k3 = (double)zexp_nterms+3;
+  double z3 = pow(z0, (int)k3);
+
+  double k4 = (double)zexp_nterms+4;
+  double z4 = pow(z0, (int)k4);
+
+  // Get Delta (z shifts through terms)
+  double del =  6.0
+    - 1.0 * k4 * k3 * k2 * z1
+    + 3.0 * k4 * k3 * z2 * k1
+    - 3.0 * k4 * z3 * k2 * k1
+    + 1.0 * z4 * k3 * k2 * k1;
+
+  // Setup Starting Parameters
+  double b0  = 0.0;
+  double b1  = 0.0;
+  double b2  = 0.0;
+  double b3  = 0.0;
+  double b0z = 1.267;
+
+  for (int ki = 1;ki <= zexp_nterms;ki++){
+    b0 += zexp_aterms[ki];
+    b1 += ki * zexp_aterms[ki];
+    b2 += ki * (ki - 1) * zexp_aterms[ki];
+    b3 += ki * (ki - 1) * (ki - 2) * zexp_aterms[ki];
+
+    b0z += zexp_aterms[ki]*pow(z0,ki);
+  }
+
+  // A0
+  zexp_aterms[0] =
+    (- 6.*b0z - b0*(del-6.) + b3*(-z1 + 3.*z2 - 3.*z3 + z4)
+     + b2 * (3.*k2*z1 - 3.*(3.*k0+5.)*z2 + 3.*(3.*k0+4.)*z3 - 3.*k1*z4)
+     + b1 * (-3.*k3*k2*z1 + 3.*k3*(3.*k0+4.)*z2
+	     -3.*k1*(3.*k0+8.)*z3 + 3.*k2*k1*z4) ) / (del);
+
+  // A1
+  zexp_aterms[(int)k1] =                        \
+    (- (b0-b0z)*k4*k3*k2                                \
+     + b3*(1. - 0.5*k4*k3*z2 + k4*k2*z3 - 0.5*k3*k2*z4) \
+     + b2*(-3.*k2 + k4*k3*k2*z2                         \
+	   - k4*k2*(2.*k0+3.)*z3 + k3*k2*k1*z4)         \
+     + b1*(3.*k3*k2 - 0.5*k4*k3*k3*k2*z2                \
+	   + k4*k3*k2*k1*z3 - 0.5*k3*k2*k2*k1*z4)       \
+     ) / (del) ;
+
+  // A2
+  zexp_aterms[(int)k2] =
+    ( + 3.*(b0-b0z)*k4*k3*k1                                    \
+      + b3*(-3. + 0.5*k4*k3*z1 - (3./2.)*k4*k1*z3 + k3*k1*z4)   \
+      + b2*(3.*(3.*k0+5) - k4*k3*k2*z1 + 3*k4*k1*k1*z3          \
+	    - k3*k1*(2.*k0+1.)*z4)                              \
+      + b1*(-3.*k3*(3.*k0+4.) + 0.5*k4*k3*k3*k2*z1              \
+	    -(3./2.)*k4*k3*k1*k0*z3 + k3*k2*k1*k0*z4)           \
+      ) / (del);
+
+  // A3
+  zexp_aterms[(int)k3] =                                       \
+    (- 3.*(b0-b0z)*k4*k2*k1                                    \
+     + b3*(3. - k4*k2*z1 + (3./2.)*k4*k1*z2 - 0.5*k2*k1*z4)   \
+     + b2*(-3.*(3.*k0+4.) + k4*k2*(2.*k0+3.)*z1               \
+	   - 3.*k4*k1*k1*z2 + k2*k1*k0*z4)                    \
+     + b1*(3.*k1*(3.*k0+8.) - k4*k3*k2*k1*z1                  \
+	   +(3./2.)*k4*k3*k1*k0*z2 - (1./2.)*k2*k1*k1*k0*z4)  \
+     ) / (del);
+
+  // A4
+  zexp_aterms[(int)k4] =                                      \
+    ( + (b0-b0z)*k3*k2*k1                                     \
+      + b3*(-1. + (1./2.)*k3*k2*z1 - k3*k1*z2 + 0.5*k2*k1*z3) \
+      + b2*(3.*k1 - k3*k2*k1*z1 + k3*k1*(2.*k0+1.)*z2         \
+	    - k2*k1*k0*z3)                                    \
+      + b1*(-3.*k2*k1 + 0.5*k3*k2*k2*k1*z1                    \
+	    -k3*k2*k1*k0*z2 + 0.5*k2*k1*k1*k0*z3)             \
+      ) / (del);
+
+
+  return;
+}
+
+void zexp_applyq0limit(){
+
+  double z = zexp_GetZ(0.0);
+  double FA = 0.0;
+
+  for (int i = 1; i <= zexp_nterms; i++){
+    FA = FA + pow(z, i)* zexp_aterms[i];
+  }
+  zexp_aterms[0]= -1.267 - FA;
+
+  return;
+}
 
 ///////////////////////////////////////////////////////////////
 // Calculate the axial form factors
@@ -714,6 +892,40 @@ void ff_configure(params const& p) {
     axial_ff_beta = p.qel_axial_3comp_beta;
     axial_ff_theta = p.qel_axial_3comp_theta;
     break;
+  case 7:
+    // ZEXPANSION
+    Axialfromq2 = zexp_FA;
+    
+    // Truncate at 10 terms
+    zexp_nterms = p.zexp_nterms;
+    if (zexp_nterms > 10)
+      zexp_nterms = 10;
+
+    // Get T values
+    zexp_tc = p.zexp_tc;
+    zexp_t0 = p.zexp_t0;
+    
+    // Get Terms
+    zexp_aterms[0] = p.zexp_a0;
+    zexp_aterms[1] = p.zexp_a1;
+    zexp_aterms[2] = p.zexp_a2;
+    zexp_aterms[3] = p.zexp_a3;
+    zexp_aterms[4] = p.zexp_a4;
+    zexp_aterms[5] = p.zexp_a5;
+    zexp_aterms[6] = p.zexp_a6;
+    zexp_aterms[7] = p.zexp_a7;
+    zexp_aterms[8] = p.zexp_a8;
+    zexp_aterms[9] = p.zexp_a9;
+
+    // Set Limits
+    zexp_q4limit = bool(p.zexp_q4limit);
+    if (zexp_q4limit) zexp_applysumrules();
+    else zexp_applyq0limit();
+
+    //    PrintZExpTerms(true);
+    //    sleep(5);
+    break;
+    
   default:
     throw("bad axial ffset");
     break;

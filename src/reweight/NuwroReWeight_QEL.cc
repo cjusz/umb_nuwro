@@ -49,6 +49,9 @@ NuwroReWeight_QEL::NuwroReWeight_QEL() {
   fDef_axial_3comp_beta = 2.0;
   fCurr_axial_3comp_beta = fTwkDial_axial_3comp_beta;
 
+  fDef_AxlFFQEL = -1;
+  fTwk_AxlFFQEL = fDef_AxlFFQEL;
+  
   // Sort many BBBA07FF dials
   ResetBBBA07();
 
@@ -89,6 +92,9 @@ NuwroReWeight_QEL::NuwroReWeight_QEL(params const &param) {
   fDef_axial_3comp_beta = param.qel_axial_3comp_beta;
   fCurr_axial_3comp_beta = fTwkDial_axial_3comp_beta;
 
+  fDef_AxlFFQEL = -1;
+  fTwk_AxlFFQEL = fDef_AxlFFQEL;
+
 }
 
 NuwroReWeight_QEL::~NuwroReWeight_QEL() {}
@@ -128,6 +134,28 @@ bool NuwroReWeight_QEL::SystIsHandled(NuwroSyst_t syst) {
     case kNuwro_Axl3comp_beta:{
       return true;
     }
+      
+    case kNuwro_AxlFFQEL:{
+      return true;
+    }
+
+    case kNuwro_AxlZexp_TC:
+    case kNuwro_AxlZexp_T0:
+    case kNuwro_AxlZexp_NTerms:
+    case kNuwro_AxlZexp_Q4Limit:
+    case kNuwro_AxlZexp_A0:
+    case kNuwro_AxlZexp_A1:
+    case kNuwro_AxlZexp_A2:
+    case kNuwro_AxlZexp_A3:
+    case kNuwro_AxlZexp_A4:
+    case kNuwro_AxlZexp_A5:
+    case kNuwro_AxlZexp_A6:
+    case kNuwro_AxlZexp_A7:
+    case kNuwro_AxlZexp_A8:
+    case kNuwro_AxlZexp_A9:
+      return true;
+      break;
+      
     default: { return false; }
   }
 }
@@ -158,44 +186,82 @@ void NuwroReWeight_QEL::SetSystematic(NuwroSyst_t syst, double val) {
     fTwkDial_axial_3comp_beta = val;
   }
   
-  
+  // Zexpansion
+  if (syst == kNuwro_AxlZexp_TC){
+    fTwk_zexp_TC = val;
+  }
+  if (syst == kNuwro_AxlZexp_T0){
+    fTwk_zexp_T0 = val;
+  }
+  if (syst == kNuwro_AxlZexp_NTerms){
+    fTwk_zexp_NTerms = int(val);
+  }
+  if (syst == kNuwro_AxlZexp_Q4Limit){
+    fTwk_zexp_Q4Limit = bool(val);
+  }
+
+  for (int i = 0; i < 10; i++){
+    if (syst == kNuwro_AxlZexp_A1 + i){
+      fTwk_zexp_A[i] = val;
+      return;
+    }
+  }
+
+  // BBBA07 Terms
  for (int i = 0; i < 7; i++) {
-    if (syst == kNuwro_BBBA07_AEp1 + i) {
-      p_AEp_twk[i] = val;
-      return;
-    }
-  }
+   if (syst == kNuwro_BBBA07_AEp1 + i){
+     p_AEp_twk[i] = val;
+     return;
+   }   
+   if (syst == kNuwro_BBBA07_AMp1 + i) {
+     p_AMp_twk[i] = val;
+     return;
+   }
+   if (syst == kNuwro_BBBA07_AEn1 + i) {
+     p_AEn_twk[i] = val;
+     return;
+   }
+   if (syst == kNuwro_BBBA07_AMn1 + i) {
+     p_AMn_twk[i] = val;
+     return;
+   }
+   if (syst == kNuwro_BBBA07_AAx1 + i) {
+     p_AAx_twk[i] = val;
+     return;
+   }
+ }
 
-  for (int i = 0; i < 7; i++) {
-    if (syst == kNuwro_BBBA07_AMp1 + i) {
-      p_AMp_twk[i] = val;
-      return;
-    }
-  }
-
-  for (int i = 0; i < 7; i++) {
-    if (syst == kNuwro_BBBA07_AEn1 + i) {
-      p_AEn_twk[i] = val;
-      return;
-    }
-  }
-
-  for (int i = 0; i < 7; i++) {
-    if (syst == kNuwro_BBBA07_AMn1 + i) {
-      p_AMn_twk[i] = val;
-      return;
-    }
-  }
-  
-  for (int i = 0; i < 7; i++) {
-    if (syst == kNuwro_BBBA07_AAx1 + i) {
-      p_AAx_twk[i] = val;
-      return;
-    }
-  }
+ return;
 }
 
 double NuwroReWeight_QEL::GetSystematic(NuwroSyst_t syst) {
+
+  // Return BBBA07
+  for (int i = 0; i < 7; i++) {
+    if (syst == kNuwro_BBBA07_AEp1 + i){
+      return p_AEp_twk[i];
+    }
+    if (syst == kNuwro_BBBA07_AMp1 + i) {
+      return p_AMp_twk[i];
+    }
+    if (syst == kNuwro_BBBA07_AEn1 + i) {
+      return p_AEn_twk[i];
+    }
+    if (syst == kNuwro_BBBA07_AMn1 + i) {
+      return p_AMn_twk[i];
+    }
+    if (syst == kNuwro_BBBA07_AAx1 + i) {
+      return p_AAx_twk[i];
+    }
+  }
+  
+  // Return Zexp
+  for (int i = 0; i < 10; i++){
+    if (syst == kNuwro_AxlZexp_A1 + i){
+      return fTwk_zexp_A[i];
+    }
+  }
+
   switch (syst) {
     case kNuwro_Ma_CCQE: {
       return fTwkDial_MaCCQE;
@@ -221,12 +287,52 @@ double NuwroReWeight_QEL::GetSystematic(NuwroSyst_t syst) {
     case kNuwro_Axl3comp_theta: {
       return fTwkDial_axial_3comp_theta;
     }
+    case kNuwro_AxlZexp_TC: {
+      return fTwk_zexp_TC;
+    }
+    case kNuwro_AxlZexp_T0: {
+      return fTwk_zexp_T0;
+    }
+    case kNuwro_AxlZexp_NTerms: {
+      return fTwk_zexp_NTerms;
+    }
+    case kNuwro_AxlZexp_Q4Limit: {
+      return fTwk_zexp_Q4Limit;
+    }
     default: { throw syst; }
   }
+  
   return 0xdeadbeef;
 }
 
 double NuwroReWeight_QEL::GetSystematicValue(NuwroSyst_t syst) {
+
+  // Return BBBA07
+  for (int i = 0; i < 7; i++) {
+    if (syst == kNuwro_BBBA07_AEp1 + i){
+      return p_AEp[i];
+    }
+    if (syst == kNuwro_BBBA07_AMp1 + i) {
+      return p_AMp[i];
+    }
+    if (syst == kNuwro_BBBA07_AEn1 + i) {
+      return p_AEn[i];
+    }
+    if (syst == kNuwro_BBBA07_AMn1 + i) {
+      return p_AMn[i];
+    }
+    if (syst == kNuwro_BBBA07_AAx1 + i) {
+      return p_AAx[i];
+    }
+  }
+
+  // Return Zexp
+  for (int i = 0; i < 10; i++){
+    if (syst == kNuwro_AxlZexp_A1 + i){
+      return fCur_zexp_A[i];
+    }
+  }
+  
   switch (syst) {
     case kNuwro_Ma_CCQE: {
       return fCurr_MaCCQE;
@@ -254,6 +360,10 @@ double NuwroReWeight_QEL::GetSystematicValue(NuwroSyst_t syst) {
     }
     default: { throw syst; }
   }
+  
+
+
+  
   return 0xdeadbeef;
 }
 
@@ -269,6 +379,29 @@ void NuwroReWeight_QEL::Reset(void) {
   fTwkDial_axial_3comp_beta = 0;
   fTwkDial_axial_3comp_theta = 0;
 
+  // bba07
+  for (int i = 0; i < 7; i++){
+    p_AEp_twk[i] = 0.0;
+    p_AMp_twk[i] = 0.0;
+    p_AEn_twk[i] = 0.0;
+    p_AMn_twk[i] = 0.0;
+    p_AAx_twk[i] = 0.0;
+  }
+
+  // Zexp
+  for (int i = 0; i < 10; i++){
+    fTwk_zexp_A[i] = 0.0;
+  }
+
+  fTwk_zexp_TC = 0.0;
+  fTwk_zexp_T0 = 0.0;
+
+  fTwk_zexp_NTerms = fDef_zexp_NTerms;
+  fTwk_zexp_Q4Limit = fDef_zexp_Q4Limit;
+
+  fDef_AxlFFQEL = -1;
+  fTwk_AxlFFQEL = fDef_AxlFFQEL;
+  
   this->Reconfigure();
 }
 
@@ -311,11 +444,26 @@ void NuwroReWeight_QEL::Reconfigure(void) {
     (1 + fError_axial_3comp_beta * fTwkDial_axial_3comp_beta);
 
   fError_axial_3comp_theta = fracerr->OneSigmaErr(kNuwro_Axl3comp_theta,
-                                                 (fTwkDial_axial_3comp_theta > 0) ? 1 : -1);
+						  (fTwkDial_axial_3comp_theta > 0) ? 1 : -1);
   fCurr_axial_3comp_theta = fDef_axial_3comp_theta *
     (1 + fError_axial_3comp_theta * fTwkDial_axial_3comp_theta);
-  
 
+  // Z Expansion 
+  fErr_zexp_TC = fracerr->OneSigmaErr(kNuwro_AxlZexp_TC,
+				      (fTwk_zexp_TC > 0) > 1 : -1);
+  fCur_zexp_TC = fDef_zexp_TC * (1. + fErr_zexp_TC * fTwk_zexp_TC);
+  
+  fErr_zexp_T0 = fracerr->OneSigmaErr(kNuwro_AxlZexp_T0,
+				      (fTwk_zexp_T0 > 0) > 1 : -1);
+  fCur_zexp_T0 = fDef_zexp_T0 * (1. + fErr_zexp_T0 * fTwk_zexp_T0);
+  
+  // A Terms
+  for (int i = 0; i < 10; i++){
+    fErr_zexp_A[i] = fracerr->OneSigmaErr(kNuwro_AxlZexp_A0+i,
+					  (fTwk_zexp_A[i] > 0) > 1 : -1);
+    fCur_zexp_A[i] = fDef_zexp_A[i] * (1. + fErr_zexp_A[i] * fTwk_zexp_A[i]);
+  }
+  
 #ifdef DEBUG_QE_REWEIGHT
   if ((fabs(fTwkDial_MaCCQE) > 1E-8) || (fabs(fTwkDial_MaNCEL) > 1E-8) ||
       (fabs(fTwkDial_MaNCEL_s) > 1E-8) || (fabs(fTwkDial_DeltaS) > 1E-8)) {
@@ -399,6 +547,27 @@ double NuwroReWeight_QEL::CalcWeight(SRW::SRWEvent const &srwev,
   rwparams.qel_axial_3comp_beta  = fCurr_axial_3comp_beta;
   rwparams.qel_axial_3comp_theta = fCurr_axial_3comp_theta;
 
+  // ZEXP
+  rwparams.zexp_q4limit = fTwk_zexp_Q4Limit;
+  rwparams.zexp_nterms = fTwk_zexp_NTerms;
+  rwparams.zexp_tc = fCur_zexp_TC;
+  rwparams.zexp_t0 = fCur_zexp_T0;
+
+  rwparams.zexp_a0 = fCur_zexp_A[0];
+  rwparams.zexp_a1 = fCur_zexp_A[1];
+  rwparams.zexp_a2 = fCur_zexp_A[2];
+  rwparams.zexp_a3 = fCur_zexp_A[3];
+  rwparams.zexp_a4 = fCur_zexp_A[4];
+  rwparams.zexp_a5 = fCur_zexp_A[5];
+  rwparams.zexp_a6 = fCur_zexp_A[6];
+  rwparams.zexp_a7 = fCur_zexp_A[7];
+  rwparams.zexp_a8 = fCur_zexp_A[8];
+  rwparams.zexp_a9 = fCur_zexp_A[9];
+
+  if (fTwk_AxlFFQEL != -1){
+    rwparams.qel_axial_ff_set = fTwk_AxlFFQEL;
+  }
+  
   double newweight = GetWghtPropToQEXSec(srwev, rwparams);
 
 #ifdef DEBUG_QE_REWEIGHT

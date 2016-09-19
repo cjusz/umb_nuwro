@@ -95,6 +95,30 @@ private:
   double fCurr_axial_3comp_beta;
   double fError_axial_3comp_beta;
 
+  // ZExp
+  int    fTwk_zexp_NTerms;
+  int    fDef_zexp_NTerms;
+  bool   fTwk_zexp_Q4Limit;
+  bool   fDef_zexp_Q4Limit;
+  
+  double fTwk_zexp_A[10];
+  double fDef_zexp_A[10];
+  double fCur_zexp_A[10];
+  double fErr_zexp_A[10];
+  
+  double fTwk_zexp_TC;
+  double fDef_zexp_TC;
+  double fCur_zexp_TC;
+  double fErr_zexp_TC;
+  
+  double fTwk_zexp_T0;
+  double fDef_zexp_T0;
+  double fCur_zexp_T0;
+  double fErr_zexp_T0;
+
+  // Alternative FF Dial
+  int fTwk_AxlFFQEL;
+  int fDef_AxlFFQEL
 };
 
 } // rew namespace

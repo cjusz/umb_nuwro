@@ -81,11 +81,28 @@ typedef enum ENuWroSyst {
   kNuwro_BBBA07_AAx6,
   kNuwro_BBBA07_AAx7,
 
+  kNuwro_AxlFFQEL,
+  
   kNuwro_Axl2comp_gamma,
   kNuwro_Axl2comp_alpha,
   kNuwro_Axl3comp_beta,
   kNuwro_Axl3comp_theta,
 
+  kNuwro_AxlZexp_TC,
+  kNuwro_AxlZexp_T0,
+  kNuwro_AxlZexp_NTerms,
+  kNuwro_AxlZexp_Q4Limit,
+  kNuwro_AxlZexp_A0,
+  kNuwro_AxlZexp_A1,
+  kNuwro_AxlZexp_A2,
+  kNuwro_AxlZexp_A3,
+  kNuwro_AxlZexp_A4,
+  kNuwro_AxlZexp_A5,
+  kNuwro_AxlZexp_A6,
+  kNuwro_AxlZexp_A7,
+  kNuwro_AxlZexp_A8,
+  kNuwro_AxlZexp_A9,
+  
   kNNuWroSystematics
 } NuwroSyst_t;
 

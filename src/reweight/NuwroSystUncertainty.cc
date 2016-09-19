@@ -128,4 +128,18 @@ void NuwroSystUncertainty::SetDefaults(void) {
   SetUncertainty(kNuwro_Axl3comp_beta, 1.0, 1.0);
   SetUncertainty(kNuwro_Axl3comp_theta, 1.0, 1.0);
 
+  SetUncertainty(kNuwro_AxlZexp_TC, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_T0, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A0, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A1, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A2, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A3, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A4, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A4, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A5, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A6, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A7, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A8, 1.0, 1.0);
+  SetUncertainty(kNuwro_AxlZexp_A9, 1.0, 1.0);
+  
 }

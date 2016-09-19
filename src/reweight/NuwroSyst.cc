@@ -81,11 +81,28 @@ std::string NuwroSyst::AsString(NuwroSyst_t syst){
     case kNuwro_BBBA07_AAx6: { return "kNuwro_BBBA07_AAx6"; }
     case kNuwro_BBBA07_AAx7: { return "kNuwro_BBBA07_AAx7"; }
 
+    case  kNuwro_AxlFFQEL:      { return "kNuwro_AxlFFQEL";   }
+      
     case kNuwro_Axl2comp_gamma: { return "kNuwro_Axl2comp_gamma"; }
     case kNuwro_Axl2comp_alpha: { return "kNuwro_Axl2comp_alpha"; }
     case kNuwro_Axl3comp_beta: { return "kNuwro_Axl3comp_beta"; }
     case kNuwro_Axl3comp_theta: { return "kNuwro_Axl3comp_theta"; }
-
+    
+    case  kNuwro_AxlZexp_TC:      { return "kNuwro_AxlZexp_TC"; }
+    case  kNuwro_AxlZexp_T0:      { return "kNuwro_AxlZexp_T0"; }
+    case  kNuwro_AxlZexp_NTerms:  { return "kNuwro_AxlZexp_NTerms"; }
+    case  kNuwro_AxlZexp_Q4Limit: { return "kNuwro_AxlZexp_Q4Limit"; }
+    case  kNuwro_AxlZexp_A0:      { return "kNuwro_AxlZexp_A0"; }
+    case  kNuwro_AxlZexp_A1:      { return "kNuwro_AxlZexp_A1"; }
+    case  kNuwro_AxlZexp_A2:      { return "kNuwro_AxlZexp_A2"; }
+    case  kNuwro_AxlZexp_A3:      { return "kNuwro_AxlZexp_A3"; }
+    case  kNuwro_AxlZexp_A4:      { return "kNuwro_AxlZexp_A4"; }
+    case  kNuwro_AxlZexp_A5:      { return "kNuwro_AxlZexp_A5"; }
+    case  kNuwro_AxlZexp_A6:      { return "kNuwro_AxlZexp_A6"; }
+    case  kNuwro_AxlZexp_A7:      { return "kNuwro_AxlZexp_A7"; }
+    case  kNuwro_AxlZexp_A8:      { return "kNuwro_AxlZexp_A8"; }
+    case  kNuwro_AxlZexp_A9:      { return "kNuwro_AxlZexp_A9"; }
+    
     default: { return "-"; }
 
   }
