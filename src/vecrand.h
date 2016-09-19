@@ -215,8 +215,8 @@ vec odp(x,y,z);
 /// random number from gaussian distribution; 
 double rand_gauss (double sigma, double average)
 {
-  double x1, x2, w, y1, y2;
-  
+  double x1, x2, w, y1;
+  //  double y2;
   do {
                  x1 = 2.0 * frandom() - 1.0;
                  x2 = 2.0 * frandom() - 1.0;
