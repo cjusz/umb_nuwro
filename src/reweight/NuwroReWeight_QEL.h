@@ -118,7 +118,7 @@ private:
 
   // Alternative FF Dial
   int fTwk_AxlFFQEL;
-  int fDef_AxlFFQEL
+  int fDef_AxlFFQEL;
 };
 
 } // rew namespace

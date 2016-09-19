@@ -74,7 +74,7 @@ NuwroReWeight_QEL::NuwroReWeight_QEL(params const &param) {
   fDef_DeltaS = param.delta_s;
   fCurr_DeltaS = fDef_DeltaS;
   
-  // 2 Comp Parameters                                                                                                                                                           
+  // 2 Comp Parameters                                                                                                                                           
   fTwkDial_axial_2comp_alpha = 0.0;
   fDef_axial_2comp_alpha = param.qel_axial_2comp_alpha;
   fCurr_axial_2comp_alpha = fTwkDial_axial_2comp_alpha;
@@ -92,6 +92,11 @@ NuwroReWeight_QEL::NuwroReWeight_QEL(params const &param) {
   fDef_axial_3comp_beta = param.qel_axial_3comp_beta;
   fCurr_axial_3comp_beta = fTwkDial_axial_3comp_beta;
 
+  // Z Expansion Parameters
+  
+
+  
+  // Form Factor Choice
   fDef_AxlFFQEL = -1;
   fTwk_AxlFFQEL = fDef_AxlFFQEL;
 
@@ -173,6 +178,11 @@ void NuwroReWeight_QEL::SetSystematic(NuwroSyst_t syst, double val) {
   if (syst == kNuwro_DeltaS_NCEL) {
     fTwkDial_DeltaS = val;
   }
+
+  if (syst == kNuwro_AxlFFQEL){
+    fTwk_AxlFFQEL = val;
+  }
+  
   if (syst == kNuwro_Axl2comp_alpha){
     fTwkDial_axial_2comp_alpha = val;
   }
@@ -254,6 +264,10 @@ double NuwroReWeight_QEL::GetSystematic(NuwroSyst_t syst) {
       return p_AAx_twk[i];
     }
   }
+
+  if (syst == kNuwro_AxlFFQEL){
+    return fTwk_AxlFFQEL;
+  }
   
   // Return Zexp
   for (int i = 0; i < 10; i++){
@@ -326,6 +340,10 @@ double NuwroReWeight_QEL::GetSystematicValue(NuwroSyst_t syst) {
     }
   }
 
+  if (syst == kNuwro_AxlFFQEL){
+    return fTwk_AxlFFQEL;
+  }
+
   // Return Zexp
   for (int i = 0; i < 10; i++){
     if (syst == kNuwro_AxlZexp_A1 + i){
@@ -358,11 +376,20 @@ double NuwroReWeight_QEL::GetSystematicValue(NuwroSyst_t syst) {
     case kNuwro_Axl3comp_theta: {
       return fCurr_axial_3comp_theta;
     }
+    case kNuwro_AxlZexp_TC: {
+      return fCur_zexp_TC;
+    }
+    case kNuwro_AxlZexp_T0: {
+      return fCur_zexp_T0;
+    }
+    case kNuwro_AxlZexp_NTerms: {
+      return fTwk_zexp_NTerms;
+    }
+    case kNuwro_AxlZexp_Q4Limit: {
+      return fTwk_zexp_Q4Limit;
+    }
     default: { throw syst; }
   }
-  
-
-
   
   return 0xdeadbeef;
 }
@@ -399,7 +426,6 @@ void NuwroReWeight_QEL::Reset(void) {
   fTwk_zexp_NTerms = fDef_zexp_NTerms;
   fTwk_zexp_Q4Limit = fDef_zexp_Q4Limit;
 
-  fDef_AxlFFQEL = -1;
   fTwk_AxlFFQEL = fDef_AxlFFQEL;
   
   this->Reconfigure();
@@ -425,6 +451,33 @@ void NuwroReWeight_QEL::Reconfigure(void) {
       fracerr->OneSigmaErr(kNuwro_DeltaS_NCEL, (fTwkDial_DeltaS > 0) ? 1 : -1);
   fCurr_DeltaS = fDef_DeltaS * (1 + fError_DeltaS * fTwkDial_DeltaS);
 
+  // BBBA07
+  int sgn;
+  for (int i = 0; i < 7; i++){
+
+    nuwro::rew::NuwroSyst_t bbba07enum;
+    bbba07enum = static_cast<nuwro::rew::NuwroSyst_t>(kNuwro_BBBA07_AEp1+i);
+    p_AEp[i] = p_AEp_def[i] *
+      (1.0 + p_AEp_twk[i] * fracerr->OneSigmaErr(bbba07enum,  (p_AEp_twk[i] > 0) ? 1 : -1));
+
+    bbba07enum = static_cast<nuwro::rew::NuwroSyst_t>(kNuwro_BBBA07_AMp1+i);
+    p_AMp[i] = p_AMp_def[i] *
+      (1.0 + p_AMp_twk[i] * fracerr->OneSigmaErr(bbba07enum,  (p_AMp_twk[i] > 0) ? 1 : -1));
+
+    bbba07enum = static_cast<nuwro::rew::NuwroSyst_t>(kNuwro_BBBA07_AEn1+i);
+    p_AEn[i] = p_AEn_def[i] *
+      (1.0 + p_AEn_twk[i] * fracerr->OneSigmaErr(bbba07enum,  (p_AEn_twk[i] > 0) ? 1 : -1));
+
+    bbba07enum = static_cast<nuwro::rew::NuwroSyst_t>(kNuwro_BBBA07_AMn1+i);
+    p_AMn[i] = p_AMn_def[i] *
+      (1.0 + p_AMn_twk[i] * fracerr->OneSigmaErr(bbba07enum,  (p_AMn_twk[i] > 0) ? 1 : -1));
+
+    bbba07enum = static_cast<nuwro::rew::NuwroSyst_t>(kNuwro_BBBA07_AAx1+i);
+    p_AAx[i] = p_AAx_def[i] *
+      (1.0 + p_AAx_twk[i] * fracerr->OneSigmaErr(bbba07enum,  (p_AAx_twk[i] > 0) ? 1 : -1));
+	
+  }
+  
 
   // Set 2 Comp Dials
   fError_axial_2comp_alpha = fracerr->OneSigmaErr(kNuwro_Axl2comp_alpha, 
@@ -450,17 +503,19 @@ void NuwroReWeight_QEL::Reconfigure(void) {
 
   // Z Expansion 
   fErr_zexp_TC = fracerr->OneSigmaErr(kNuwro_AxlZexp_TC,
-				      (fTwk_zexp_TC > 0) > 1 : -1);
+				      (fTwk_zexp_TC > 0) ? 1 : -1);
   fCur_zexp_TC = fDef_zexp_TC * (1. + fErr_zexp_TC * fTwk_zexp_TC);
   
   fErr_zexp_T0 = fracerr->OneSigmaErr(kNuwro_AxlZexp_T0,
-				      (fTwk_zexp_T0 > 0) > 1 : -1);
+				      (fTwk_zexp_T0 > 0) ? 1 : -1);
   fCur_zexp_T0 = fDef_zexp_T0 * (1. + fErr_zexp_T0 * fTwk_zexp_T0);
   
   // A Terms
   for (int i = 0; i < 10; i++){
-    fErr_zexp_A[i] = fracerr->OneSigmaErr(kNuwro_AxlZexp_A0+i,
-					  (fTwk_zexp_A[i] > 0) > 1 : -1);
+    nuwro::rew::NuwroSyst_t zexpenum;
+    zexpenum = static_cast<nuwro::rew::NuwroSyst_t>(kNuwro_AxlZexp_A0+i);
+    fErr_zexp_A[i] = fracerr->OneSigmaErr(zexpenum,
+					  (fTwk_zexp_A[i] > 0) ? 1 : -1);
     fCur_zexp_A[i] = fDef_zexp_A[i] * (1. + fErr_zexp_A[i] * fTwk_zexp_A[i]);
   }
   
@@ -542,31 +597,83 @@ double NuwroReWeight_QEL::CalcWeight(SRW::SRWEvent const &srwev,
   rwparams.qel_s_axial_mass = fCurr_MaNCEL_s;
   rwparams.delta_s = fCurr_DeltaS;
 
-  rwparams.qel_axial_2comp_alpha = fCurr_axial_2comp_alpha;
-  rwparams.qel_axial_2comp_gamma = fCurr_axial_2comp_gamma;
-  rwparams.qel_axial_3comp_beta  = fCurr_axial_3comp_beta;
-  rwparams.qel_axial_3comp_theta = fCurr_axial_3comp_theta;
-
-  // ZEXP
-  rwparams.zexp_q4limit = fTwk_zexp_Q4Limit;
-  rwparams.zexp_nterms = fTwk_zexp_NTerms;
-  rwparams.zexp_tc = fCur_zexp_TC;
-  rwparams.zexp_t0 = fCur_zexp_T0;
-
-  rwparams.zexp_a0 = fCur_zexp_A[0];
-  rwparams.zexp_a1 = fCur_zexp_A[1];
-  rwparams.zexp_a2 = fCur_zexp_A[2];
-  rwparams.zexp_a3 = fCur_zexp_A[3];
-  rwparams.zexp_a4 = fCur_zexp_A[4];
-  rwparams.zexp_a5 = fCur_zexp_A[5];
-  rwparams.zexp_a6 = fCur_zexp_A[6];
-  rwparams.zexp_a7 = fCur_zexp_A[7];
-  rwparams.zexp_a8 = fCur_zexp_A[8];
-  rwparams.zexp_a9 = fCur_zexp_A[9];
-
   if (fTwk_AxlFFQEL != -1){
     rwparams.qel_axial_ff_set = fTwk_AxlFFQEL;
   }
+
+  // BBBA07
+  if (rwparams.qel_axial_ff_set == 4){
+
+    rwparams.bba07_AEp1 = p_AEp[0];
+    rwparams.bba07_AEp2 = p_AEp[1];
+    rwparams.bba07_AEp3 = p_AEp[2];
+    rwparams.bba07_AEp4 = p_AEp[3];
+    rwparams.bba07_AEp5 = p_AEp[4];
+    rwparams.bba07_AEp6 = p_AEp[5];
+    rwparams.bba07_AEp7 = p_AEp[6];
+
+    rwparams.bba07_AMp1 = p_AMp[0];
+    rwparams.bba07_AMp2 = p_AMp[1];
+    rwparams.bba07_AMp3 = p_AMp[2];
+    rwparams.bba07_AMp4 = p_AMp[3];
+    rwparams.bba07_AMp5 = p_AMp[4];
+    rwparams.bba07_AMp6 = p_AMp[5];
+    rwparams.bba07_AMp7 = p_AMp[6];
+
+    rwparams.bba07_AEn1 = p_AEn[0];
+    rwparams.bba07_AEn2 = p_AEn[1];
+    rwparams.bba07_AEn3 = p_AEn[2];
+    rwparams.bba07_AEn4 = p_AEn[3];
+    rwparams.bba07_AEn5 = p_AEn[4];
+    rwparams.bba07_AEn6 = p_AEn[5];
+    rwparams.bba07_AEn7 = p_AEn[6];
+
+    rwparams.bba07_AMn1 = p_AMn[0];
+    rwparams.bba07_AMn2 = p_AMn[1];
+    rwparams.bba07_AMn3 = p_AMn[2];
+    rwparams.bba07_AMn4 = p_AMn[3];
+    rwparams.bba07_AMn5 = p_AMn[4];
+    rwparams.bba07_AMn6 = p_AMn[5];
+    rwparams.bba07_AMn7 = p_AMn[6];
+    
+    rwparams.bba07_AAx1 = p_AAx[0];
+    rwparams.bba07_AAx2 = p_AAx[1];
+    rwparams.bba07_AAx3 = p_AAx[2];
+    rwparams.bba07_AAx4 = p_AAx[3];
+    rwparams.bba07_AAx5 = p_AAx[4];
+    rwparams.bba07_AAx6 = p_AAx[5];
+    rwparams.bba07_AAx7 = p_AAx[6];
+
+  }
+  
+  // 2/3 COMP
+  if (rwparams.qel_axial_ff_set == 5 ||
+      rwparams.qel_axial_ff_set == 6){
+    rwparams.qel_axial_2comp_alpha = fCurr_axial_2comp_alpha;
+    rwparams.qel_axial_2comp_gamma = fCurr_axial_2comp_gamma;
+    rwparams.qel_axial_3comp_beta  = fCurr_axial_3comp_beta;
+    rwparams.qel_axial_3comp_theta = fCurr_axial_3comp_theta;
+  }
+  
+  // ZEXP
+  if (rwparams.qel_axial_ff_set == 7){
+    rwparams.zexp_q4limit = fTwk_zexp_Q4Limit;
+    rwparams.zexp_nterms = fTwk_zexp_NTerms;
+    rwparams.zexp_tc = fCur_zexp_TC;
+    rwparams.zexp_t0 = fCur_zexp_T0;
+
+    rwparams.zexp_a0 = fCur_zexp_A[0];
+    rwparams.zexp_a1 = fCur_zexp_A[1];
+    rwparams.zexp_a2 = fCur_zexp_A[2];
+    rwparams.zexp_a3 = fCur_zexp_A[3];
+    rwparams.zexp_a4 = fCur_zexp_A[4];
+    rwparams.zexp_a5 = fCur_zexp_A[5];
+    rwparams.zexp_a6 = fCur_zexp_A[6];
+    rwparams.zexp_a7 = fCur_zexp_A[7];
+    rwparams.zexp_a8 = fCur_zexp_A[8];
+    rwparams.zexp_a9 = fCur_zexp_A[9];
+  }
+
   
   double newweight = GetWghtPropToQEXSec(srwev, rwparams);
 
