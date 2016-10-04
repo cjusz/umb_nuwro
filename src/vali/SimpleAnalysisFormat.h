@@ -10,9 +10,6 @@
 #include "TObject.h"
 #include "TTree.h"
 
-static const Int_t kNThreshMax = 10;
-static const Int_t kMaxFSMomenta = 20;
-
 #include "RooTrackerEvent.h"
 
 //#define DEBUG_SAF
