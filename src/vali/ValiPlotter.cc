@@ -386,92 +386,46 @@ void PlotVar1D_2Dial(VarToPlot1D_2Dial &v, PlotData &pd) {
           " #Rightarrow " + v.Dial2Val2 + " " + v.Dial2Units,
       v.NXBins, v.XBinMin, v.XBinMax);
 
+  std::cout << "Plot string: " << v.PlotString << std::endl;
+
   Draw(pd.tree_dialm2, v.PlotString + " >> " + h_m2_name,
        std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
            ".0",
        "GOFF");
-  std::cout << "Plotting: \"" << std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
-           ".0"
-std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
-           ".0"
-std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
-           ".0"
-std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
-           "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
-           pd.nent_dial0 + ".0"
-std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
-           "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
-           ".0" << "\"" << std::endl;
+  std::cout << "Plotting: \"" << (std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
+           ".0") << "\"" << std::endl;
 
   Draw(pd.tree_dial0, v.PlotString + " >> " + h_0_name,
        std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
            ".0",
        "GOFF");
-  std::cout << "Plotting: \"" << std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
-           ".0"
-std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
-           ".0"
-std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
-           ".0"
-std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
-           "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
-           pd.nent_dial0 + ".0"
-std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
-           "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
-           ".0" << "\"" << std::endl;
+  std::cout << "Plotting: \"" << (std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
+           ".0") << "\"" << std::endl;
 
   Draw(pd.tree_dial2, v.PlotString + " >> " + h_2_name,
        std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
            ".0",
        "GOFF");
-  std::cout << "Plotting: \"" << std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
-           ".0"
-std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
-           ".0"
-std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
-           ".0"
-std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
-           "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
-           pd.nent_dial0 + ".0"
-std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
-           "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
-           ".0" << "\"" << std::endl;
+  std::cout << "Plotting: \"" << (std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
+           ".0") << "\"" << std::endl;
 
   Draw(pd.tree_dial0, v.PlotString + " >> " + h_0_wm2_name,
        std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
            "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
            pd.nent_dial0 + ".0",
        "GOFF");
-  std::cout << "Plotting: \"" << std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
-           ".0"
-std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
-           ".0"
-std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
-           ".0"
-std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
+  std::cout << "Plotting: \"" << (std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
            "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
-           pd.nent_dial0 + ".0"
-std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
-           "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
-           ".0" << "\"" << std::endl;
+           pd.nent_dial0 + ".0") << "\"" << std::endl;
 
   Draw(pd.tree_dial0, v.PlotString + " >> " + h_0_w2_name,
        std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
            "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
            ".0",
        "GOFF");
-  std::cout << "Plotting: \"" << std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
-           ".0"
-std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
-           ".0"
-std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
-           ".0"
-std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
-           "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
-           pd.nent_dial0 + ".0"
-std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
+  std::cout << "Plotting: \"" << (std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
            "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
-           ".0" << "\"" << std::endl;
+           ".0",) << "\"" << std::endl;
 
   h_dialm2->Scale(1.0, "width");
   h_dial0->Scale(1.0, "width");
