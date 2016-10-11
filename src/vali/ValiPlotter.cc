@@ -390,28 +390,88 @@ void PlotVar1D_2Dial(VarToPlot1D_2Dial &v, PlotData &pd) {
        std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
            ".0",
        "GOFF");
+  std::cout << "Plotting: \"" << std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
+           ".0"
+std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
+           ".0"
+std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
+           ".0"
+std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
+           "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
+           pd.nent_dial0 + ".0"
+std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
+           "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
+           ".0" << "\"" << std::endl;
 
   Draw(pd.tree_dial0, v.PlotString + " >> " + h_0_name,
        std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
            ".0",
        "GOFF");
+  std::cout << "Plotting: \"" << std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
+           ".0"
+std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
+           ".0"
+std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
+           ".0"
+std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
+           "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
+           pd.nent_dial0 + ".0"
+std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
+           "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
+           ".0" << "\"" << std::endl;
 
   Draw(pd.tree_dial2, v.PlotString + " >> " + h_2_name,
        std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
            ".0",
        "GOFF");
+  std::cout << "Plotting: \"" << std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
+           ".0"
+std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
+           ".0"
+std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
+           ".0"
+std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
+           "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
+           pd.nent_dial0 + ".0"
+std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
+           "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
+           ".0" << "\"" << std::endl;
 
   Draw(pd.tree_dial0, v.PlotString + " >> " + h_0_wm2_name,
        std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
            "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
            pd.nent_dial0 + ".0",
        "GOFF");
+  std::cout << "Plotting: \"" << std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
+           ".0"
+std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
+           ".0"
+std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
+           ".0"
+std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
+           "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
+           pd.nent_dial0 + ".0"
+std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
+           "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
+           ".0" << "\"" << std::endl;
 
   Draw(pd.tree_dial0, v.PlotString + " >> " + h_0_w2_name,
        std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
            "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
            ".0",
        "GOFF");
+  std::cout << "Plotting: \"" << std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dialm2 +
+           ".0"
+std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial0 +
+           ".0"
+std::string("(EvtWght*(" + v.SelectionString + "))/") + pd.nent_dial2 +
+           ".0"
+std::string("weight_") + v.Dial1Name + "_0_to_minus2_" + v.Dial2Name +
+           "_0_to_minus2*(EvtWght*(" + v.SelectionString + "))/" +
+           pd.nent_dial0 + ".0"
+std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
+           "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
+           ".0" << "\"" << std::endl;
 
   h_dialm2->Scale(1.0, "width");
   h_dial0->Scale(1.0, "width");
@@ -491,8 +551,8 @@ void PlotVar1D_2Dial(VarToPlot1D_2Dial &v, PlotData &pd) {
 
   ratioP->cd();
 
-  TH1D *h_dial_m2_rat = static_cast<TH1D *>(h_dial0_weight_m2->Clone());
-  TH1D *h_dial_2_rat = static_cast<TH1D *>(h_dial0_weight_2->Clone());
+  TH1D *h_dial_m2_rat = static_cast<TH1D *>(h_dial0_weight_m2->Clone((std::string(h_dial_m2_rat->GetName()) + "_rat").c_str()));
+  TH1D *h_dial_2_rat = static_cast<TH1D *>(h_dial0_weight_2->Clone((std::string(h_dial_2_rat->GetName()) + "_rat").c_str()));
   h_dial_m2_rat->Divide(h_dial0_weight_m2, h_dialm2, 1, 1, "b");
   h_dial_2_rat->Divide(h_dial0_weight_2, h_dial2, 1, 1, "b");
 
