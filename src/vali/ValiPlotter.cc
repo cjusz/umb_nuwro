@@ -505,8 +505,8 @@ void PlotVar1D_2Dial(VarToPlot1D_2Dial &v, PlotData &pd) {
 
   ratioP->cd();
 
-  TH1D *h_dial_m2_rat = static_cast<TH1D *>(h_dial0_weight_m2->Clone((std::string(h_dial_m2_rat->GetName()) + "_rat").c_str()));
-  TH1D *h_dial_2_rat = static_cast<TH1D *>(h_dial0_weight_2->Clone((std::string(h_dial_2_rat->GetName()) + "_rat").c_str()));
+  TH1D *h_dial_m2_rat = static_cast<TH1D *>(h_dial0_weight_m2->Clone((std::string(h_dialm2->GetName()) + "_rat").c_str()));
+  TH1D *h_dial_2_rat = static_cast<TH1D *>(h_dial0_weight_2->Clone((std::string(h_dial2->GetName()) + "_rat").c_str()));
   h_dial_m2_rat->Divide(h_dial0_weight_m2, h_dialm2, 1, 1, "b");
   h_dial_2_rat->Divide(h_dial0_weight_2, h_dial2, 1, 1, "b");
 
