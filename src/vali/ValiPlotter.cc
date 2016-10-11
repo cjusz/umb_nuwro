@@ -425,7 +425,7 @@ void PlotVar1D_2Dial(VarToPlot1D_2Dial &v, PlotData &pd) {
        "GOFF");
   std::cout << "Plotting: \"" << (std::string("weight_") + v.Dial1Name + "_0_to_2_" + v.Dial2Name +
            "_0_to_2*(EvtWght*(" + v.SelectionString + "))/" + pd.nent_dial0 +
-           ".0",) << "\"" << std::endl;
+           ".0") << "\"" << std::endl;
 
   h_dialm2->Scale(1.0, "width");
   h_dial0->Scale(1.0, "width");
