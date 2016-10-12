@@ -20,7 +20,7 @@ X *strTH1(std::string n, std::string t, int nb, double l, double h) {
 
 template <typename X>
 void Draw(X *rt, std::string p, std::string s, std::string o) {
-  std::cout << "Drawing: " << rt->GetName() << " -- " p << ",  " << s << ",  "
+  std::cout << "Drawing: " << rt->GetName() << " -- " << p << ",  " << s << ",  "
             << o << std::endl;
   std::cout << "Drew: ..."
             << rt->Draw(p.c_str(), s.c_str(), o.c_str(), _maxToPlot)
