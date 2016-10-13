@@ -186,7 +186,7 @@ void NuwroReWeight_SPP::Reconfigure(void) {
   fCurr_SPPBkgScale =
       fDef_SPPBkgScale +
       fDef_SPPBkgScale * fError_SPPBkgScale * fTwkDial_SPPBkgScale;
-
+#ifdef DEBUG_RES_REWEIGHT
   std::cout << "[INFO]: "
             << "MaRES: " << fCurr_MaRES << " {" << fDef_MaRES << "*(1+"
             << fError_MaRES << " * [" << fTwkDial_MaRES << "]}"
@@ -195,6 +195,7 @@ void NuwroReWeight_SPP::Reconfigure(void) {
             << ", SPPBkgScale: " << (fCurr_SPPBkgScale - 1.0) << " {"
             << fDef_SPPBkgScale << "*(1+" << fError_SPPBkgScale << " * ["
             << fTwkDial_SPPBkgScale << "]}" << std::endl;
+#endif
 }
 
 double GetEBind(event &nuwro_event, params const &rwparams) {

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 
 #include "TFile.h"
 #include "TTree.h"
@@ -78,9 +79,21 @@ int main(int argc, char const *argv[]) {
   std::vector<ENuWroSyst> Systs;
   std::vector<NuwroSystInfo *> SystInstances;
   std::vector<std::string> WghtEngineNames;
+  ENuWroSyst syst;
   while (argu < argc) {  // leave space for the other files we need
     std::string DialName(argv[argu]);
-    ENuWroSyst syst = NuwroSyst::FromString(DialName);
+    std::cout << "[INFO]: Parsing dial name: " << DialName << std::endl;
+    size_t epos = DialName.find_first_of('=');
+    if(epos != std::string::npos){
+      std::string DialVal = DialName.substr(epos+1);
+      DialName = DialName.substr(0,epos);
+      syst = NuwroSyst::FromString(DialName);
+      double uncert = strtod(DialVal.c_str(),0)/2.0; // cancel out default of move by 2 tweaks
+      std::cout << "[INFO]: Setting uncert for dial " << syst << " to " << (uncert*2.0) << std::endl;
+      NuwroSystUncertainty::Instance()->SetUncertainty(syst,uncert,uncert);
+    } else {
+      syst = NuwroSyst::FromString(DialName);
+    }
 
     NuwroWghtEngineI *wghtCalc = NULL;
     bool AddNew = true;
