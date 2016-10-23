@@ -82,20 +82,33 @@ endfunction()
 
 message(STATUS "Added GenROOTDictionary command.")
 
-execute_process (COMMAND root-config --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process (COMMAND root-config --libs OUTPUT_VARIABLE ROOT_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process (COMMAND root-config --version OUTPUT_VARIABLE ROOT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND root-config
+  --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND root-config
+  --libdir OUTPUT_VARIABLE ROOT_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND root-config
+  --version OUTPUT_VARIABLE ROOT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND root-config
+  --features OUTPUT_VARIABLE ROOT_FEATURES OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+set(ROOT_LD_FLAGS "-L${ROOT_LIBDIR}")
+
+set(ROOT_LIBS Core;Cint;RIO;Net;Hist;Graf;Graf3d;Gpad;Tree;Rint;Postscript;Matrix;Physics;MathCore;Thread;EG;EGPythia6;Geom)
+
 message ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
 message ( STATUS "[ROOT]: root-config --cflags: " ${ROOT_CXX_FLAGS} )
 message ( STATUS "[ROOT]: root-config --libs: " ${ROOT_LD_FLAGS} )
+message ( STATUS "[ROOT]: root-config --features: " ${ROOT_FEATURES} )
 
 
-if("${ROOT_VERSION}" MATCHES "6.*")
-  set(ISROOT6 TRUE)
-  message( STATUS "[ROOT]: Using ROOT 6.")
-else()
+# This check rarely works so forcing to false for the moment
+#
+# if("${ROOT_VERSION}" MATCHES "6.*")
+#   set(ISROOT6 TRUE)
+#   message( STATUS "[ROOT]: Using ROOT 6.")
+# else()
   set(ISROOT6 FALSE)
-endif()
+# endif()
 
 ################################## Pythia6 ####################################
 
@@ -104,7 +117,10 @@ if(DEFINED ENV{PYTHIA6})
 else()
   set(PYTHIA6LIBLOC)
 endif()
+set(PYTHIA_LIB Pythia6)
 
+############################### External Libs ##################################
+set(EXTERNAL_LIBS ${ROOT_LIBS};${PYTHIA_LIB})
 ################################## COMPILER ####################################
 
 set(NUWRO_CFLAGS "")
@@ -117,10 +133,10 @@ set(CMAKE_CXX_FLAGS_DEBUG " -O3 -g ${ROOT_CXX_FLAGS} ${CXX_WARNINGS} ${NUWRO_CFL
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -O3 ${ROOT_CXX_FLAGS} ${CXX_WARNINGS} ")
 
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS_DEBUG} ${ROOT_LD_FLAGS} -lEG -lEGPythia6 -lGeom -lMinuit ${PYTHIA6LIBLOC} -lPythia6")
+  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS_DEBUG} ${ROOT_LD_FLAGS} ${PYTHIA6LIBLOC}")
   set(CURRENT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
 elseif(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS_RELEASE} ${ROOT_LD_FLAGS} -lEG -lEGPythia6 -lGeom -lMinuit ${PYTHIA6LIBLOC} -lPythia6 -Wl,--no-as-needed")
+  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS_RELEASE} ${ROOT_LD_FLAGS} ${PYTHIA6LIBLOC} -Wl,--no-as-needed")
   set(CURRENT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_RELEASE})
 else()
   message(FATAL_ERROR "[ERROR]: Unknown CMAKE_BUILD_TYPE (\"${CMAKE_BUILD_TYPE}\"): Should be \"DEBUG\" or \"RELEASE\".")
@@ -139,14 +155,14 @@ endif()
 
 add_subdirectory(src)
 
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/setup.sh
+file(WRITE ${CMAKE_INSTALL_PREFIX}/setup.sh
   "source $ENV{ROOTSYS}/bin/thisroot.sh\n")
-file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export NUWRO=${PROJECT_SOURCE_DIR}\n")
-file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export NUWRO_INC=${CMAKE_INSTALL_PREFIX}/include\n")
-file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export PATH=${CMAKE_INSTALL_PREFIX}/bin:\${PATH}\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup.sh "export NUWRO=${PROJECT_SOURCE_DIR}\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup.sh "export NUWRO_INC=${CMAKE_INSTALL_PREFIX}/include\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup.sh "export PATH=${CMAKE_INSTALL_PREFIX}/bin:\${PATH}\n")
 if(DEFINED ENV{PYTHIA6})
-  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export PYTHIA6=$ENV{PYTHIA6}\n")
-  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export LD_LIBRARY_PATH=\${PYTHIA6}:\${LD_LIBRARY_PATH}\n")
+  file(APPEND ${CMAKE_INSTALL_PREFIX}/setup.sh "export PYTHIA6=$ENV{PYTHIA6}\n")
+  file(APPEND ${CMAKE_INSTALL_PREFIX}/setup.sh "export LD_LIBRARY_PATH=\${PYTHIA6}:\${LD_LIBRARY_PATH}\n")
 endif()
-file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/setup.sh "export LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:\${LD_LIBRARY_PATH}")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup.sh "export LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:\${LD_LIBRARY_PATH}")
 

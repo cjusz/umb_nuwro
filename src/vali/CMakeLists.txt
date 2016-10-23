@@ -20,7 +20,7 @@ add_executable(SAF_Analysis SAF_Analysis.cc SimpleAnalysisFormat.cc)
 
 set_target_properties(SAF_Analysis PROPERTIES COMPILE_FLAGS " -DSAF_STRICT")
 
-target_link_libraries(SAF_Analysis event)
+target_link_libraries(SAF_Analysis event;${EXTERNAL_LIBS})
 set_target_properties(SAF_Analysis PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 
 install(TARGETS SAF_Analysis DESTINATION bin)

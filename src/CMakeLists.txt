@@ -131,16 +131,16 @@ if(NOT NUWRO_SINGLE_LIB)
 endif()
 
 set_target_properties(nuwro PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-target_link_libraries(nuwro ${ROOTLIBS})
+target_link_libraries(nuwro ${EXTERNAL_LIBS})
 
 add_executable(nuwro2rootracker nuwro2rootracker.cc)
 target_link_libraries(nuwro2rootracker event)
-target_link_libraries(nuwro2rootracker ${ROOTLIBS})
+target_link_libraries(nuwro2rootracker ${EXTERNAL_LIBS})
 set_target_properties(nuwro2rootracker PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 
 add_executable(dumpParams dumpParams.cc)
 target_link_libraries(dumpParams event)
-target_link_libraries(dumpParams ${ROOTLIBS})
+target_link_libraries(dumpParams ${EXTERNAL_LIBS})
 set_target_properties(dumpParams PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 
 
