@@ -1,12 +1,18 @@
-1) Install root with pythia6
-2) Set ROOTSYS to the folder where root is installed
-3) In this directory type:
-  make
-4) Add nuwro/bin to your PATH
-5) Copy data/params.txt to your working directory and modify as needed.
-6) Type:
-  nuwro
-7) To analyse the output type:
-  myroot eventsout.root 
+# Prerequisites
+  * Build pythia6, set the environment variable `PYTHIA6` to point to the directory containing libPythia6.so
+  * Install ROOT with pythia6 enabled
+  
+# Build
+  * Make a build directory: `mkdir build; cd build`
+  * Configure the build with cmake: `cmake ..`
+  * Build: `make`
+  * Install: `make install` -- by default this will install to a subdirectory of the build directory named `$(uname)`.
+  * To set up the NuWro environment: `source /path/to/build/setup.sh`
+  
+# Getting events
+  * Run nominal NuWro: `nuwro`!
+  * Copy /path/to/source/data/params.txt to your working directory and modify as needed.
+  * Run NuWro with parameter override: `nuwro -i params.txt`
+  * Create an analysis flat tree: `SAF_Analysis -n eventsout.root SAF.eventsout.root`
 
 
