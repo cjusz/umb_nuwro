@@ -97,7 +97,7 @@ set(ROOT_LIBS Core;Cint;RIO;Net;Hist;Graf;Graf3d;Gpad;Tree;Rint;Postscript;Matri
 
 message ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
 message ( STATUS "[ROOT]: root-config --cflags: " ${ROOT_CXX_FLAGS} )
-message ( STATUS "[ROOT]: root-config --libs: " ${ROOT_LD_FLAGS} )
+message ( STATUS "[ROOT]: root-config --libdir: " ${ROOT_LD_FLAGS} )
 message ( STATUS "[ROOT]: root-config --features: " ${ROOT_FEATURES} )
 
 
@@ -107,8 +107,20 @@ message ( STATUS "[ROOT]: root-config --features: " ${ROOT_FEATURES} )
 #   set(ISROOT6 TRUE)
 #   message( STATUS "[ROOT]: Using ROOT 6.")
 # else()
+if(NOT DEFINED USEROOT6)
   set(ISROOT6 FALSE)
+else()
+  set(ISROOT6 ${USEROOT6})
+endif()
 # endif()
+
+if(ISROOT6)
+  #remove libCint if using ROOT6
+  list(REMOVE_AT ROOT_LIBS 1)
+endif()
+
+message ( STATUS "[ROOT]: root libraries: " ${ROOT_LIBS} )
+
 
 ################################## Pythia6 ####################################
 
