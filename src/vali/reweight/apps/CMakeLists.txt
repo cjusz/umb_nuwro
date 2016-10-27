@@ -25,13 +25,13 @@ set_target_properties(SimpleReweighterTest PROPERTIES COMPILE_FLAGS "${FOMP} ")
 
 add_executable(SimpleFitterProfiler SimpleFitterProfiler.cc)
 
-target_link_libraries(SimpleFitterProfiler reweight;${EVENT_LIBS};vali;${EXTERNAL_LIBS})
+target_link_libraries(SimpleFitterProfiler reweight;vali;${EVENT_LIBS};${EXTERNAL_LIBS})
 set_target_properties(SimpleFitterProfiler PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP} ")
 set_target_properties(SimpleFitterProfiler PROPERTIES COMPILE_FLAGS "${FOMP} ")
 
 add_executable(SimpleReweighterMemChecker SimpleReweighterMemChecker.cc)
 
-target_link_libraries(SimpleReweighterMemChecker reweight;${EVENT_LIBS};vali;${EXTERNAL_LIBS})
+target_link_libraries(SimpleReweighterMemChecker reweight;vali;${EVENT_LIBS};${EXTERNAL_LIBS})
 set_target_properties(SimpleReweighterMemChecker PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${FOMP} ")
 set_target_properties(SimpleReweighterMemChecker PROPERTIES COMPILE_FLAGS "${FOMP} ")
 
