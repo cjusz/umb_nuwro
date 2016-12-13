@@ -76,8 +76,12 @@ int main(int argc,char** argv)
 		
 		for (int i = 0; i < nofac; i++)
 		{		
-			cout<<((char)(97+i))<<" - "<<actions[i]; for (int k = 0; k < 50 - actions[i].length(); k++) cout<<" "; if (actions_on[i]) cout<<"*"; cout<<endl;
-			for (int k = 0; k < 50 + 5; k++) cout<<"-"; cout<<endl;
+			cout<<((char)(97+i))<<" - "<<actions[i]; 
+			for (int k = 0; k < 50 - actions[i].length(); k++) cout<<" "; 
+			if (actions_on[i]) cout<<"*"; 
+			cout<<endl;
+			for (int k = 0; k < 50 + 5; k++) cout<<"-"; 
+			cout<<endl;
 		}
 		
 		cout<<endl<<endl<<endl;
@@ -88,8 +92,12 @@ int main(int argc,char** argv)
 		
 		for (int i = 0; i < nofac; i++)
 		{		
-			cout<<((char)(97+i+3))<<" - "<<actions[i]; for (int k = 0; k < 50 - actions[i].length(); k++) cout<<" "; if (actions_on[i+3]) cout<<"*"; cout<<endl;
-			for (int k = 0; k < 50 + 5; k++) cout<<"-"; cout<<endl;
+			cout<<((char)(97+i+3))<<" - "<<actions[i]; 
+			for (int k = 0; k < 50 - actions[i].length(); k++) cout<<" "; 
+			if (actions_on[i+3]) cout<<"*"; 
+			cout<<endl;
+			for (int k = 0; k < 50 + 5; k++) cout<<"-"; 
+			cout<<endl;
 		}
 		
 		cout<<endl<<endl<<endl;
@@ -100,8 +108,12 @@ int main(int argc,char** argv)
 		
 		for (int i = 0; i < nofac; i++)
 		{		
-			cout<<((char)(97+i+6))<<" - "<<actions[i]; for (int k = 0; k < 50 - actions[i].length(); k++) cout<<" "; if (actions_on[i+6]) cout<<"*"; cout<<endl;
-			for (int k = 0; k < 50 + 5; k++) cout<<"-"; cout<<endl;
+			cout<<((char)(97+i+6))<<" - "<<actions[i]; 
+			for (int k = 0; k < 50 - actions[i].length(); k++) cout<<" "; 
+			if (actions_on[i+6]) cout<<"*"; 
+			cout<<endl;
+			for (int k = 0; k < 50 + 5; k++) cout<<"-"; 
+			cout<<endl;
 		}
 								
 		type = getch();

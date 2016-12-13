@@ -385,9 +385,8 @@ cohevent_bs (params & par, event & e, nucleus & jadro, bool cc, bool fast)
 		e.weight*=2*Corr/pow2(ma2/(ma2+Q2))*cos2thetac;
     }
 
-    if ((par.coh_mass_correction) && 
-       ((y > 1.0 - mlep / E) || (Q2 < Q2min)))
-        e.weight = 0.0;
+	if ((par.coh_mass_correction) && ((y > 1.0 - mlep / E) || (Q2 < Q2min)))
+		e.weight = 0.0;
 	
 	//Re-weight for A!=12 according to R-S model
 	if(A!=12)

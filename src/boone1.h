@@ -421,7 +421,7 @@ double boone::wdiff2(double &mul)
      mul=findmin(makefun(*this,&boone::wdiff2),0.1,10);
    double res=0;
    for(int i=0;i<20;i++)
-    for(int j=0;j<18;j++)
+     for(int j=0;j<18;j++)
        if(active[i][j])
        {
        	double y=exp(i,j)-nuw(i,j)*mul;
@@ -644,20 +644,21 @@ double boone::avg9(int i ,int j)
    }
 
 void boone::print()
-{ for(int i=0;i<20;i++)
+{ 
+	for(int i=0;i<20;i++)
     for(int j=0;j<18;j++)
     {
-	cout<< i<<"  "<<j<< "  ========================================="<<endl;
-	cout<< h2.GetBinContent(i+1,j+1)<<endl;
-	cout<< Nuw[i][j]<<endl;
+		cout<< i<<"  "<<j<< "  ========================================="<<endl;
+		cout<< h2.GetBinContent(i+1,j+1)<<endl;
+		cout<< Nuw[i][j]<<endl;
 	}
     for(int i=0;i<17;i++)
     {
-	cout<< i<< "  ========================================="<<endl;
-	cout<< h1.GetBinContent(i+1)<<endl;
-	cout<< Nuwq2[i]/binlen[i]<<endl;
-	cout<< h1mc.GetBinContent(i+1)<<endl;
-	cout<< Nuwmcq2[i]/binlen[i]<<endl;
+		cout<< i<< "  ========================================="<<endl;
+		cout<< h1.GetBinContent(i+1)<<endl;
+		cout<< Nuwq2[i]/binlen[i]<<endl;
+		cout<< h1mc.GetBinContent(i+1)<<endl;
+		cout<< Nuwmcq2[i]/binlen[i]<<endl;
     }
 }
 
