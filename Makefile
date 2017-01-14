@@ -7,15 +7,26 @@
 #DEBUG         = 1
 #DEBUGON = -g
 #CXXFLAGS      = `${ROOTSYS}/bin/root-config --cflags` -fPIC -O2 -I src 
-CXXFLAGS      = `${ROOTSYS}/bin/root-config --cflags` -fPIC -O2 $(DEBUGON) -I src -Wl,--no-as-needed -Wall -Wno-unused-variable -Wno-sign-compare -Wno-unused-function -Wno-unused-but-set-variable -Wno-reorder $(QTINCLUDEDIRS)
+CXXFLAGS      = `${ROOTSYS}/bin/root-config --cflags` -fPIC -O2 $(DEBUGON) -I src -I src/reweight -I src/vali -Wl,--no-as-needed -Wall -Wno-unused-variable -Wno-sign-compare -Wno-unused-function -Wno-unused-but-set-variable -Wno-reorder $(QTINCLUDEDIRS)
 #LDFLAGS       = `${ROOTSYS}/bin/root-config --libs` -lPythia6 -lEG -lEGPythia6 -lCore  -lCint -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lGeom -lpthread -lm -ldl -rdynamic -lHist $(QTLIBS)
-LDFLAGS       = `${ROOTSYS}/bin/root-config --libs` -lPythia6  -lEG -lEGPythia6 -lGeom -lMinuit $(QTLIBS)
+LDFLAGS       = `${ROOTSYS}/bin/root-config --libs` -lPythia6  -lEG -lEGPythia6 -lGeom -lGraf3d -lMatrix -lMinuit  $(QTLIBS)
 LD	      = g++
 CXX	      = g++
 CC 	      = g++
+FC        = gfortran
 
+#                SimpleFitterProfiler    SimpleReweighterMemChecker  
+#                SAF_Analysis DumpDialTweaks   \
+#                SimpleReweighter  SimpleReweighterProfiler \
+#                SimpleReweighterTest \
+#                SimpleReweighterTest \
+#                SimpleReweighterMemChecker\
+#                SimpleReweighterProfiler \
+#                SimpleFitterProfiler\
+#                SAF_Analysis DumpDialTweaks   \
 
-TRGTS =         $(addprefix $(BIN)/,nuwro kaskada myroot glue event1.so nuwro2neut nuwro2nuance nuwro2rootracker\
+TRGTS =         $(addprefix $(BIN)/, \
+                nuwro kaskada myroot glue event1.so nuwro2neut nuwro2nuance nuwro2rootracker\
                 dumpParams test_beam_rf test_makehist test_nucleus test_beam \
                 fsi niwg ladek_topologies test mb_nce_run ganalysis\
                 )
@@ -116,6 +127,64 @@ $(BIN)/ganalysis: $(addprefix src/, \
 #$(BIN)/plots:           src/event1.o src/event1dict.o src/pdg.o src/particle.o src/generatormt.o src/dirs.o
 
 $(BIN)/dumpParams:      src/dumpParams.o src/dirs.o
+		$(LINK.cc) $^ -o $@
+
+REWEIGHT_OBJS=$(EVENT_OBJS) \
+           src/reweight/NuwroReWeight.o \
+           src/reweight/NuwroReWeight_FlagNorm.o \
+           src/reweight/NuwroReWeight_QEL.o \
+           src/reweight/NuwroReWeight_SPP.o \
+           src/reweight/NuwroSyst.o \
+           src/reweight/NuwroSystSet.o \
+           src/reweight/NuwroSystUncertainty.o \
+           src/dis/alfa.o\
+           src/dis/charge.o\
+           src/dis/delta.o\
+           src/dis/parameters.o\
+           src/dis/singlepion.o\
+           src/dis/singlepionhadr.o\
+           src/dis/resevent2.o\
+           src/dis/dis2res.o\
+           src/dis/dis_cr_sec.o\
+           src/dis/LeptonMass.o\
+           src/dis/dis_cc_neutron.o\
+           src/dis/dis_cc_proton.o\
+           src/dis/dis_cr_sec.o\
+           src/dis/disevent.o\
+           src/dis/dis_nc.o\
+           src/dis/fragmentation.o\
+           src/dis/fragmentation_cc.o\
+           src/dis/fragmentation_nc.o\
+           src/dis/grv94_bodek.o\
+           src/dis/LeptonMass.o\
+           src/dis/parameters.o\
+           src/dis/resevent2.o\
+           src/dis/singlepion.o\
+           src/dis/singlepionhadr.o\
+           src/qel_sigma.o\
+           src/ff.cc
+
+$(BIN)/DumpDialTweaks: src/vali/reweight/apps/DumpDialTweaks.o $(REWEIGHT_OBJS)
+		$(LINK.cc) $^ -o $@
+
+$(BIN)/SimpleReweighter: src/vali/reweight/apps/SimpleReweighter.o $(REWEIGHT_OBJS)
+		$(LINK.cc) $^ -o $@
+
+$(BIN)/SimpleReweighterProfiler: src/vali/reweight/apps/SimpleReweighterProfiler.o $(REWEIGHT_OBJS)
+		$(LINK.cc) $^ -o $@
+
+
+$(BIN)/SimpleFitterProfiler: src/vali/reweight/apps/SimpleFitterProfiler.o  src/vali/ValiPlotter.o $(REWEIGHT_OBJS)  $(EVENT_OBJS)
+		$(LINK.cc) $^ -o $@
+                
+
+$(BIN)/SimpleReweighterMemChecker: src/vali/reweight/apps/SimpleReweighterMemChecker.o src/vali/ValiPlotter.o src/vali/SimpleAnalysisFormat.o src/RooTrackerEvent.o $(REWEIGHT_OBJS) $(EVENT_OBJS)
+		$(LINK.cc) $^ -o $@
+
+$(BIN)/SimpleReweighterTest: src/vali/reweight/apps/SimpleReweighterTest.o $(REWEIGHT_OBJS)
+		$(LINK.cc) $^ -o $@
+
+$(BIN)/SAF_Analysis: src/vali/SAF_Analysis.o src/vali/SAF_Analysis.o  src/vali/SimpleAnalysisFormat.o src/RooTrackerEvent.o $(REWEIGHT_OBJS)  $(EVENT_OBJS)
 		$(LINK.cc) $^ -o $@
 
 $(BIN)/test_nucleus:   src/generatormt.o src/nucleus.o src/test_nucleus.o src/pdg.o src/dirs.o  src/nucleus_data.o src/isotopes.o src/elements.o
