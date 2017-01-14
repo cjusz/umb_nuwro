@@ -1,5 +1,3 @@
-
-
 #include "dirs.h"
 #include <cstdlib>
 #include <cstring>

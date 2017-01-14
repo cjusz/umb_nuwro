@@ -753,6 +753,7 @@ void NuWro::real_events(params &p) {
   }
 
   // Save Flux and XSec Histograms
+  if(p.beam_type>2)
   if (p.OutputEvtHistogram || p.beam_type == 4 || p.beam_type == 5){
     cout << "Saving histogram" << endl;
     ff->cd();
